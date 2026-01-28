@@ -346,6 +346,19 @@ p.brand-tagline {
   }
 }
 
+/* Breakpoint for medium tablets (650-850px) */
+@media (min-width: 651px) and (max-width: 850px) {
+  .hero-chopsticks {
+    /* Center the meat portion on screen */
+    right: auto;
+    left: 35%;
+    /* Position so meat is near center */
+    width: 420px;
+    top: -60px;
+    transform: rotate(40deg);
+  }
+}
+
 /* Notices & Countdown */
 .notice-board {
   position: relative;
