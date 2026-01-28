@@ -291,96 +291,102 @@
             }
         }
 
-        function renderProducts(products) {
-            const container = document.getElementById('productsContainer');
-            container.innerHTML = '';
-
-            if (products.length === 0) {
-                container.innerHTML = '<div style="text-align:center; padding:20px; color:#888;">暫無商品，請點擊下方按鈕新增。</div>';
-            }
-
-            products.forEach((p, index) => {
-                const el = document.createElement('div');
-                el.className = 'product-item';
-                el.dataset.index = index;
-                el.innerHTML = `
+        products.forEach((p, index) => {
+            const el = document.createElement('div');
+            el.className = 'product-item';
+            el.dataset.index = index;
+            el.innerHTML = `
                     <div class="product-header">
                         <div style="display:flex; gap:10px; align-items:center;">
                             <span style="color:#666;">ID:</span>
-                            <input type="text" class="form-input p-id" value="${p.ID || ''}" style="width:100px; padding:4px;" placeholder="ID">
+                            <input type="text" class="form-input p-id" value="${p.ID || ''}" style="width:80px; padding:4px; text-align:center;" placeholder="ID">
                         </div>
-                        <button type="button" onclick="removeProduct(${index})" style="background:#ffdddd; color:red; border:1px solid red; border-radius:4px; padding:2px 8px; font-size:0.9rem;">
-                            🗑️ 刪除
-                        </button>
+                        <div style="flex-grow:1; display:flex; justify-content:flex-end; gap:10px;">
+                             <select class="form-input p-category" style="width:auto;">
+                                <option value="main" ${p.Category === 'main' ? 'selected' : ''}>🍗 主餐</option>
+                                <option value="addon" ${p.Category === 'addon' ? 'selected' : ''}>➕ 加購</option>
+                                <option value="snack" ${p.Category === 'snack' ? 'selected' : ''}>🍟 單點</option>
+                            </select>
+                            <button type="button" onclick="removeProduct(${index})" style="background:#fff0f0; color:#d32f2f; border:1px solid #ffcdd2; border-radius:4px; padding:4px 10px; font-size:0.85rem; cursor:pointer;">
+                                🗑️ 刪除
+                            </button>
+                        </div>
                     </div>
                     
-                    <div class="form-group">
-                        <label>商品類別</label>
-                        <select class="form-input p-category">
-                            <option value="main" ${p.Category === 'main' ? 'selected' : ''}>🍗 主餐 (Main)</option>
-                            <option value="addon" ${p.Category === 'addon' ? 'selected' : ''}>➕ 加購 (Addon)</option>
-                            <option value="snack" ${p.Category === 'snack' ? 'selected' : ''}>🍟 單點/其他 (Snack)</option>
-                        </select>
-                    </div>
-
-                    <div class="form-group">
-                        <label>品名</label>
-                        <input type="text" class="form-input p-name" value="${p.Name || ''}" placeholder="商品名稱">
-                    </div>
-                    <div class="form-group" style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
-                        <div>
-                            <label>價格</label>
+                    <div class="form-grid" style="grid-template-columns: 2fr 1fr;">
+                        <div class="form-group">
+                            <label class="form-label">商品名稱</label>
+                            <input type="text" class="form-input p-name" value="${p.Name || ''}" placeholder="例如: 茶香鵝肉">
+                        </div>
+                         <div class="form-group">
+                            <label class="form-label">原價</label>
                             <input type="number" class="form-input p-price" value="${p.Price || 0}">
                         </div>
-                        <div>
-                            <label>優惠價 (可空)</label>
-                            <input type="number" class="form-input p-discount" value="${p.DiscountPrice || ''}" placeholder="例如: 250">
-                        </div>
-                    </div>
-                    
-                    <div class="form-group" style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
-                         <div style="background:#fff4e6; padding:8px; border-radius:4px; border:1px dashed #ccc;">
-                            <label style="color:#cf6a00;">綁定優惠 ID (可空)</label>
-                            <input type="text" class="form-input p-promodesc" value="${p.PromoDesc || ''}" placeholder="例如: p1">
-                            <div style="font-size:0.75rem; color:#888; margin-top:2px;">(設定為 p1 即代表每買 2 份 p1 可享此優惠價)</div>
-                        </div>
-                        <div>
-                            <label>促銷標籤</label>
-                            <input type="text" class="form-input p-tag" value="${p.PromoTag || ''}" placeholder="例如: 加購優惠">
-                        </div>
                     </div>
 
                     <div class="form-group">
-                        <label>描述</label>
-                        <input type="text" class="form-input p-desc" value="${p.Description || ''}" placeholder="商品描述...">
+                        <label class="form-label">商品描述</label>
+                        <input type="text" class="form-input p-desc" value="${p.Description || ''}" placeholder="描述內容...">
                     </div>
+
                     <div class="form-group">
-                        <label>圖片路徑</label>
+                        <label class="form-label">圖片網址</label>
                         <input type="text" class="form-input p-image" value="${p.Image || ''}" placeholder="images/filename.png">
                     </div>
-                `;
-                container.appendChild(el);
-            });
 
-            // Ensure "Add Product" button exists at button
-            let addBtn = document.getElementById('addProductBtn');
-            if (!addBtn) {
-                addBtn = document.createElement('button');
-                addBtn.id = 'addProductBtn';
-                addBtn.type = 'button';
-                addBtn.innerText = '➕ 新增商品';
-                addBtn.style.width = '100%';
-                addBtn.style.padding = '10px';
-                addBtn.style.marginTop = '10px';
-                addBtn.style.background = '#eef';
-                addBtn.style.color = 'var(--primary-color)';
-                addBtn.style.border = '1px dashed var(--primary-color)';
-                addBtn.style.borderRadius = '6px';
-                addBtn.style.cursor = 'pointer';
-                addBtn.onclick = addProduct;
-                // Insert after container
-                container.parentNode.appendChild(addBtn);
-            }
+                    <!-- Promo Section -->
+                    <div style="background:#f9f9f9; padding:15px; border-radius:6px; border:1px solid #eee; margin-top:10px;">
+                        <div style="font-size:0.9rem; font-weight:bold; color:#555; margin-bottom:10px;">🏷️ 優惠與促銷設定</div>
+                        <div class="form-grid" style="grid-template-columns: 1fr 1fr;">
+                             <div class="form-group">
+                                <label class="form-label">優惠價格 (可空)</label>
+                                <input type="number" class="form-input p-discount" value="${p.DiscountPrice || ''}" placeholder="折扣後的金額">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">促銷標籤</label>
+                                <input type="text" class="form-input p-tag" value="${p.PromoTag || ''}" placeholder="例如: 加購優惠">
+                            </div>
+                        </div>
+                        
+                        <div style="display:flex; gap:10px; align-items:flex-end; background:#fff; padding:10px; border:1px dashed #ddd; border-radius:4px;">
+                            <div class="form-group" style="flex:1; margin-bottom:0;">
+                                <label class="form-label" style="font-size:0.85rem;">綁定條件 ID</label>
+                                <input type="text" class="form-input p-promodesc" value="${p.PromoDesc || ''}" placeholder="例如: p1">
+                            </div>
+                            <div style="padding-bottom:10px; color:#888;">x</div>
+                            <div class="form-group" style="width:80px; margin-bottom:0;">
+                                <label class="form-label" style="font-size:0.85rem;">數量</label>
+                                <input type="number" class="form-input p-promotargetqty" value="${p.PromoTargetQty || '2'}" placeholder="2">
+                            </div>
+                            <div style="padding-bottom:8px; font-size:0.85rem; color:#666; flex:2;">
+                                (買 <span style="font-weight:bold;">N</span> 個指定 ID，可享此優惠)
+                            </div>
+                        </div>
+                    </div>
+                `;
+            container.appendChild(el);
+        });
+
+        // Ensure "Add Product" button exists at button
+        let addBtn = document.getElementById('addProductBtn');
+        if (!addBtn) {
+            addBtn = document.createElement('button');
+            addBtn.id = 'addProductBtn';
+            addBtn.type = 'button';
+            addBtn.innerText = '➕ 新增商品';
+            addBtn.style.width = '100%';
+            addBtn.style.padding = '12px';
+            addBtn.style.marginTop = '15px';
+            addBtn.style.background = '#eef';
+            addBtn.style.color = 'var(--primary-color)';
+            addBtn.style.border = '1px dashed var(--primary-color)';
+            addBtn.style.borderRadius = '6px';
+            addBtn.style.fontSize = '1rem';
+            addBtn.style.cursor = 'pointer';
+            addBtn.onclick = addProduct;
+            // Insert after container
+            container.parentNode.appendChild(addBtn);
+        }
         }
 
         function syncProductsFromDOM() {
@@ -396,7 +402,8 @@
                     Description: div.querySelector('.p-desc').value,
                     PromoTag: div.querySelector('.p-tag').value,
                     Image: div.querySelector('.p-image').value,
-                    PromoDesc: div.querySelector('.p-promodesc').value // Stores Target ID
+                    PromoDesc: div.querySelector('.p-promodesc').value,
+                    PromoTargetQty: div.querySelector('.p-promotargetqty').value
                 });
             });
             currentProducts = updated;
@@ -413,7 +420,8 @@
                 Image: '',
                 DiscountPrice: '',
                 PromoTag: '',
-                PromoDesc: ''
+                PromoDesc: '',
+                PromoTargetQty: ''
             });
             renderProducts(currentProducts);
         }

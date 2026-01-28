@@ -197,7 +197,8 @@ function renderApp(productsArray, settingsMsg) {
             discountPrice: p.DiscountPrice || null,
             image: p.Image || 'images/goose-whole.png', // Fallback image
             promoTag: p.PromoTag || '',
-            promoDesc: p.PromoDesc || '' // This stores the Target Product ID for conditional discounts
+            promoDesc: p.PromoDesc || '', // This stores the Target Product ID for conditional discounts
+            promoTargetQty: parseInt(p.PromoTargetQty) || 2 // Default 2 if not strict
         };
         cart[id] = 0;
 
@@ -284,8 +285,10 @@ function calculateTotal() {
             // Check target count
             const targetCount = getCount(targetId);
 
-            // Rule: 2 Targets -> 1 Discount
-            const discountableCount = Math.floor(targetCount / 2);
+            // Rule: N Targets -> 1 Discount
+            // Default 2 if undefined (safety)
+            const requiredQty = product.promoTargetQty || 2;
+            const discountableCount = Math.floor(targetCount / requiredQty);
 
             let discountedQty = 0;
             let regularQty = 0;

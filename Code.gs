@@ -194,7 +194,7 @@ function saveSettings(doc, data) {
   if (data.products && Array.isArray(data.products)) {
     var productSheet = doc.getSheetByName('Products');
     productSheet.clearContents();
-    productSheet.appendRow(['ID', 'Name', 'Price', 'Description', 'Image', 'Category', 'DiscountPrice', 'PromoTag', 'PromoDesc']);
+    productSheet.appendRow(['ID', 'Name', 'Price', 'Description', 'Image', 'Category', 'DiscountPrice', 'PromoTag', 'PromoDesc', 'PromoTargetQty']);
     
     data.products.forEach(function(p) {
       productSheet.appendRow([
@@ -206,7 +206,8 @@ function saveSettings(doc, data) {
         p.Category || '',
         p.DiscountPrice || '',
         p.PromoTag || '',
-        p.PromoDesc || ''
+        p.PromoDesc || '',
+        p.PromoTargetQty || ''
       ]);
     });
   }
