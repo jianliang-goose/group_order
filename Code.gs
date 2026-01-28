@@ -116,13 +116,17 @@ function doPost(e) {
     }
 
     // Dispatch based on action
+    // Dispatch based on action
     if (data.action === 'updateOrder') {
       return updateOrder(doc, data);
     } else if (data.action === 'saveSettings') {
       return saveSettings(doc, data);
+    } else if (data.items || data.totalAmount || data.phone || !data.action) {
+       // Heuristic: If it has order-like fields OR no action (legacy support), treat as order
+       return createOrder(doc, data);
     } else {
-      // Default: Create New Order
-      return createOrder(doc, data);
+       return ContentService.createTextOutput(JSON.stringify({result: "error", error: "Unknown action"}))
+         .setMimeType(ContentService.MimeType.JSON);
     }
 
   } catch (e) {
