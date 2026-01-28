@@ -55,15 +55,22 @@ button {
 }
 
 /* Header / Hero */
-/* Hero Section Redesign */
+/* Hero Section Redesign - Dramatic Table */
 .hero-section {
   position: relative;
-  background: radial-gradient(circle at 70% 50%, #fffbf5, #ffeacc);
-  /* Warm glow */
-  padding: 20px 0 60px;
+  /* Table Background */
+  background:
+    linear-gradient(to right, rgba(0, 0, 0, 0.7) 0%, rgba(0, 0, 0, 0.3) 50%, rgba(0, 0, 0, 0.0) 100%),
+    /* Text Legibility Gradient */
+    url('hero_table.jpg');
+  background-size: cover;
+  background-position: center;
+  padding: 40px 0 80px;
   overflow: hidden;
   margin-bottom: 50px;
-  box-shadow: 0 10px 30px rgba(185, 78, 0, 0.1);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  color: white;
+  /* Switch text to white for dark wood */
 }
 
 .hero-container {
@@ -76,113 +83,123 @@ button {
   display: flex;
   align-items: center;
   gap: 12px;
-  margin-bottom: 40px;
+  margin-bottom: 60px;
 }
 
 .brand-logo-small {
-  width: 50px;
-  height: 50px;
+  width: 60px;
+  height: 60px;
   border-radius: 50%;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
 }
 
 .brand-name-mini {
   font-weight: 700;
-  font-size: 1.2rem;
-  color: var(--text-dark);
-  letter-spacing: 1px;
+  font-size: 1.4rem;
+  color: #fff;
+  /* White text */
+  letter-spacing: 2px;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
 }
 
 /* Content Layout */
 .hero-content {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 40% 60%;
+  /* More space for visuals */
   align-items: center;
-  gap: 40px;
-  min-height: 400px;
+  /* gap: 0; Overlap allowed */
+  min-height: 500px;
+  /* Taller */
 }
 
 /* Text Side */
 .hero-text {
   text-align: left;
   z-index: 10;
+  padding-right: 20px;
 }
 
 h1.brand-title {
-  font-size: 3.2rem;
-  color: var(--primary-dark);
-  margin-bottom: 20px;
-  line-height: 1.2;
-  text-shadow: none;
-  /* Reset passed shadow */
+  font-size: 4rem;
+  /* Giant Title */
+  color: #fff;
+  margin-bottom: 25px;
+  line-height: 1.1;
+  text-shadow: 0 4px 20px rgba(0, 0, 0, 0.8);
 }
 
 p.brand-tagline {
-  font-size: 1.2rem;
-  color: var(--text-light);
-  margin-bottom: 30px;
+  font-size: 1.4rem;
+  color: #eee;
+  margin-bottom: 40px;
   max-width: 100%;
-  text-shadow: none;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.8);
+  font-weight: 400;
+  line-height: 1.6;
 }
 
 .cta-button {
   display: inline-block;
-  padding: 15px 40px;
+  padding: 18px 45px;
   background: var(--primary-color);
+  /* Keep brand color */
   color: white;
   text-decoration: none;
-  border-radius: 30px;
+  border-radius: 50px;
   font-weight: 700;
-  font-size: 1.2rem;
-  box-shadow: 0 4px 15px rgba(185, 78, 0, 0.3);
-  transition: transform 0.3s, box-shadow 0.3s;
+  font-size: 1.3rem;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  transition: transform 0.3s, box-shadow 0.3s, background 0.3s;
+  border: 2px solid rgba(255, 255, 255, 0.1);
 }
 
 .cta-button:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 8px 25px rgba(185, 78, 0, 0.4);
+  transform: translateY(-5px) scale(1.05);
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.6);
+  background: #d85e00;
 }
 
-/* Visual Side */
+/* Visual Side - Dramatic Scale */
 .hero-visuals {
   position: relative;
-  height: 400px;
+  height: 600px;
+  /* Tall container */
   display: flex;
   align-items: center;
   justify-content: center;
+  /* Allow bleeding out */
 }
 
 .hero-plate {
-  width: 100%;
-  max-width: 450px;
+  width: 140%;
+  /* Over-sized */
+  max-width: 800px;
   object-fit: contain;
-  filter: drop-shadow(0 20px 40px rgba(0, 0, 0, 0.2));
-  animation: floatPlate 6s ease-in-out infinite;
+  /* Dramatic Shadow on Table */
+  filter: drop-shadow(0 30px 50px rgba(0, 0, 0, 0.6));
+  transform: rotate(-5deg);
+  /* Casual angle */
+  margin-left: -50px;
+  /* Pull closer to text */
+  margin-top: 50px;
+  transition: transform 0.5s ease;
 }
 
 .hero-chopsticks {
   position: absolute;
-  top: 0;
-  right: -20px;
-  width: 200px;
-  filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.15));
-  animation: floatChopsticks 4s ease-in-out infinite;
+  top: 5%;
+  right: -10%;
+  width: 450px;
+  /* Giant Chopsticks */
+  filter: drop-shadow(20px 30px 30px rgba(0, 0, 0, 0.4));
   transform-origin: center right;
+  z-index: 5;
+  animation: floatChopsticksDramatic 6s ease-in-out infinite;
 }
 
-@keyframes floatPlate {
-
-  0%,
-  100% {
-    transform: translateY(0);
-  }
-
-  50% {
-    transform: translateY(-10px);
-  }
-}
-
-@keyframes floatChopsticks {
+@keyframes floatChopsticksDramatic {
 
   0%,
   100% {
@@ -190,43 +207,57 @@ p.brand-tagline {
   }
 
   50% {
-    transform: translateY(-5px) rotate(2deg);
+    transform: translateY(-20px) rotate(3deg);
   }
 }
 
 /* Mobile Responsive */
-@media (max-width: 768px) {
+@media (max-width: 900px) {
   .hero-content {
     grid-template-columns: 1fr;
     text-align: center;
     min-height: auto;
+    gap: 20px;
   }
 
   .hero-text {
     order: 2;
     text-align: center;
+    padding-right: 0;
   }
 
+  .hero-section {
+    padding: 20px 0 40px;
+  }
+
+  h1.brand-title {
+    font-size: 2.5rem;
+  }
+
+  /* On mobile, stack them nicely */
   .hero-visuals {
     order: 1;
-    height: 300px;
+    height: 350px;
+    margin-bottom: -50px;
+    /* Overlay text slightly */
   }
 
   .hero-plate {
-    max-width: 300px;
+    width: 100%;
+    max-width: 450px;
+    margin: 0;
+    transform: rotate(0deg);
   }
 
   .hero-chopsticks {
-    width: 150px;
-    right: 0;
+    width: 200px;
+    top: -10px;
+    right: -20px;
   }
 
   .brand-bar {
     justify-content: center;
-  }
-
-  h1.brand-title {
-    font-size: 2.2rem;
+    margin-bottom: 20px;
   }
 }
 
