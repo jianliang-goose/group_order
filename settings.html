@@ -257,10 +257,8 @@
             await loadSettings();
         });
 
-        // Shared CSV URLs (Copy from script.js)
-        const PRODUCTS_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQd_Hya-NceMfrF79aibzVQ8SoUqHI5nL_DHpGhtG8lCDUT4y_iNA2XzS9R-uJqWJtNk2XaMfP86vvL/pub?gid=598932868&single=true&output=csv";
-        const SETTINGS_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQd_Hya-NceMfrF79aibzVQ8SoUqHI5nL_DHpGhtG8lCDUT4y_iNA2XzS9R-uJqWJtNk2XaMfP86vvL/pub?gid=1252826992&single=true&output=csv";
-        const CORS_PROXY = "https://api.allorigins.win/raw?url=";
+        // Shared CSV URLs are already loaded from script.js
+        // If script.js fails, these will be undefined and catch block will handle it.
 
         async function loadSettings() {
             try {
