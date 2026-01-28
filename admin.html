@@ -216,63 +216,161 @@
             }
         }
 
-        function renderProductStats(stats) {
+        function calculateAndRenderStats(orders) {
             // Find or Create Container
             let container = document.getElementById('productStatsContainer');
             if (!container) {
                 const statsGrid = document.querySelector('.stats-grid');
-                // Insert after main stats grid
                 const section = document.createElement('div');
                 section.id = 'productStatsContainer';
                 section.className = 'data-table-wrapper';
                 section.style.marginBottom = '30px';
-                section.style.padding = '20px';
+                section.style.padding = '25px';
+                section.style.background = '#fff';
+                section.style.borderRadius = '10px';
+                section.style.boxShadow = '0 2px 5px rgba(0,0,0,0.05)';
+
+                // Header with Title and Filter
+                const headerDiv = document.createElement('div');
+                headerDiv.style.display = 'flex';
+                headerDiv.style.alignItems = 'center';
+                headerDiv.style.marginBottom = '20px';
+                headerDiv.style.borderBottom = '1px solid #eee';
+                headerDiv.style.paddingBottom = '15px';
 
                 const title = document.createElement('h3');
                 title.innerText = '📊 商品銷售統計';
-                title.style.margin = '0 0 15px 0';
+                title.style.margin = '0';
                 title.style.color = '#333';
+                title.style.fontSize = '1.3rem';
+
+                // Status Filter Dropdown
+                const filterWrapper = document.createElement('div');
+                filterWrapper.style.marginLeft = 'auto';
+                filterWrapper.style.display = 'flex';
+                filterWrapper.style.alignItems = 'center';
+                filterWrapper.style.gap = '10px';
+
+                const filterLabel = document.createElement('span');
+                filterLabel.innerText = '狀態篩選:';
+                filterLabel.style.fontSize = '0.9rem';
+                filterLabel.style.color = '#666';
+
+                const filterSelect = document.createElement('select');
+                filterSelect.id = 'statsStatusFilter';
+                filterSelect.className = 'status-select'; // Reuse existing style class or custom
+                filterSelect.style.padding = '6px 12px';
+                filterSelect.style.borderRadius = '6px';
+                filterSelect.style.border = '1px solid #ddd';
+                filterSelect.style.fontSize = '0.9rem';
+                filterSelect.style.cursor = 'pointer';
+                filterSelect.style.outline = 'none';
+
+                filterSelect.innerHTML = `
+                    <option value="ALL">📋 全部 (已取消除外)</option>
+                    <option value="未處理">🔴 未處理</option>
+                    <option value="已確認">🔵 已確認</option>
+                    <option value="已出貨/待取">🟢 已出貨/待取</option>
+                    <option value="已完成">🏁 已完成</option>
+                `;
+
+                filterSelect.addEventListener('change', () => {
+                    if (window.currentOrdersData) {
+                        calculateAndRenderStats(window.currentOrdersData);
+                    }
+                });
+
+                filterWrapper.appendChild(filterLabel);
+                filterWrapper.appendChild(filterSelect);
+                headerDiv.appendChild(title);
+                headerDiv.appendChild(filterWrapper);
 
                 const content = document.createElement('div');
                 content.id = 'productStatsContent';
                 content.style.display = 'grid';
-                content.style.gridTemplateColumns = 'repeat(auto-fill, minmax(200px, 1fr))';
-                content.style.gap = '15px';
+                content.style.gridTemplateColumns = 'repeat(auto-fill, minmax(220px, 1fr))';
+                content.style.gap = '20px';
 
-                section.appendChild(title);
+                section.appendChild(headerDiv);
                 section.appendChild(content);
-
-                // Insert into DOM
                 statsGrid.parentNode.insertBefore(section, statsGrid.nextSibling);
                 container = section;
             }
 
+            // Calculation Logic
+            const filterValue = document.getElementById('statsStatusFilter') ? document.getElementById('statsStatusFilter').value : 'ALL';
+            const productStats = {};
+            let matchCount = 0;
+
+            orders.forEach(o => {
+                if (o.Status === '已取消') return;
+                if (filterValue !== 'ALL' && o.Status !== filterValue) return;
+
+                matchCount++;
+                const itemsStr = o.Items || "";
+                const itemParts = itemsStr.split(/,\s*/);
+                itemParts.forEach(part => {
+                    const match = part.match(/(.+)x(\d+)$/);
+                    if (match) {
+                        const name = match[1].trim();
+                        const qty = parseInt(match[2]);
+                        if (productStats[name]) {
+                            productStats[name] += qty;
+                        } else {
+                            productStats[name] = qty;
+                        }
+                    }
+                });
+            });
+
+            // Render Results
             const contentDiv = document.getElementById('productStatsContent');
-            contentDiv.innerHTML = ''; // Clear old
+            contentDiv.innerHTML = '';
 
-            // Sort by Qty desc
-            const sortedItems = Object.entries(stats).sort((a, b) => b[1] - a[1]);
+            const sortedItems = Object.entries(productStats).sort((a, b) => b[1] - a[1]);
 
-            if (sortedItems.length === 0) {
-                contentDiv.innerHTML = '<div style="color:#777;">尚無銷售數據</div>';
+            if (matchCount === 0 || sortedItems.length === 0) {
+                contentDiv.innerHTML = `
+                    <div style="grid-column: 1/-1; text-align:center; padding:30px; color:#999; background:#f9f9f9; border-radius:8px;">
+                        無符合條件的銷售數據
+                    </div>`;
                 return;
             }
 
             sortedItems.forEach(([name, qty]) => {
                 const card = document.createElement('div');
-                card.style.background = '#f9f9f9';
-                card.style.padding = '10px';
-                card.style.borderRadius = '5px';
-                card.style.borderLeft = '4px solid var(--primary-color)';
-                card.innerHTML = `
-                    <div style="font-size:0.9rem; color:#555; margin-bottom:5px;">${name}</div>
-                    <div style="font-size:1.5rem; font-weight:bold; color:#333;">${qty}</div>
+                card.style.background = '#fff';
+                card.style.padding = '15px';
+                card.style.borderRadius = '8px';
+                card.style.border = '1px solid #eee';
+                card.style.boxShadow = '0 2px 4px rgba(0,0,0,0.03)';
+                card.style.display = 'flex';
+                card.style.flexDirection = 'column';
+                card.style.position = 'relative';
+                card.style.overflow = 'hidden';
+
+                // Left accent bar
+                const bar = document.createElement('div');
+                bar.style.position = 'absolute';
+                bar.style.left = '0';
+                bar.style.top = '0';
+                bar.style.bottom = '0';
+                bar.style.width = '5px';
+                bar.style.background = 'var(--primary-color)';
+                card.appendChild(bar);
+
+                card.innerHTML += `
+                    <div style="font-size:0.95rem; color:#666; margin-bottom:8px; padding-left:10px; line-height:1.4;">${name}</div>
+                    <div style="font-size:1.8rem; font-weight:800; color:#333; padding-left:10px;">${qty} <span style="font-size:0.9rem; font-weight:normal; color:#999;">份</span></div>
                 `;
                 contentDiv.appendChild(card);
             });
         }
 
         function renderDashboard(orders) {
+            // Save globally for filtering logic
+            window.currentOrdersData = orders;
+
             // Stats
             try {
                 // 1. Basic Counts
@@ -286,26 +384,8 @@
                 }, 0);
                 document.getElementById('totalRevenue').innerText = `$${Math.round(revenue).toLocaleString()}`;
 
-                // 3. Product Sales Statistics
-                const productStats = {};
-                orders.forEach(o => {
-                    if (o.Status === '已取消') return; // Skip cancelled
-                    const itemsStr = o.Items || "";
-                    const itemParts = itemsStr.split(/,\s*/);
-                    itemParts.forEach(part => {
-                        const match = part.match(/(.+)x(\d+)$/);
-                        if (match) {
-                            const name = match[1].trim();
-                            const qty = parseInt(match[2]);
-                            if (productStats[name]) {
-                                productStats[name] += qty;
-                            } else {
-                                productStats[name] = qty;
-                            }
-                        }
-                    });
-                });
-                renderProductStats(productStats);
+                // 3. Product Sales Statistics (Enhanced)
+                calculateAndRenderStats(orders);
 
                 const pending = orders.filter(o => o.Status === '未處理').length;
                 document.getElementById('pendingOrders').innerText = pending;
