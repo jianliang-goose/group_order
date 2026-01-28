@@ -287,25 +287,109 @@ p.brand-tagline {
   flex-wrap: wrap;
 }
 
+/* Improved Store Links */
+.store-search-help {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 10px;
+}
+
+.store-link {
+  display: inline-flex;
+  align-items: center;
+  padding: 8px 12px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  text-decoration: none;
+  font-weight: 600;
+  transition: all 0.2s ease;
+  border: 1px solid transparent;
+}
+
+.link-711 {
+  background-color: #fff0f0;
+  color: #E11F26;
+  border-color: #ffd0d0;
+}
+
+.link-711:hover {
+  background-color: #ffe0e0;
+  transform: translateY(-1px);
+}
+
+.link-fm {
+  background-color: #f0fff4;
+  color: #00A84D;
+  border-color: #d0f0d8;
+}
+
+.link-fm:hover {
+  background-color: #e0ffe8;
+  transform: translateY(-1px);
+}
+
+/* Polished Radio Option */
 .radio-option {
   display: flex;
   align-items: center;
   gap: 8px;
   cursor: pointer;
-  padding: 10px 16px;
-  border: 1px solid #E0E0E0;
-  border-radius: var(--radius-sm);
-  transition: all 0.2s;
+  padding: 12px 18px;
+  background: #fff;
+  border: 2px solid #EEE;
+  /* Thicker border */
+  border-radius: 12px;
+  /* Smooth corners */
+  transition: all 0.2s ease;
+  font-weight: 500;
 }
 
 .radio-option:hover {
-  background: #FFF8F0;
-  border-color: var(--primary-color);
+  background: #fffaf5;
+  border-color: #FFDAB9;
 }
 
 .radio-option input[type="radio"]:checked+span {
-  font-weight: 600;
+  font-weight: 700;
   color: var(--primary-color);
+}
+
+/* Quantity Control - Tactile Feel */
+.quantity-control {
+  background: #f0f0f0;
+  padding: 5px;
+  border-radius: 40px;
+  /* Capsule shape */
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.05);
+  /* Inner shadow depth */
+}
+
+.qty-btn {
+  width: 38px;
+  height: 38px;
+  background: white;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  font-weight: bold;
+}
+
+.qty-btn:active {
+  transform: scale(0.92);
+}
+
+/* Product Card Polish */
+.product-card {
+  border: none;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.08), 0 5px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+.product-image {
+  transition: transform 0.5s ease;
+}
+
+.product-card:hover .product-image {
+  transform: scale(1.05);
+  /* Subtle zoom */
 }
 
 .radio-option input[type="radio"]:checked {
