@@ -215,6 +215,62 @@
             }
         }
 
+        function renderProductStats(stats) {
+            // Find or Create Container
+            let container = document.getElementById('productStatsContainer');
+            if (!container) {
+                const statsGrid = document.querySelector('.stats-grid');
+                // Insert after main stats grid
+                const section = document.createElement('div');
+                section.id = 'productStatsContainer';
+                section.className = 'data-table-wrapper';
+                section.style.marginBottom = '30px';
+                section.style.padding = '20px';
+
+                const title = document.createElement('h3');
+                title.innerText = '📊 商品銷售統計';
+                title.style.margin = '0 0 15px 0';
+                title.style.color = '#333';
+
+                const content = document.createElement('div');
+                content.id = 'productStatsContent';
+                content.style.display = 'grid';
+                content.style.gridTemplateColumns = 'repeat(auto-fill, minmax(200px, 1fr))';
+                content.style.gap = '15px';
+
+                section.appendChild(title);
+                section.appendChild(content);
+
+                // Insert into DOM
+                statsGrid.parentNode.insertBefore(section, statsGrid.nextSibling);
+                container = section;
+            }
+
+            const contentDiv = document.getElementById('productStatsContent');
+            contentDiv.innerHTML = ''; // Clear old
+
+            // Sort by Qty desc
+            const sortedItems = Object.entries(stats).sort((a, b) => b[1] - a[1]);
+
+            if (sortedItems.length === 0) {
+                contentDiv.innerHTML = '<div style="color:#777;">尚無銷售數據</div>';
+                return;
+            }
+
+            sortedItems.forEach(([name, qty]) => {
+                const card = document.createElement('div');
+                card.style.background = '#f9f9f9';
+                card.style.padding = '10px';
+                card.style.borderRadius = '5px';
+                card.style.borderLeft = '4px solid var(--primary-color)';
+                card.innerHTML = `
+                    <div style="font-size:0.9rem; color:#555; margin-bottom:5px;">${name}</div>
+                    <div style="font-size:1.5rem; font-weight:bold; color:#333;">${qty}</div>
+                `;
+                contentDiv.appendChild(card);
+            });
+        }
+
         // Stats
         try {
             document.getElementById('totalOrders').innerText = orders.length;
