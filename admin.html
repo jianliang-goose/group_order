@@ -208,10 +208,11 @@
             try {
                 const response = await fetch(`${GAS_API_URL}?type=orders`);
                 const orders = await response.json();
+                console.log("Orders Data:", orders);
                 renderDashboard(orders);
             } catch (e) {
-                console.error(e);
-                alert("無法載入訂單資料");
+                console.error("Fetch/Render Error:", e);
+                alert("無法載入訂單資料: " + e.message);
             }
         }
 
