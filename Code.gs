@@ -1,7 +1,7 @@
 function doGet(e) {
-  var lock = LockService.getScriptLock();
-  lock.tryLock(10000); 
-
+  // Optimization: No lock needed for simple reads (Config/Orders)
+  // This drastically improves concurrent load times.
+  
   try {
     var doc = SpreadsheetApp.getActiveSpreadsheet();
     
@@ -16,8 +16,6 @@ function doGet(e) {
   } catch (error) {
     return ContentService.createTextOutput(JSON.stringify({error: error.message}))
       .setMimeType(ContentService.MimeType.JSON);
-  } finally {
-    lock.releaseLock();
   }
 }
 
