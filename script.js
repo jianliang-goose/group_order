@@ -195,7 +195,9 @@ function renderApp(productsArray, settingsMsg) {
             name: p.Name,
             price: p.Price,
             discountPrice: p.DiscountPrice || null,
-            image: p.Image || 'images/goose-whole.png' // Fallback image
+            image: p.Image || 'images/goose-whole.png', // Fallback image
+            promoTag: p.PromoTag || '',
+            promoDesc: p.PromoDesc || '' // This stores the Target Product ID for conditional discounts
         };
         cart[id] = 0;
 
@@ -252,71 +254,93 @@ function calculateTotal() {
     let itemTotal = 0;
     const itemsListHtml = []; // To store summary HTML lines
 
-    // 1. Calculate P1 (1/4 Goose)
-    if (products.p1) {
-        const count = cart.p1 || 0;
-        if (count > 0) {
-            const price = count * products.p1.price;
-            itemTotal += price;
-            itemsListHtml.push(`
-                <div class="summary-item-row">
-                    <span class="summary-item-name">${products.p1.name} x ${count}</span>
-                    <span class="summary-item-price">$${price.toLocaleString()}</span>
-                </div>
-            `);
-        }
-    }
+    // Helper to get total cart count for an ID
+    const getCount = (id) => cart[id] || 0;
 
-    // 2. Calculate P2 (Sauce) with Logic
-    if (products.p2) {
-        const p1Count = cart.p1 || 0;
-        const discountableSauceCount = Math.floor(p1Count / 2); // Every 2 goose -> 1 cheap sauce
-        const actualSauceCount = cart.p2 || 0;
+    // First pass: Calculate "Main" items cost that are not addons
+    // Actually we iterate all products. 
+    // We need to handle Discount Logic Dynamically.
 
-        let discountedSauces = 0;
-        let regularSauces = 0;
+    // Logic:
+    // 1. Iterate all cart items.
+    // 2. If an item has 'PromoDesc' (e.g., 'p1'), it means it is a CONDITIONAL ADDON.
+    //    It checks count of 'p1'.
+    //    Rule: Buy 2 'p1' get 1 'this' at discount.
+    //    We calculate how many can be discounted.
+    // 3. Else standard price.
 
-        if (actualSauceCount <= discountableSauceCount) {
-            discountedSauces = actualSauceCount;
-        } else {
-            discountedSauces = discountableSauceCount;
-            regularSauces = actualSauceCount - discountableSauceCount;
-        }
-
-        const sauceDataset = products.p2;
-        const discountPrice = sauceDataset.discountPrice || sauceDataset.price;
-
-        if (discountedSauces > 0) {
-            const price = discountedSauces * discountPrice;
-            itemTotal += price;
-            itemsListHtml.push(`
-                <div class="summary-item-row">
-                    <span class="summary-item-name">${products.p2.name} (加購優惠) x ${discountedSauces}</span>
-                    <span class="summary-item-price">$${price.toLocaleString()}</span>
-                </div>
-            `);
-        }
-
-        if (regularSauces > 0) {
-            const price = regularSauces * products.p2.price;
-            itemTotal += price;
-            itemsListHtml.push(`
-                <div class="summary-item-row">
-                    <span class="summary-item-name">${products.p2.name} x ${regularSauces}</span>
-                    <span class="summary-item-price">$${price.toLocaleString()}</span>
-                </div>
-            `);
-        }
-    }
-
-    // 3. Other items
     Object.keys(cart).forEach(id => {
-        if (id !== 'p1' && id !== 'p2' && cart[id] > 0) {
-            const price = cart[id] * products[id].price;
+        const count = cart[id];
+        if (count <= 0) return;
+
+        const product = products[id];
+        let finalPrice = 0;
+
+        // Dynamic Discount Logic
+        // Check if this product has a "PromoDesc" which holds the Target ID (e.g. "p1")
+        // And if it has a discount price.
+        if (product.promoDesc && product.discountPrice) {
+            const targetId = product.promoDesc.trim();
+            // Check target count
+            const targetCount = getCount(targetId);
+
+            // Rule: 2 Targets -> 1 Discount
+            const discountableCount = Math.floor(targetCount / 2);
+
+            let discountedQty = 0;
+            let regularQty = 0;
+
+            if (count <= discountableCount) {
+                discountedQty = count;
+            } else {
+                discountedQty = discountableCount;
+                regularQty = count - discountableCount;
+            }
+
+            // Calc
+            if (discountedQty > 0) {
+                const sub = discountedQty * product.discountPrice;
+                finalPrice += sub;
+                itemsListHtml.push(`
+                    <div class="summary-item-row">
+                        <span class="summary-item-name">${product.name} (${product.promoTag || '優惠'}) x ${discountedQty}</span>
+                        <span class="summary-item-price">$${sub.toLocaleString()}</span>
+                    </div>
+                `);
+            }
+            if (regularQty > 0) {
+                const sub = regularQty * product.price;
+                finalPrice += sub;
+                itemsListHtml.push(`
+                    <div class="summary-item-row">
+                        <span class="summary-item-name">${product.name} x ${regularQty}</span>
+                        <span class="summary-item-price">$${sub.toLocaleString()}</span>
+                    </div>
+                `);
+            }
+
+            itemTotal += finalPrice;
+
+        } else if (product.discountPrice && !product.promoDesc) {
+            // Unconditional Discount (if enabled later, currently user asked for conditional)
+            // If just discount price exists but NO condition, is it a sale?
+            // User asked: "Generic discount field". 
+            // Let's assume if NO condition (empty PromoDesc) but HAS DiscountPrice -> Direct Sale Price.
+            const price = count * product.discountPrice;
             itemTotal += price;
             itemsListHtml.push(`
                 <div class="summary-item-row">
-                    <span class="summary-item-name">${products[id].name} x ${cart[id]}</span>
+                    <span class="summary-item-name">${product.name} (特價) x ${count}</span>
+                    <span class="summary-item-price">$${price.toLocaleString()}</span>
+                </div>
+            `);
+        } else {
+            // Regular Price
+            const price = count * product.price;
+            itemTotal += price;
+            itemsListHtml.push(`
+                <div class="summary-item-row">
+                    <span class="summary-item-name">${product.name} x ${count}</span>
                     <span class="summary-item-price">$${price.toLocaleString()}</span>
                 </div>
             `);

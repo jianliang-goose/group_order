@@ -337,19 +337,26 @@
                             <input type="number" class="form-input p-discount" value="${p.DiscountPrice || ''}" placeholder="例如: 250">
                         </div>
                     </div>
-                    <div class="form-group">
-                        <label>描述</label>
-                        <input type="text" class="form-input p-desc" value="${p.Description || ''}" placeholder="商品描述...">
-                    </div>
+                    
                     <div class="form-group" style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+                         <div style="background:#fff4e6; padding:8px; border-radius:4px; border:1px dashed #ccc;">
+                            <label style="color:#cf6a00;">綁定優惠 ID (可空)</label>
+                            <input type="text" class="form-input p-promodesc" value="${p.PromoDesc || ''}" placeholder="例如: p1">
+                            <div style="font-size:0.75rem; color:#888; margin-top:2px;">(設定為 p1 即代表每買 2 份 p1 可享此優惠價)</div>
+                        </div>
                         <div>
                             <label>促銷標籤</label>
                             <input type="text" class="form-input p-tag" value="${p.PromoTag || ''}" placeholder="例如: 加購優惠">
                         </div>
-                        <div>
-                            <label>圖片路徑</label>
-                            <input type="text" class="form-input p-image" value="${p.Image || ''}" placeholder="images/filename.png">
-                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>描述</label>
+                        <input type="text" class="form-input p-desc" value="${p.Description || ''}" placeholder="商品描述...">
+                    </div>
+                    <div class="form-group">
+                        <label>圖片路徑</label>
+                        <input type="text" class="form-input p-image" value="${p.Image || ''}" placeholder="images/filename.png">
                     </div>
                 `;
                 container.appendChild(el);
@@ -389,7 +396,7 @@
                     Description: div.querySelector('.p-desc').value,
                     PromoTag: div.querySelector('.p-tag').value,
                     Image: div.querySelector('.p-image').value,
-                    PromoDesc: '' // Internal field
+                    PromoDesc: div.querySelector('.p-promodesc').value // Stores Target ID
                 });
             });
             currentProducts = updated;
@@ -405,7 +412,8 @@
                 Description: '',
                 Image: '',
                 DiscountPrice: '',
-                PromoTag: ''
+                PromoTag: '',
+                PromoDesc: ''
             });
             renderProducts(currentProducts);
         }
