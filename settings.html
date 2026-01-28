@@ -257,10 +257,45 @@
             await loadSettings();
         });
 
+        // Shared CSV URLs (Copy from script.js)
+        const PRODUCTS_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQd_Hya-NceMfrF79aibzVQ8SoUqHI5nL_DHpGhtG8lCDUT4y_iNA2XzS9R-uJqWJtNk2XaMfP86vvL/pub?gid=598932868&single=true&output=csv";
+        const SETTINGS_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQd_Hya-NceMfrF79aibzVQ8SoUqHI5nL_DHpGhtG8lCDUT4y_iNA2XzS9R-uJqWJtNk2XaMfP86vvL/pub?gid=1252826992&single=true&output=csv";
+        const CORS_PROXY = "https://api.allorigins.win/raw?url=";
+
         async function loadSettings() {
             try {
-                const response = await fetch(`${GAS_API_URL}?type=config`);
-                const data = await response.json();
+                // Optimization: Load from CSV for speed (Google Sheet -> File -> Publish to Web -> CSV)
+                // This avoids the 5-10s GAS cold start.
+                // Note: There is a 1-5 min cache delay on Google's side after saving.
+
+                // Helper to fetch CSV
+                const fetchCSV = async (url) => {
+                    try {
+                        const res = await fetch(url);
+                        if (!res.ok) throw new Error("Direct Request Failed");
+                        return await res.text();
+                    } catch (e) {
+                        // Fallback to proxy
+                        const res = await fetch(CORS_PROXY + encodeURIComponent(url));
+                        return await res.text();
+                    }
+                };
+
+                const [prodCsv, setCsv] = await Promise.all([
+                    fetchCSV(PRODUCTS_CSV_URL),
+                    fetchCSV(SETTINGS_CSV_URL)
+                ]);
+
+                const data = {
+                    products: parseCSV(prodCsv),
+                    settings: {}
+                };
+
+                // transform settings array to obj
+                const setArr = parseCSV(setCsv);
+                setArr.forEach(r => {
+                    if (r.Key) data.settings[r.Key] = r.Value;
+                });
 
                 // 1. Fill Settings
                 const form = document.getElementById('settingsForm');
@@ -481,6 +516,30 @@
                 btn.innerHTML = originalText;
                 btn.style.opacity = '1';
             }
+        }
+        // CSV Parser Helper
+        function parseCSV(csvText) {
+            const lines = csvText.trim().split(/\r?\n/);
+            if (lines.length < 2) return [];
+            const headers = lines[0].split(',').map(h => h.trim());
+            const result = [];
+            for (let i = 1; i < lines.length; i++) {
+                const currentLine = lines[i];
+                if (!currentLine.trim()) continue;
+                // Simple split for robustness if no quotes used, but let's assume simple CSV for now
+                // or just use script.js one if available.
+                // Re-implementing a basic split:
+                const values = currentLine.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
+                const row = {};
+                headers.forEach((header, index) => {
+                    let val = values[index] || '';
+                    val = val.trim();
+                    if (val.startsWith('"') && val.endsWith('"')) val = val.slice(1, -1);
+                    row[header] = val;
+                });
+                result.push(row);
+            }
+            return result;
         }
     </script>
 </body>
