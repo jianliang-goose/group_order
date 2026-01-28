@@ -55,32 +55,39 @@ button {
 }
 
 /* Header / Hero */
+/* Header / Hero */
 header {
+  position: relative;
   text-align: center;
-  padding: 60px 0 40px;
-  background-image: linear-gradient(to bottom, #fff0e0, var(--bg-color));
+  padding: 100px 20px;
+  background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.3)), url('hero_banner.png');
+  background-size: cover;
+  background-position: center;
+  color: white;
+  margin-bottom: 40px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
 }
 
 .logo-container {
-  margin-bottom: 20px;
-}
-
-.logo-img {
-  max-width: 180px;
-  border-radius: 50%;
-  /* If logo needs it */
+  display: none;
+  /* Hide old logo container */
 }
 
 h1.brand-title {
-  font-size: 2.5rem;
-  color: var(--primary-dark);
-  margin-bottom: 10px;
-  letter-spacing: 1px;
+  font-size: 3.5rem;
+  color: #FFF;
+  margin-bottom: 15px;
+  letter-spacing: 2px;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
 }
 
 p.brand-tagline {
-  font-size: 1.1rem;
-  color: var(--text-light);
+  font-size: 1.3rem;
+  color: #f0f0f0;
+  max-width: 600px;
+  margin: 0 auto;
+  text-shadow: 0 1px 5px rgba(0, 0, 0, 0.5);
+  font-weight: 500;
 }
 
 /* Notices & Countdown */
