@@ -310,8 +310,8 @@ p.brand-tagline {
   .hero-plate {
     width: 170%;
     /* Slightly adjusted scale */
-    left: -10%;
-    /* Shifted right to center the meat (was -35%) */
+    left: -35%;
+    /* Center better */
     top: -40px;
     /* Move up */
     max-width: none;
@@ -321,12 +321,21 @@ p.brand-tagline {
   .hero-chopsticks {
     width: 450px;
     /* Much larger bite on mobile */
-    top: -30px;
-    right: auto;
-    left: 50%;
-    transform: translateX(-25%) rotate(10deg);
-    /* Align left side (meat) to center */
-    /* rotate(10deg) for a natural angle */
+    top: -60px;
+    right: -80px;
+    transform: rotate(45deg);
+  }
+
+  @media (max-width: 650px) {
+    .hero-chopsticks {
+      /* Make left edge close to center */
+      right: auto;
+      left: 45%;
+      /* Starts from near middle */
+      width: 380px;
+      /* Slightly smaller to fit */
+      top: -50px;
+    }
   }
 }
 
