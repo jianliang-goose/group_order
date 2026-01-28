@@ -264,66 +264,80 @@
 
         async function loadSettings() {
             try {
-                // Optimization: Load from CSV for speed (Google Sheet -> File -> Publish to Web -> CSV)
-                // This avoids the 5-10s GAS cold start.
-                // Note: There is a 1-5 min cache delay on Google's side after saving.
+                // Method 1: Try Loading from CSV (Fastest)
+                try {
+                    console.log("Attempting CSV load...");
+                    const fetchCSV = async (url) => {
+                        try {
+                            const res = await fetch(url);
+                            if (!res.ok) throw new Error("Direct Request Failed");
+                            return await res.text();
+                        } catch (e) {
+                            const res = await fetch(CORS_PROXY + encodeURIComponent(url));
+                            return await res.text();
+                        }
+                    };
 
-                // Helper to fetch CSV
-                const fetchCSV = async (url) => {
-                    try {
-                        const res = await fetch(url);
-                        if (!res.ok) throw new Error("Direct Request Failed");
-                        return await res.text();
-                    } catch (e) {
-                        // Fallback to proxy
-                        const res = await fetch(CORS_PROXY + encodeURIComponent(url));
-                        return await res.text();
-                    }
-                };
+                    const [prodCsv, setCsv] = await Promise.all([
+                        fetchCSV(PRODUCTS_CSV_URL),
+                        fetchCSV(SETTINGS_CSV_URL)
+                    ]);
 
-                const [prodCsv, setCsv] = await Promise.all([
-                    fetchCSV(PRODUCTS_CSV_URL),
-                    fetchCSV(SETTINGS_CSV_URL)
-                ]);
+                    const data = {
+                        products: parseCSV(prodCsv),
+                        settings: {}
+                    };
 
-                const data = {
-                    products: parseCSV(prodCsv),
-                    settings: {}
-                };
+                    const setArr = parseCSV(setCsv);
+                    setArr.forEach(r => {
+                        if (r.Key) data.settings[r.Key] = r.Value;
+                    });
 
-                // transform settings array to obj
-                const setArr = parseCSV(setCsv);
-                setArr.forEach(r => {
-                    if (r.Key) data.settings[r.Key] = r.Value;
-                });
+                    console.log("CSV Load Success");
+                    applySettings(data);
+                    document.getElementById('pageLoader').style.display = 'none';
+                    return; // Exit if successful
 
-                // 1. Fill Settings
-                const form = document.getElementById('settingsForm');
-                for (const key in data.settings) {
-                    let value = data.settings[key];
-                    if (typeof value === 'string' && value.match(/^\d{4}-\d{2}-\d{2}T/)) {
-                        const d = new Date(value);
-                        const year = d.getFullYear();
-                        const month = String(d.getMonth() + 1).padStart(2, '0');
-                        const day = String(d.getDate()).padStart(2, '0');
-                        value = `${year}/${month}/${day}`;
-                    }
-                    if (form.elements[key]) {
-                        form.elements[key].value = value;
-                    }
+                } catch (csvErr) {
+                    console.warn("CSV Load failed, falling back to API...", csvErr);
                 }
 
-                // 2. Render Products
-                currentProducts = data.products || [];
-                renderProducts(currentProducts);
+                // Method 2: Fallback to GAS API (Slower but reliable)
+                console.log("Fetching from GAS API...");
+                const response = await fetch(`${GAS_API_URL}?type=config`);
+                const data = await response.json();
 
+                console.log("API Load Success");
+                applySettings(data);
                 document.getElementById('pageLoader').style.display = 'none';
 
             } catch (e) {
                 console.error(e);
-                alert("無法載入設定");
+                alert("無法載入設定 (請確認網址或網路狀態)");
                 document.getElementById('pageLoader').innerHTML = '<p style="color:red">載入失敗，請重新整理。</p>';
             }
+        }
+
+        function applySettings(data) {
+            // 1. Fill Settings
+            const form = document.getElementById('settingsForm');
+            for (const key in data.settings) {
+                let value = data.settings[key];
+                if (typeof value === 'string' && value.match(/^\d{4}-\d{2}-\d{2}T/)) {
+                    const d = new Date(value);
+                    const year = d.getFullYear();
+                    const month = String(d.getMonth() + 1).padStart(2, '0');
+                    const day = String(d.getDate()).padStart(2, '0');
+                    value = `${year}/${month}/${day}`;
+                }
+                if (form.elements[key]) {
+                    form.elements[key].value = value;
+                }
+            }
+
+            // 2. Render Products
+            currentProducts = data.products || [];
+            renderProducts(currentProducts);
         }
 
         products.forEach((p, index) => {
