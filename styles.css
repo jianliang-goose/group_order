@@ -300,8 +300,8 @@ p.brand-tagline {
   /* Visuals move to bottom and bleed out */
   .hero-visuals {
     order: 2;
-    height: 550px;
-    /* Increased height to show full plate */
+    height: 360px;
+    /* Reduced height to remove empty space below plate */
     overflow: visible;
     margin-bottom: -20px;
     /* Less negative margin to push board down */
@@ -330,8 +330,8 @@ p.brand-tagline {
     .hero-chopsticks {
       /* Make left edge close to center */
       right: auto;
-      left: 45%;
-      /* Starts from near middle */
+      left: 50%;
+      /* Starts from near middle to avoid being too left */
       width: 380px;
       /* Slightly smaller to fit */
       top: -50px;
