@@ -194,10 +194,11 @@
         </div>
     </main>
 
+    <script src="script.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', async () => {
-            if (GAS_API_URL.includes("YOUR_GAS_WEB_APP_URL")) {
-                alert("請先設定 GAS URL");
+            if (typeof GAS_API_URL === 'undefined' || GAS_API_URL.includes("YOUR_GAS_WEB_APP_URL")) {
+                alert("請先設定 GAS URL (請檢查 script.js)");
                 return;
             }
             fetchOrders();
@@ -217,7 +218,7 @@
         function renderDashboard(orders) {
             // Stats
             document.getElementById('totalOrders').innerText = orders.length;
-            const revenue = orders.reduce((sum, o) => sum + (parseInt(o.Grand_Total) || 0), 0);
+            const revenue = orders.reduce((sum, o) => sum + (parseInt(o.Grand_Total || o.Total_Amount) || 0), 0);
             document.getElementById('totalRevenue').innerText = `$${revenue.toLocaleString()}`;
             const pending = orders.filter(o => o.Status === '未處理').length;
             document.getElementById('pendingOrders').innerText = pending;
@@ -257,7 +258,7 @@
                         <span style="font-size:0.8rem; color:#888;">${o.Store_Info || ''}</span>
                     </td>
                     <td class="items-cell">${o.Items}</td>
-                    <td style="font-weight:bold; color:var(--primary-color);">$${(o.Grand_Total || 0).toLocaleString()}</td>
+                    <td style="font-weight:bold; color:var(--primary-color);">$${(o.Grand_Total || o.Total_Amount || 0).toLocaleString()}</td>
                     <td>${statusHtml}</td>
                     <td>
                         <input type="text" class="note-input" id="note-${o.Order_ID}" value="${o.Note || ''}" placeholder="備註...">
