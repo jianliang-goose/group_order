@@ -1,3 +1,12 @@
+/* Custom Font - Ningshu (Subset: 建良鵝肉 only) */
+@font-face {
+  font-family: 'Ningshu';
+  src: url('fonts/ningshu-subset.woff2') format('woff2');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
 /* Global Reset & Typography */
 :root {
   --primary-color: #B94E00;
@@ -125,6 +134,7 @@ button {
 }
 
 .brand-name-mini {
+  font-family: 'Ningshu', 'Noto Sans TC', sans-serif;
   font-weight: 700;
   font-size: 1.6rem;
   color: #fff;
