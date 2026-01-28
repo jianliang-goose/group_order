@@ -126,10 +126,46 @@
         .nav-link:hover {
             color: var(--primary-color);
         }
+
+        /* Full page loader */
+        #pageLoader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.9);
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid #eee;
+            border-top-color: var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            100% {
+                transform: rotate(360deg);
+            }
+        }
     </style>
 </head>
 
 <body>
+    <!-- Loader -->
+    <div id="pageLoader">
+        <div class="spinner"></div>
+        <p style="margin-top:15px; color:#555; font-weight:500;">載入設定中...</p>
+    </div>
+
     <header style="background: white; border-bottom: 1px solid #ddd; padding: 15px 0;">
         <div class="container" style="display:flex; justify-content:space-between; align-items:center;">
             <div style="display:flex; align-items:center; gap:20px;">
@@ -151,6 +187,16 @@
             <div class="card">
                 <div class="card-header">📅 運費與時程設定</div>
                 <div class="form-grid">
+                    <!-- Global Open/Close Switch -->
+                    <div class="form-group"
+                        style="grid-column: 1/-1; background:#eef; padding:10px; border-radius:4px;">
+                        <label class="form-label">接單狀態</label>
+                        <select class="form-input" name="is_open" style="font-weight:bold;">
+                            <option value="true">✅ 開放接單中 (開啟)</option>
+                            <option value="false">⛔ 暫停接單 (關閉)</option>
+                        </select>
+                    </div>
+
                     <div class="form-group">
                         <label class="form-label">最後接單日</label>
                         <input type="text" class="form-input" name="close_date" placeholder="YYYY/MM/DD">
@@ -213,14 +259,31 @@
 
         async function loadSettings() {
             try {
+                // Fetch using CSV method if available for read correctness? 
+                // Settings page needs READ-WRITE reliability. Let's stick to API for fetching initial values if possible, 
+                // BUT the user says ISO dates are showing. ISO dates usually come from Date objects in GAS being JSON stringified.
+                // We should format them.
+
                 const response = await fetch(`${GAS_API_URL}?type=config`);
                 const data = await response.json();
 
                 // 1. Fill Settings
                 const form = document.getElementById('settingsForm');
                 for (const key in data.settings) {
+                    let value = data.settings[key];
+
+                    // Format Dates if they look like ISO strings (e.g. 2026-02-09T16:00:00.000Z)
+                    if (typeof value === 'string' && value.match(/^\d{4}-\d{2}-\d{2}T/)) {
+                        const d = new Date(value);
+                        // Adjust to local YYYY/MM/DD string
+                        const year = d.getFullYear();
+                        const month = String(d.getMonth() + 1).padStart(2, '0');
+                        const day = String(d.getDate()).padStart(2, '0');
+                        value = `${year}/${month}/${day}`;
+                    }
+
                     if (form.elements[key]) {
-                        form.elements[key].value = data.settings[key];
+                        form.elements[key].value = value;
                     }
                 }
 
@@ -228,9 +291,13 @@
                 currentProducts = data.products; // Keep reference
                 renderProducts(data.products);
 
+                // Hide Loader
+                document.getElementById('pageLoader').style.display = 'none';
+
             } catch (e) {
                 console.error(e);
                 alert("無法載入設定");
+                document.getElementById('pageLoader').innerHTML = '<p style="color:red">載入失敗，請重新整理。</p>';
             }
         }
 
@@ -289,6 +356,7 @@
             // Gather Data
             const form = document.getElementById('settingsForm');
             const settings = {
+                is_open: form.elements['is_open'].value, // New field
                 close_date: form.elements['close_date'].value,
                 shipping_date: form.elements['shipping_date'].value,
                 pickup_date: form.elements['pickup_date'].value,

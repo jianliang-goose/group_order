@@ -157,6 +157,18 @@ function renderApp(productsArray, settingsMsg) {
     settings = settingsMsg;
     renderNotices();
 
+    // Check Global Open/Close status
+    if (settings.is_open === 'false') {
+        document.body.innerHTML = `
+            <div style="display:flex; justify-content:center; align-items:center; height:100vh; flex-direction:column; text-align:center; padding:20px;">
+                <h1>⛔ 目前暫停接單</h1>
+                <p>感謝您的支持，目前表單已關閉。</p>
+                <p>若有疑問請聯繫管理員。</p>
+            </div>
+        `;
+        return; // Stop rendering
+    }
+
     // Render Group Leaders
     const leaderSelect = document.getElementById('groupLeader');
     if (leaderSelect && settings.group_leaders) {
