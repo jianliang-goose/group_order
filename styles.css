@@ -339,23 +339,10 @@ p.brand-tagline {
     right: auto;
     left: 50%;
     /* Starts from near middle to avoid being too left */
-    width: 460px;
-    /* 20% larger for more impact */
+    width: 380px;
+    /* Slightly smaller to fit */
     top: -50px;
     transform: rotate(45deg);
-  }
-}
-
-/* Breakpoint for medium tablets (650-850px) */
-@media (min-width: 651px) and (max-width: 850px) {
-  .hero-chopsticks {
-    /* Center the meat portion on screen */
-    right: auto;
-    left: 35%;
-    /* Position so meat is near center */
-    width: 420px;
-    top: -60px;
-    transform: rotate(40deg);
   }
 }
 
