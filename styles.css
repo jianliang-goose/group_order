@@ -339,8 +339,8 @@ p.brand-tagline {
     right: auto;
     left: 50%;
     /* Starts from near middle to avoid being too left */
-    width: 380px;
-    /* Slightly smaller to fit */
+    width: 460px;
+    /* 20% larger for more impact */
     top: -50px;
     transform: rotate(45deg);
   }
