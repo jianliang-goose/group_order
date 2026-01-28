@@ -325,10 +325,7 @@ function calculateTotal() {
             itemTotal += finalPrice;
 
         } else if (product.discountPrice && !product.promoDesc) {
-            // Unconditional Discount (if enabled later, currently user asked for conditional)
-            // If just discount price exists but NO condition, is it a sale?
-            // User asked: "Generic discount field". 
-            // Let's assume if NO condition (empty PromoDesc) but HAS DiscountPrice -> Direct Sale Price.
+            // Unconditional Discount (Direct Sale)
             const price = count * product.discountPrice;
             itemTotal += price;
             itemsListHtml.push(`
@@ -352,6 +349,7 @@ function calculateTotal() {
 
     // Update Items List UI
     const listContainer = document.getElementById('orderItemsList');
+
     if (listContainer) {
         if (itemTotal > 0) {
             listContainer.innerHTML = itemsListHtml.join('');
