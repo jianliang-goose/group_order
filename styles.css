@@ -52,6 +52,8 @@ button {
   max-width: 1200px;
   margin: 0 auto;
   padding: 0 20px;
+  position: relative;
+  /* Context */
 }
 
 /* Header / Hero */
@@ -65,11 +67,11 @@ button {
   background-size: cover;
   background-position: center;
   padding: 20px 0 0;
-  /* Removing bottom padding to let image sit on edge */
-  height: 90vh;
-  /* Full screen feel */
-  min-height: 600px;
-  max-height: 1000px;
+  /* Responsive Height Control */
+  height: auto;
+  min-height: 90vh;
+  /* Ensure it's at least full screen but can grow */
+  /* Remove max-height restriction */
   overflow: hidden;
   margin-bottom: 0;
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
@@ -117,7 +119,9 @@ button {
   display: grid;
   grid-template-columns: 45% 55%;
   align-items: center;
-  height: 80%;
+  /* Remove fixed height, let content drive it */
+  min-height: 60vh;
+  padding-bottom: 40px;
 }
 
 /* Text Side */
@@ -125,21 +129,25 @@ button {
   text-align: left;
   z-index: 20;
   /* Above images */
-  padding-bottom: 50px;
+  position: relative;
+  /* Ensure it stacks correctly */
 }
 
 h1.brand-title {
-  font-size: 5rem;
-  /* Movie Poster Scale */
+  /* Fluid Scalable Type: min 2rem, pref 5vw, max 5rem */
+  font-size: clamp(2.5rem, 6vw, 5rem);
   color: #fff;
   margin-bottom: 20px;
-  line-height: 1;
+  line-height: 1.2;
+  /* More breathing room for wrapped lines */
   text-shadow: 0 5px 30px rgba(0, 0, 0, 0.9);
   letter-spacing: 2px;
+  word-break: keep-all;
+  /* CJK: try not to break words mid-phrase */
 }
 
 p.brand-tagline {
-  font-size: 1.5rem;
+  font-size: clamp(1rem, 2vw, 1.5rem);
   color: #f0f0f0;
   margin-bottom: 40px;
   max-width: 90%;
@@ -149,16 +157,24 @@ p.brand-tagline {
 }
 
 .cta-button {
-  padding: 20px 60px;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  padding: 15px 40px;
   background: linear-gradient(135deg, var(--primary-color), #8B3A00);
   color: white;
   text-decoration: none;
   border-radius: 60px;
   font-weight: 800;
-  font-size: 1.5rem;
+  font-size: clamp(1.2rem, 3vw, 1.5rem);
   box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
   border: 3px solid rgba(255, 255, 255, 0.15);
   transition: all 0.3s;
+  max-width: 100%;
+  /* Prevent overflowing screen */
+  text-align: center;
+  white-space: nowrap;
+  /* Try to keep single line */
 }
 
 .cta-button:hover {
@@ -172,6 +188,8 @@ p.brand-tagline {
   position: relative;
   height: 100%;
   width: 100%;
+  pointer-events: none;
+  /* Allow clicks to pass through images to buttons behind/under */
 }
 
 .hero-plate {
@@ -184,17 +202,18 @@ p.brand-tagline {
   /* Realistic Grounding Shadow: Dark black with high blur */
   filter: drop-shadow(0 30px 40px #000000);
   transform: rotate(-15deg);
-  z-index: 1;
+  z-index: 10;
 }
 
 .hero-chopsticks {
   position: absolute;
   top: 5%;
   right: -25%;
-  width: 600px;
-  /* HUGE */
+  width: 800px;
+  /* GIGANTIC */
   filter: drop-shadow(30px 40px 50px rgba(0, 0, 0, 0.6));
-  z-index: 5;
+  z-index: 30;
+  /* Higher than text z-index:20 */
   transform: rotate(15deg);
   animation: floatChopsticksCinematic 8s ease-in-out infinite;
 }
@@ -252,38 +271,48 @@ p.brand-tagline {
   /* Visuals move to bottom and bleed out */
   .hero-visuals {
     order: 2;
-    height: 400px;
-    /* Fixed height area for images to inhabit */
+    height: 550px;
+    /* Increased height to show full plate */
     overflow: visible;
+    margin-bottom: -20px;
+    /* Less negative margin to push board down */
   }
 
   .hero-plate {
-    width: 200%;
-    /* Extremely wide to look macro */
-    left: -50%;
-    /* Center cut */
-    top: 0;
+    width: 170%;
+    /* Slightly adjusted scale */
+    left: -35%;
+    /* Center better */
+    top: -40px;
+    /* Move up */
     max-width: none;
     transform: rotate(0deg);
   }
 
   .hero-chopsticks {
-    width: 300px;
-    top: -50px;
-    right: -50px;
+    width: 450px;
+    /* Much larger bite on mobile */
+    top: -60px;
+    right: -80px;
     transform: rotate(45deg);
   }
 }
 
 /* Notices & Countdown */
 .notice-board {
+  position: relative;
   background: var(--card-bg);
-  border-left: 4px solid var(--primary-color);
-  padding: 20px;
-  margin: 0 auto 40px;
-  max-width: 800px;
+  border-left: 6px solid var(--primary-color);
+  padding: 30px;
+  /* Overlap Effect */
+  margin: -60px auto 60px;
+  /* Negative top margin pulls it up */
+  max-width: 900px;
   border-radius: var(--radius-sm);
-  box-shadow: var(--shadow-sm);
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+  /* Stronger shadow for depth */
+  z-index: 50;
+  /* Above the hero background, but below floating chopsticks if they reach here */
 }
 
 .notice-title {
