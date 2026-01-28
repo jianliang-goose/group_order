@@ -511,9 +511,13 @@
             const note = document.getElementById(`note-${orderId}`).value;
 
             const btn = document.querySelector(`button[onclick="updateOrder('${orderId}')"]`);
-            const originalText = btn.innerText;
-            btn.innerText = '...';
+            // Store original content
+            const originalHTML = btn.innerHTML;
+
+            // Set loading state with spinner
+            btn.innerHTML = '<span class="spinner-icon"></span>';
             btn.disabled = true;
+            btn.style.opacity = '0.7';
 
             try {
                 const payload = {
@@ -536,8 +540,10 @@
                 console.error(e);
                 alert('更新失敗');
             } finally {
-                btn.innerText = originalText;
+                // Restore original state
+                btn.innerHTML = originalHTML;
                 btn.disabled = false;
+                btn.style.opacity = '1';
             }
         }
     </script>

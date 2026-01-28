@@ -56,6 +56,24 @@ button {
   /* Context */
 }
 
+/* Spinner for Loading Buttons */
+.spinner-icon {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  border: 3px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  border-top-color: #fff;
+  animation: spin 1s ease-in-out infinite;
+  vertical-align: middle;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 /* Header / Hero */
 /* Hero Section Redesign - MAX CINEMATIC */
 .hero-section {
