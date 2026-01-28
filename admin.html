@@ -244,46 +244,70 @@
                 title.style.color = '#333';
                 title.style.fontSize = '1.3rem';
 
-                // Status Filter Dropdown
-                const filterWrapper = document.createElement('div');
-                filterWrapper.style.marginLeft = 'auto';
-                filterWrapper.style.display = 'flex';
-                filterWrapper.style.alignItems = 'center';
-                filterWrapper.style.gap = '10px';
+                headerDiv.appendChild(title);
 
-                const filterLabel = document.createElement('span');
-                filterLabel.innerText = '狀態篩選:';
-                filterLabel.style.fontSize = '0.9rem';
-                filterLabel.style.color = '#666';
+                // Filter Buttons Container
+                const filterContainer = document.createElement('div');
+                filterContainer.id = 'statsFilterContainer';
+                filterContainer.style.display = 'flex';
+                filterContainer.style.gap = '8px';
+                filterContainer.style.flexWrap = 'wrap';
+                filterContainer.style.marginLeft = 'auto';
 
-                const filterSelect = document.createElement('select');
-                filterSelect.id = 'statsStatusFilter';
-                filterSelect.className = 'status-select'; // Reuse existing style class or custom
-                filterSelect.style.padding = '6px 12px';
-                filterSelect.style.borderRadius = '6px';
-                filterSelect.style.border = '1px solid #ddd';
-                filterSelect.style.fontSize = '0.9rem';
-                filterSelect.style.cursor = 'pointer';
-                filterSelect.style.outline = 'none';
+                // Status Options (Updated)
+                const statuses = ['未處理', '完成待取', '已出貨', '已取消'];
 
-                filterSelect.innerHTML = `
-                    <option value="ALL">📋 全部 (已取消除外)</option>
-                    <option value="未處理">🔴 未處理</option>
-                    <option value="已確認">🔵 已確認</option>
-                    <option value="已出貨/待取">🟢 已出貨/待取</option>
-                    <option value="已完成">🏁 已完成</option>
-                `;
+                statuses.forEach(status => {
+                    const btn = document.createElement('button');
+                    btn.innerText = status;
+                    // Default active unless '已取消'
+                    const isCancelled = (status === '已取消');
+                    if (!isCancelled) btn.className = 'filter-pill active';
+                    else btn.className = 'filter-pill';
 
-                filterSelect.addEventListener('change', () => {
-                    if (window.currentOrdersData) {
-                        calculateAndRenderStats(window.currentOrdersData);
+                    // Styles
+                    btn.style.padding = '6px 12px';
+                    btn.style.borderRadius = '20px';
+                    btn.style.border = '1px solid var(--primary-color)';
+                    btn.style.cursor = 'pointer';
+                    btn.style.fontSize = '0.85rem';
+                    btn.style.transition = 'all 0.2s';
+
+                    // Initial State Style
+                    if (!isCancelled) {
+                        btn.style.background = 'var(--primary-color)';
+                        btn.style.color = '#fff';
+                    } else {
+                        btn.style.background = '#fff';
+                        btn.style.color = '#666';
+                        btn.style.borderColor = '#ccc';
                     }
+
+                    btn.dataset.status = status;
+
+                    btn.onclick = () => {
+                        const isActive = btn.classList.contains('active');
+                        if (isActive) {
+                            btn.classList.remove('active');
+                            // Inactive Style
+                            btn.style.background = '#fff';
+                            btn.style.color = '#666';
+                            btn.style.borderColor = '#ccc';
+                        } else {
+                            btn.classList.add('active');
+                            // Active Style
+                            btn.style.background = 'var(--primary-color)';
+                            btn.style.color = '#fff';
+                            btn.style.borderColor = 'var(--primary-color)';
+                        }
+                        if (window.currentOrdersData) {
+                            calculateAndRenderStats(window.currentOrdersData);
+                        }
+                    };
+                    filterContainer.appendChild(btn);
                 });
 
-                filterWrapper.appendChild(filterLabel);
-                filterWrapper.appendChild(filterSelect);
-                headerDiv.appendChild(title);
-                headerDiv.appendChild(filterWrapper);
+                headerDiv.appendChild(filterContainer);
 
                 const content = document.createElement('div');
                 content.id = 'productStatsContent';
@@ -298,13 +322,36 @@
             }
 
             // Calculation Logic
-            const filterValue = document.getElementById('statsStatusFilter') ? document.getElementById('statsStatusFilter').value : 'ALL';
+            const activeStatuses = [];
+
+            // Check DOM for active pills
+            const pills = document.querySelectorAll('#statsFilterContainer .filter-pill.active');
+            if (pills.length > 0) {
+                pills.forEach(p => activeStatuses.push(p.dataset.status));
+            } else {
+                // Fallback if UI not ready (should not happen as we just built it) 
+                // OR if user unselected all (valid case)
+                // If container exists but no pills active, activeStatuses is empty.
+
+                // However, for first load logic where container might not be in DOM yet?
+                if (!document.getElementById('statsFilterContainer')) {
+                    // First load default: All except Cancelled
+                    activeStatuses.push('未處理', '完成待取', '已出貨');
+                }
+            }
+
             const productStats = {};
             let matchCount = 0;
 
             orders.forEach(o => {
-                if (o.Status === '已取消') return;
-                if (filterValue !== 'ALL' && o.Status !== filterValue) return;
+                // Multi-select Filter Logic
+                if (document.getElementById('statsFilterContainer')) {
+                    if (activeStatuses.length === 0) return; // All unselected -> Show nothing
+                    if (!activeStatuses.includes(o.Status)) return;
+                } else {
+                    // Fallback default logic
+                    if (o.Status === '已取消') return;
+                }
 
                 matchCount++;
                 const itemsStr = o.Items || "";
