@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>建良鵝肉 - 年節團購</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=Outfit:wght@400;600&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+
+    <header>
+        <div class="container">
+            <div class="logo-container">
+                <img src="建良鵝肉logo-FINAL.jpg" alt="建良鵝肉 Logo" class="logo-img">
+            </div>
+            <h1 class="brand-title">建良鵝肉・年節團購</h1>
+            <p class="brand-tagline">嚴選茶香鵝肉，傳統工法煙燻入味。年節聚餐的最佳選擇。</p>
+        </div>
+    </header>
+
+    <main class="container">
+
+        <!-- Important Notices -->
+        <section class="notice-board">
+            <div class="notice-title">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="12" y1="8" x2="12" y2="12"></line>
+                    <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                </svg>
+                訂購重要時程與運費
+            </div>
+            <ul class="notice-list" id="noticeList">
+                <li>載入中...</li>
+            </ul>
+        </section>
+
+        <!-- Product List -->
+        <section class="products-grid" id="productList">
+            <div class="loading-spinner" style="grid-column: 1/-1; text-align: center; padding: 40px;">
+                載入商品中...
+            </div>
+        </section>
+
+        <!-- Order Form -->
+        <section class="order-section">
+            <h2 class="section-title">填寫訂購資料</h2>
+            <form id="orderForm" onsubmit="submitOrder(event)">
+
+                <div class="form-group">
+                    <label class="form-label">團購主</label>
+                    <select class="form-select" id="groupLeader">
+                        <option value="無">無</option>
+                        <!-- Options will be populated from settings -->
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">訂購人姓名 <span style="color:red">*</span></label>
+                    <input type="text" class="form-input" id="customerName" placeholder="請輸入姓名" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">訂購人電話 <span style="color:red">*</span></label>
+                    <input type="tel" class="form-input" id="customerPhone" placeholder="09xx-xxx-xxx" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">取貨方式 <span style="color:red">*</span></label>
+                    <div class="radio-group">
+                        <label class="radio-option">
+                            <input type="radio" name="deliveryMethod" value="self" onchange="toggleDeliveryOptions()"
+                                checked>
+                            <span>現場自取 (免運)</span>
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="deliveryMethod" value="shipping"
+                                onchange="toggleDeliveryOptions()">
+                            <span>超商冷凍店到店</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Hidden by default, shown if shipping selected -->
+                <div id="shippingOptions" class="sub-options">
+                    <div class="form-group">
+                        <label class="form-label">選擇超商</label>
+                        <div class="radio-group">
+                            <label class="radio-option">
+                                <input type="radio" name="storeType" value="familymart" checked> 全家 FamilyMart
+                            </label>
+                            <label class="radio-option">
+                                <input type="radio" name="storeType" value="711"> 7-11
+                            </label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">收件門市 (店名/店號) <span style="color:red">*</span></label>
+                        <input type="text" class="form-input" id="storeInfo" placeholder="例如：全家三重旺旺店">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">付款方式 <span style="color:red">*</span></label>
+                    <select class="form-select" id="paymentMethod" required>
+                        <option value="atm">ATM 轉帳</option>
+                        <option value="jko">街口支付 (Jko Pay)</option>
+                    </select>
+                </div>
+
+                <!-- Summary Board -->
+                <div class="order-summary">
+                    <div id="orderItemsList" class="summary-items">
+                        <!-- Items will be injected here -->
+                    </div>
+                    <hr style="border: 0; border-top: 1px dashed #ddd; margin: 10px 0;">
+                    <div class="summary-row">
+                        <span>商品小計</span>
+                        <span id="subTotalDisplay">$0</span>
+                    </div>
+                    <div class="summary-row" id="shippingRow">
+                        <span>運費</span>
+                        <span id="shippingDisplay">$0</span>
+                    </div>
+                    <div class="summary-row total">
+                        <span>總金額</span>
+                        <span id="grandTotalDisplay">$0</span>
+                    </div>
+                </div>
+
+                <button type="submit" class="submit-btn" id="submitBtn">確認送出訂單</button>
+            </form>
+        </section>
+
+    </main>
+
+    <footer>
+        <p>&copy; 2026 建良鵝肉. All Rights Reserved.</p>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+
+</html>

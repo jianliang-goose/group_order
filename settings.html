@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>商店設定 - 建良鵝肉</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        body {
+            background-color: #f5f5f5;
+        }
+
+        .dashboard-container {
+            max-width: 1000px;
+            margin: 20px auto;
+            padding: 20px;
+        }
+
+        .card {
+            background: white;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+
+        .card-header {
+            font-size: 1.25rem;
+            font-weight: bold;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+            color: #333;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-label {
+            font-weight: 500;
+            margin-bottom: 5px;
+            display: block;
+            color: #555;
+        }
+
+        .form-input,
+        .form-textarea {
+            width: 100%;
+            padding: 8px 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+
+        .form-textarea {
+            height: 100px;
+            resize: vertical;
+        }
+
+        .product-item {
+            border: 1px solid #eee;
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+            background: #fafafa;
+        }
+
+        .product-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        .product-grid {
+            display: grid;
+            grid-template-columns: 100px 1fr 100px;
+            gap: 10px;
+            align-items: center;
+        }
+
+        /* Mobile adjust for grid */
+        @media (max-width: 600px) {
+            .product-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .btn-submit {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 4px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        .btn-submit:hover {
+            opacity: 0.9;
+        }
+
+        .btn-submit:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+
+        .nav-link {
+            color: #666;
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 1.1rem;
+        }
+
+        .nav-link:hover {
+            color: var(--primary-color);
+        }
+    </style>
+</head>
+
+<body>
+    <header style="background: white; border-bottom: 1px solid #ddd; padding: 15px 0;">
+        <div class="container" style="display:flex; justify-content:space-between; align-items:center;">
+            <div style="display:flex; align-items:center; gap:20px;">
+                <h1 style="font-size: 1.5rem; margin:0;">商店設定</h1>
+                <nav>
+                    <a href="admin.html" class="nav-link">訂單列表</a>
+                    <span style="color:#ccc">|</span>
+                    <a href="settings.html" class="nav-link" style="color: #333; font-weight:bold;">⚙️ 商店設定</a>
+                </nav>
+            </div>
+            <a href="index.html" style="color: #666; text-decoration: none;">回前台</a>
+        </div>
+    </header>
+
+    <main class="dashboard-container">
+        <form id="settingsForm" onsubmit="saveSettings(event)">
+
+            <!-- Global Settings -->
+            <div class="card">
+                <div class="card-header">📅 運費與時程設定</div>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label class="form-label">最後接單日</label>
+                        <input type="text" class="form-input" name="close_date" placeholder="YYYY/MM/DD">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">最後寄貨日</label>
+                        <input type="text" class="form-input" name="shipping_date" placeholder="YYYY/MM/DD">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">最後自取日</label>
+                        <input type="text" class="form-input" name="pickup_date" placeholder="YYYY/MM/DD (時間)">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">免運門檻 ($)</label>
+                        <input type="number" class="form-input" name="shipping_threshold">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">運費 ($)</label>
+                        <input type="number" class="form-input" name="shipping_fee">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Group Leaders -->
+            <div class="card">
+                <div class="card-header">👥 團購主名單</div>
+                <div class="form-group">
+                    <label class="form-label">團購主姓名 (請用逗號隔開)</label>
+                    <textarea class="form-textarea" name="group_leaders" placeholder="例如: 無, 宛儒, 小明"></textarea>
+                </div>
+            </div>
+
+            <!-- Products -->
+            <div class="card">
+                <div class="card-header">🍗 商品管理</div>
+                <div id="productsContainer">
+                    <!-- Products rendered via JS -->
+                    <div style="text-align:center; padding:20px;">載入中...</div>
+                </div>
+            </div>
+
+            <button type="submit" class="btn-submit" id="saveBtn">💾 儲存所有設定</button>
+            <p style="text-align:center; color:#666; font-size:0.9rem; margin-top:10px;">
+                注意：儲存後，Google 系統約需 5~10 分鐘才會更新前台網站內容，請耐心等候。
+            </p>
+        </form>
+    </main>
+
+    <script src="script.js"></script>
+    <script>
+        let currentProducts = [];
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            if (GAS_API_URL.includes("YOUR_GAS_WEB_APP_URL")) {
+                alert("請先設定 GAS URL");
+                return;
+            }
+            await loadSettings();
+        });
+
+        async function loadSettings() {
+            try {
+                const response = await fetch(`${GAS_API_URL}?type=config`);
+                const data = await response.json();
+
+                // 1. Fill Settings
+                const form = document.getElementById('settingsForm');
+                for (const key in data.settings) {
+                    if (form.elements[key]) {
+                        form.elements[key].value = data.settings[key];
+                    }
+                }
+
+                // 2. Render Products
+                currentProducts = data.products; // Keep reference
+                renderProducts(data.products);
+
+            } catch (e) {
+                console.error(e);
+                alert("無法載入設定");
+            }
+        }
+
+        function renderProducts(products) {
+            const container = document.getElementById('productsContainer');
+            container.innerHTML = '';
+
+            products.forEach((p, index) => {
+                const el = document.createElement('div');
+                el.className = 'product-item';
+                el.dataset.index = index;
+                el.innerHTML = `
+                    <div class="product-header">
+                        <span>ID: ${p.ID}</span>
+                        <span>${p.Category === 'main' ? '主餐' : '加購/其他'}</span>
+                    </div>
+                    <div class="form-group">
+                        <label>品名</label>
+                        <input type="text" class="form-input p-name" value="${p.Name}">
+                    </div>
+                    <div class="form-group" style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+                        <div>
+                            <label>價格</label>
+                            <input type="number" class="form-input p-price" value="${p.Price}">
+                        </div>
+                        <div>
+                            <label>優惠價 (可空)</label>
+                            <input type="number" class="form-input p-discount" value="${p.DiscountPrice || ''}">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>描述</label>
+                        <input type="text" class="form-input p-desc" value="${p.Description || ''}">
+                    </div>
+                    <div class="form-group" style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+                        <div>
+                            <label>促銷標籤 (如: 加購優惠)</label>
+                            <input type="text" class="form-input p-tag" value="${p.PromoTag || ''}">
+                        </div>
+                        <div>
+                            <label>圖片路徑</label>
+                            <input type="text" class="form-input p-image" value="${p.Image || ''}">
+                        </div>
+                    </div>
+                `;
+                container.appendChild(el);
+            });
+        }
+
+        async function saveSettings(e) {
+            e.preventDefault();
+            const btn = document.getElementById('saveBtn');
+            btn.disabled = true;
+            btn.innerText = "儲存中...";
+
+            // Gather Data
+            const form = document.getElementById('settingsForm');
+            const settings = {
+                close_date: form.elements['close_date'].value,
+                shipping_date: form.elements['shipping_date'].value,
+                pickup_date: form.elements['pickup_date'].value,
+                shipping_threshold: form.elements['shipping_threshold'].value,
+                shipping_fee: form.elements['shipping_fee'].value,
+                group_leaders: form.elements['group_leaders'].value
+            };
+
+            // Gather Products
+            const productDivs = document.querySelectorAll('.product-item');
+            const updatedProducts = [];
+            productDivs.forEach(div => {
+                const idx = div.dataset.index;
+                // Preserve original ID and Category as we didn't make them editable for safety
+                // We update editable fields
+                const original = currentProducts[idx];
+                updatedProducts.push({
+                    ID: original.ID,
+                    Category: original.Category, // Keep original category logic
+                    Name: div.querySelector('.p-name').value,
+                    Price: div.querySelector('.p-price').value,
+                    DiscountPrice: div.querySelector('.p-discount').value,
+                    Description: div.querySelector('.p-desc').value,
+                    PromoTag: div.querySelector('.p-tag').value,
+                    Image: div.querySelector('.p-image').value,
+                    PromoDesc: original.PromoDesc || '' // Keep hidden fields
+                });
+            });
+
+            const payload = {
+                action: 'saveSettings',
+                settings: settings,
+                products: updatedProducts
+            };
+
+            try {
+                await fetch(GAS_API_URL, {
+                    method: "POST",
+                    mode: "no-cors",
+                    headers: { "Content-Type": "text/plain" },
+                    body: JSON.stringify(payload)
+                });
+                alert("設定已儲存！");
+                location.reload();
+            } catch (e) {
+                console.error(e);
+                alert("儲存失敗");
+            } finally {
+                btn.disabled = false;
+                btn.innerText = "💾 儲存所有設定";
+            }
+        }
+    </script>
+</body>
+
+</html>

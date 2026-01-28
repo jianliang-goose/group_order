@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>訂單管理 - 建良鵝肉</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        body {
+            background-color: #f5f5f5;
+        }
+
+        .dashboard-container {
+            max-width: 1400px;
+            margin: 20px auto;
+            padding: 20px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        .stat-label {
+            color: #666;
+            margin-top: 5px;
+        }
+
+        /* Table Styles */
+        .data-table-wrapper {
+            overflow-x: auto;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 1000px;
+        }
+
+        .data-table th,
+        .data-table td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+            vertical-align: middle;
+        }
+
+        .data-table th {
+            background-color: var(--primary-color);
+            color: white;
+            white-space: nowrap;
+        }
+
+        .data-table tr:hover {
+            background-color: #f9f9f9;
+        }
+
+        .items-cell {
+            font-size: 0.9rem;
+            color: #444;
+            max-width: 300px;
+        }
+
+        .status-select {
+            padding: 5px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+        }
+
+        .note-input {
+            width: 100%;
+            padding: 5px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        .action-btn {
+            padding: 5px 10px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            color: white;
+            margin-right: 5px;
+            font-size: 0.85rem;
+        }
+
+        .btn-save {
+            background-color: #28a745;
+        }
+
+        .btn-save:hover {
+            background-color: #218838;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .nav-link {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 1.1rem;
+        }
+
+        .nav-link:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+
+<body>
+    <header style="background: white; border-bottom: 1px solid #ddd; padding: 15px 0;">
+        <div class="container" style="display:flex; justify-content:space-between; align-items:center;">
+            <div style="display:flex; align-items:center; gap:20px;">
+                <h1 style="font-size: 1.5rem; margin:0;">訂單管理後台</h1>
+                <nav>
+                    <a href="admin.html" class="nav-link" style="color: #333; font-weight:bold;">訂單列表</a>
+                    <span style="color:#ccc">|</span>
+                    <a href="settings.html" class="nav-link">⚙️ 商店設定</a>
+                </nav>
+            </div>
+            <a href="index.html" style="color: #666; text-decoration: none;">回前台</a>
+        </div>
+    </header>
+
+    <main class="dashboard-container">
+        <!-- Statistics -->
+        <section class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-value" id="totalOrders">0</div>
+                <div class="stat-label">總訂單數</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="totalRevenue">$0</div>
+                <div class="stat-label">總營業額</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="pendingOrders">0</div>
+                <div class="stat-label">未處理訂單</div>
+            </div>
+        </section>
+
+        <!-- Orders Table -->
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 15px;">
+            <h2 class="section-title" style="margin:0;">訂單列表</h2>
+            <button onclick="location.reload()" style="padding: 8px 15px; cursor:pointer;">🔄 重新整理</button>
+        </div>
+
+        <div class="data-table-wrapper">
+            <table class="data-table" id="ordersTable">
+                <thead>
+                    <tr>
+                        <th>訂單編號 / 時間</th>
+                        <th>姓名 / 電話</th>
+                        <th>團購主</th>
+                        <th>取貨方式</th>
+                        <th>訂購內容</th>
+                        <th>總金額</th>
+                        <th>狀態</th>
+                        <th>備註</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td colspan="9" style="text-align:center; padding: 30px;">載入中...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            if (GAS_API_URL.includes("YOUR_GAS_WEB_APP_URL")) {
+                alert("請先設定 GAS URL");
+                return;
+            }
+            fetchOrders();
+        });
+
+        async function fetchOrders() {
+            try {
+                const response = await fetch(`${GAS_API_URL}?type=orders`);
+                const orders = await response.json();
+                renderDashboard(orders);
+            } catch (e) {
+                console.error(e);
+                alert("無法載入訂單資料");
+            }
+        }
+
+        function renderDashboard(orders) {
+            // Stats
+            document.getElementById('totalOrders').innerText = orders.length;
+            const revenue = orders.reduce((sum, o) => sum + (parseInt(o.Grand_Total) || 0), 0);
+            document.getElementById('totalRevenue').innerText = `$${revenue.toLocaleString()}`;
+            const pending = orders.filter(o => o.Status === '未處理').length;
+            document.getElementById('pendingOrders').innerText = pending;
+
+            // Table
+            const tbody = document.querySelector('#ordersTable tbody');
+            tbody.innerHTML = '';
+
+            // Sort new to old
+            orders.sort((a, b) => new Date(b.Timestamp) - new Date(a.Timestamp));
+
+            orders.forEach(o => {
+                const tr = document.createElement('tr');
+                const date = new Date(o.Timestamp).toLocaleString('zh-TW', { month: 'numeric', day: 'numeric', hour: 'numeric', minute: 'numeric' });
+
+                // Status Dropdown
+                const statusOptions = ['未處理', '已確認', '已出貨/待取', '已完成', '已取消'];
+                let statusHtml = `<select class="status-select" id="status-${o.Order_ID}">`;
+                statusOptions.forEach(st => {
+                    const selected = (o.Status === st) ? 'selected' : '';
+                    statusHtml += `<option value="${st}" ${selected}>${st}</option>`;
+                });
+                statusHtml += `</select>`;
+
+                tr.innerHTML = `
+                    <td>
+                        <div style="font-weight:bold;">${o.Order_ID}</div>
+                        <div style="font-size:0.85rem; color:#666;">${date}</div>
+                    </td>
+                    <td>
+                        <div>${o.Name}</div>
+                        <div style="font-size:0.85rem; color:#666;">${o.Phone}</div>
+                    </td>
+                    <td>${o.Group_Leader || '-'}</td>
+                    <td>
+                        ${o.Delivery_Method}<br>
+                        <span style="font-size:0.8rem; color:#888;">${o.Store_Info || ''}</span>
+                    </td>
+                    <td class="items-cell">${o.Items}</td>
+                    <td style="font-weight:bold; color:var(--primary-color);">$${(o.Grand_Total || 0).toLocaleString()}</td>
+                    <td>${statusHtml}</td>
+                    <td>
+                        <input type="text" class="note-input" id="note-${o.Order_ID}" value="${o.Note || ''}" placeholder="備註...">
+                    </td>
+                    <td>
+                        <button class="action-btn btn-save" onclick="updateOrder('${o.Order_ID}')">儲存</button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        async function updateOrder(orderId) {
+            const status = document.getElementById(`status-${orderId}`).value;
+            const note = document.getElementById(`note-${orderId}`).value;
+
+            const btn = document.querySelector(`button[onclick="updateOrder('${orderId}')"]`);
+            const originalText = btn.innerText;
+            btn.innerText = '...';
+            btn.disabled = true;
+
+            try {
+                const payload = {
+                    action: 'updateOrder',
+                    orderId: orderId,
+                    status: status,
+                    note: note
+                };
+
+                await fetch(GAS_API_URL, {
+                    method: "POST",
+                    mode: "no-cors",
+                    headers: { "Content-Type": "text/plain" },
+                    body: JSON.stringify(payload)
+                });
+
+                // Since no-cors returns opaque, we assume success if no network error
+                alert('更新成功！');
+            } catch (e) {
+                console.error(e);
+                alert('更新失敗');
+            } finally {
+                btn.innerText = originalText;
+                btn.disabled = false;
+            }
+        }
+    </script>
+</body>
+
+</html>
