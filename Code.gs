@@ -224,13 +224,19 @@ function createOrder(doc, data) {
      sheet.appendRow([
        'Timestamp', 'Order_ID', 'Group_Leader', 'Name', 'Phone', 'Items', 
        'Total_Amount', 'Shipping_Fee', 'Grand_Total', 
-       'Payment_Method', 'Delivery_Method', 'Store_Info', 'Status', 'Note'
+       'Payment_Method', 'Payment_Info', 'Delivery_Method', 'Store_Info', 'Status', 'Note'
      ]);
   } else {
-     // Check if Note column exists in existing sheet, if not, createOrder doesn't strictly fail, 
-     // but we might want to ensure headers match. 
-     // simplified: just append, trusting structure or user fixes. 
-     // For robustness, we could check headers here too, but let's keep it simple for speed.
+     // Check if Payment_Info column exists, if not add it
+     var headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
+     if (headers.indexOf('Payment_Info') === -1) {
+       // Insert Payment_Info column after Payment_Method
+       var paymentMethodIndex = headers.indexOf('Payment_Method');
+       if (paymentMethodIndex !== -1) {
+         sheet.insertColumnAfter(paymentMethodIndex + 1);
+         sheet.getRange(1, paymentMethodIndex + 2).setValue('Payment_Info');
+       }
+     }
   }
 
   var newRow = [];
@@ -247,6 +253,7 @@ function createOrder(doc, data) {
   newRow.push(data.shippingFee || 0);
   newRow.push(data.grandTotal || 0);
   newRow.push(data.paymentMethod || '');
+  newRow.push(data.paymentInfo || '');
   newRow.push(data.deliveryMethod || '');
   newRow.push(data.storeInfo || '');
   newRow.push('未處理'); 

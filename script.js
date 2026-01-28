@@ -396,6 +396,21 @@ function toggleDeliveryOptions() {
     calculateTotal();
 }
 
+// Toggle Payment Options visibility
+function togglePaymentOptions() {
+    const method = document.querySelector('input[name="paymentMethod"]:checked').value;
+    const atmOptions = document.getElementById('atmOptions');
+    const jkoOptions = document.getElementById('jkoOptions');
+
+    if (method === 'atm') {
+        atmOptions.classList.add('active');
+        jkoOptions.classList.remove('active');
+    } else {
+        atmOptions.classList.remove('active');
+        jkoOptions.classList.add('active');
+    }
+}
+
 // Submit Order
 async function submitOrder(e) {
     e.preventDefault();
@@ -415,6 +430,36 @@ async function submitOrder(e) {
     if (deliveryMethod === 'shipping' && !storeInfo.trim()) {
         alert("請填寫收件門市資訊！");
         return;
+    }
+
+    // Payment Validation
+    const paymentMethod = document.querySelector('input[name="paymentMethod"]:checked').value;
+    let paymentInfo = '';
+
+    if (paymentMethod === 'atm') {
+        const atmLast5 = document.getElementById('atmLast5').value;
+        const atmDate = document.getElementById('atmDate').value;
+        if (!atmLast5 || atmLast5.length !== 5) {
+            alert("請填寫正確的轉帳帳號末5碼！");
+            return;
+        }
+        if (!atmDate) {
+            alert("請填寫轉帳日期！");
+            return;
+        }
+        paymentInfo = `帳號末5碼: ${atmLast5}, 日期: ${atmDate}`;
+    } else {
+        const jkoAccount = document.getElementById('jkoAccount').value;
+        const jkoDate = document.getElementById('jkoDate').value;
+        if (!jkoAccount.trim()) {
+            alert("請填寫您的街口帳號或暱稱！");
+            return;
+        }
+        if (!jkoDate) {
+            alert("請填寫付款日期！");
+            return;
+        }
+        paymentInfo = `街口帳號: ${jkoAccount}, 日期: ${jkoDate}`;
     }
 
     if (GAS_API_URL.includes("YOUR_GAS_WEB_APP_URL")) {
@@ -441,7 +486,8 @@ async function submitOrder(e) {
         totalAmount: parseInt(document.getElementById('subTotalDisplay').innerText.replace(/[$,]/g, '')),
         shippingFee: document.getElementById('shippingDisplay').innerText === "免運費" ? 0 : 120,
         grandTotal: total,
-        paymentMethod: document.getElementById('paymentMethod').value,
+        paymentMethod: paymentMethod === 'atm' ? 'ATM轉帳' : '街口支付',
+        paymentInfo: paymentInfo,
         deliveryMethod: deliveryMethod === 'self' ? '現場自取' : '冷凍店到店',
         storeInfo: deliveryMethod === 'shipping' ?
             `${document.querySelector('input[name="storeType"]:checked').nextSibling.textContent.trim()} - ${storeInfo}` : '',
@@ -457,7 +503,7 @@ async function submitOrder(e) {
             body: JSON.stringify(payload)
         });
 
-        alert(`訂單已送出！\n應付總額: $${total}\n請依選擇的付款方式結帳。`);
+        alert(`訂單已送出！\n應付總額: $${total}\n付款方式: ${payload.paymentMethod}\n${paymentInfo}\n\n感謝您的訂購！`);
         location.reload(); // Reset form
 
     } catch (err) {

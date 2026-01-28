@@ -134,10 +134,58 @@
 
                 <div class="form-group">
                     <label class="form-label">付款方式 <span style="color:red">*</span></label>
-                    <select class="form-select" id="paymentMethod" required>
-                        <option value="atm">ATM 轉帳</option>
-                        <option value="jko">街口支付 (Jko Pay)</option>
-                    </select>
+                    <div class="radio-group">
+                        <label class="radio-option">
+                            <input type="radio" name="paymentMethod" value="atm" onchange="togglePaymentOptions()"
+                                checked>
+                            <span>ATM 轉帳</span>
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="paymentMethod" value="jko" onchange="togglePaymentOptions()">
+                            <span>街口支付</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- ATM Payment Info -->
+                <div id="atmOptions" class="sub-options active">
+                    <div
+                        style="background:#fff; padding:15px; border-radius:8px; border:1px solid #ddd; margin-bottom:15px;">
+                        <div style="font-weight:bold; color:#333; margin-bottom:10px;">🏦 轉帳資訊</div>
+                        <div style="font-size:1.1rem; color:#B94E00;">
+                            <strong>XX銀行 (代碼 123)</strong><br>
+                            帳號：<strong style="letter-spacing:1px;">123-456-789</strong><br>
+                            戶名：<strong>XXX</strong>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">轉帳帳號末5碼 <span style="color:red">*</span></label>
+                        <input type="text" class="form-input" id="atmLast5" placeholder="例如：12345" maxlength="5"
+                            pattern="[0-9]{5}">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">轉帳日期 <span style="color:red">*</span></label>
+                        <input type="date" class="form-input" id="atmDate">
+                    </div>
+                </div>
+
+                <!-- JKO Payment Info -->
+                <div id="jkoOptions" class="sub-options">
+                    <div
+                        style="background:#fff; padding:15px; border-radius:8px; border:1px solid #ddd; margin-bottom:15px; text-align:center;">
+                        <div style="font-weight:bold; color:#333; margin-bottom:10px;">📱 街口支付</div>
+                        <img src="街口QR Code.jpg" alt="街口支付 QR Code"
+                            style="max-width:200px; border-radius:8px; border:2px solid #eee;">
+                        <p style="margin-top:10px; color:#666; font-size:0.9rem;">請掃描 QR Code 完成付款</p>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">街口帳號/暱稱 <span style="color:red">*</span></label>
+                        <input type="text" class="form-input" id="jkoAccount" placeholder="您的街口帳號或暱稱">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">付款日期 <span style="color:red">*</span></label>
+                        <input type="date" class="form-input" id="jkoDate">
+                    </div>
                 </div>
 
                 <!-- Summary Board -->
