@@ -377,8 +377,8 @@ p.brand-tagline {
 /* Notices & Countdown Board Redesign */
 .notice-board {
   position: relative;
-  background: rgba(255, 255, 255, 0.95);
-  /* Slightly transparent */
+  background: rgba(255, 255, 255, 0.90);
+  /* Transparent white */
   backdrop-filter: blur(8px);
   /* Glassmorphism effect */
   /* Clean white card */
