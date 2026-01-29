@@ -12,6 +12,112 @@
         href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=Outfit:wght@400;600&display=swap"
         rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
+    <style>
+        /* Success Screen Styles */
+        .success-card {
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            max-width: 600px;
+            margin: 40px auto;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .success-icon {
+            width: 80px;
+            height: 80px;
+            background: #d4edda;
+            color: #155724;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+            margin: 0 auto 20px;
+        }
+
+        .success-title {
+            color: #155724;
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+
+        .success-subtitle {
+            color: #666;
+            margin-bottom: 30px;
+        }
+
+        .order-details-box {
+            background: #f8f9fa;
+            border: 1px dashed #ccc;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: left;
+            margin-bottom: 20px;
+        }
+
+        .detail-row {
+            display: flex;
+            justify-content: span;
+            margin-bottom: 10px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 5px;
+        }
+
+        .detail-row:last-child {
+            border-bottom: none;
+        }
+
+        .detail-label {
+            font-weight: bold;
+            color: #555;
+            flex: 0 0 100px;
+        }
+
+        .detail-value {
+            color: #333;
+            flex: 1;
+        }
+
+        .screenshot-hint {
+            background: #fff3cd;
+            color: #856404;
+            padding: 10px;
+            border-radius: 6px;
+            margin-bottom: 25px;
+            font-size: 0.9rem;
+            display: inline-block;
+        }
+
+        .back-home-btn {
+            display: inline-block;
+            background: var(--primary-color, #c45a00);
+            color: white;
+            padding: 12px 30px;
+            border-radius: 25px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: transform 0.2s;
+        }
+
+        .back-home-btn:hover {
+            transform: scale(1.05);
+        }
+    </style>
 </head>
 
 <body>
@@ -212,10 +318,74 @@
             </form>
         </section>
 
+        <!-- Success Section (Hidden by default) -->
+        <section class="success-section" id="successSection" style="display: none;">
+            <div class="success-card">
+                <div class="success-icon">✓</div>
+                <h2 class="success-title">訂購完成！</h2>
+                <div class="success-subtitle"><span id="successDate"></span> 訂單已送出</div>
+
+                <div class="order-details-box">
+                    <div class="detail-row">
+                        <div class="detail-label">訂購人</div>
+                        <div class="detail-value" id="successName">-</div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">總金額</div>
+                        <div class="detail-value" id="successTotal" style="color:#c45a00; font-weight:bold;">-</div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">付款方式</div>
+                        <div class="detail-value" id="successPayment">-</div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">取貨方式</div>
+                        <div class="detail-value" id="successDelivery">-</div>
+                    </div>
+                    <div class="detail-row" style="flex-direction:column;">
+                        <div class="detail-label" style="margin-bottom:5px;">訂購內容</div>
+                        <div class="detail-value" id="successItems" style="font-size:0.9rem; line-height:1.5;">-</div>
+                    </div>
+                </div>
+
+                <div class="screenshot-hint">
+                    📸 <strong>請截圖保存此畫面</strong> 以方便核對訂單
+                </div>
+
+                <br>
+                <a href="javascript:location.reload()" class="back-home-btn">回到首頁</a>
+            </div>
+        </section>
+
     </main>
 
-    <footer>
-        <p>&copy; 2026 建良鵝肉. All Rights Reserved.</p>
+    <footer class="site-footer">
+        <div class="container footer-content">
+            <div class="footer-info">
+                <h3 class="footer-brand">
+                    <img src="brand_logo.png" alt="Logo"
+                        style="width: 40px; height: 40px; vertical-align: middle; margin-right: 10px; border-radius: 50%; border: 2px solid var(--accent-color);">
+                    建良鵝肉
+                </h3>
+                <p class="footer-address">
+                    📍 <a href="https://maps.google.com/?q=新竹市東區光復路一段230號" target="_blank">300 新竹市東區光復路一段230號</a>
+                </p>
+                <p class="footer-phone">
+                    📞 <a href="tel:036669219">03 666 9219</a>
+                </p>
+                <p class="copyright">&copy; 2026 建良鵝肉. All Rights Reserved.</p>
+            </div>
+            <div class="footer-social">
+                <p>加入 LINE 好友．聯絡我們</p>
+                <img src="https://qr-official.line.me/gs/M_063ifost_GW.png?oat_content=qr" alt="建良鵝肉 LINE QR Code"
+                    class="qr-code">
+            </div>
+        </div>
+        <div class="container">
+            <div class="developer-credit">
+                ✨ Website Designed by <a href="http://evelynytliu.github.io/" target="_blank">Evelyn Liu</a> ✨
+            </div>
+        </div>
     </footer>
 
     <script src="script.js"></script>

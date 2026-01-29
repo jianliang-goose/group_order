@@ -503,8 +503,33 @@ async function submitOrder(e) {
             body: JSON.stringify(payload)
         });
 
-        alert(`訂單已送出！\n應付總額: $${total}\n付款方式: ${payload.paymentMethod}\n${paymentInfo}\n\n感謝您的訂購！`);
-        location.reload(); // Reset form
+        // Show Success Page & Hide Other Sections
+        const hero = document.querySelector('.hero-section');
+        hero.style.display = 'flex'; // Ensure it's visible
+        hero.classList.add('compact'); // Switch to compact mode
+
+        document.querySelector('.order-section').style.display = 'none';
+        document.getElementById('productList').style.display = 'none';
+        document.querySelector('.notice-board').style.display = 'none'; // Hide notice board too for cleaner look
+
+        const successSection = document.getElementById('successSection');
+        successSection.style.display = 'block';
+
+        // Fill Data
+        document.getElementById('successDate').innerText = new Date().toLocaleString('zh-TW', { hour12: false });
+        document.getElementById('successName').innerText = payload.name;
+        document.getElementById('successTotal').innerText = `$${total.toLocaleString()}`;
+        document.getElementById('successPayment').innerText = `${payload.paymentMethod}\n(${paymentInfo})`;
+        document.getElementById('successDelivery').innerText = `${payload.deliveryMethod}\n${payload.storeInfo}`;
+
+        // Format Items for better readability
+        const itemsList = itemsStr.map(item => `• ${item}`).join('<br>'); // Add bullet points
+        document.getElementById('successItems').innerHTML = itemsList;
+
+        window.scrollTo(0, 0); // Scroll to top to see msg
+
+        // Do NOT reload
+
 
     } catch (err) {
         console.error(err);

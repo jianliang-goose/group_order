@@ -76,11 +76,7 @@
             background-color: #f9f9f9;
         }
 
-        .items-cell {
-            font-size: 0.9rem;
-            color: #444;
-            max-width: 300px;
-        }
+
 
         .status-select {
             padding: 5px;
@@ -88,11 +84,256 @@
             border: 1px solid #ddd;
         }
 
-        .note-input {
+        .note-text {
+            max-width: 120px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: inline-block;
+            color: #555;
+            font-size: 0.9rem;
+            vertical-align: middle;
+        }
+
+        /* Prevent wrapping for badges and buttons */
+        .status-badge,
+        .status-btn,
+        .action-btn,
+        .verified-badge {
+            white-space: nowrap !important;
+        }
+
+        /* Column specific width adjustments */
+        /* Order ID / Date */
+        .data-table td:nth-child(1) {
+            white-space: nowrap;
+        }
+
+        /* Name / Phone */
+        .data-table td:nth-child(2) {
+            white-space: nowrap;
+        }
+
+        /* Amount */
+        .data-table td:nth-child(6) {
+            white-space: nowrap;
+        }
+
+        /* Status */
+        .data-table td:nth-child(9) {
+            white-space: nowrap;
+            min-width: 100px;
+            text-align: center;
+        }
+
+        /* Action */
+        .data-table td:nth-child(11) {
+            white-space: nowrap;
+            text-align: center;
+        }
+
+        .items-cell {
+            font-size: 0.9rem;
+            color: #444;
+            min-width: 220px;
+            /* Ensure space for items */
+            max-width: 400px;
+        }
+
+        .status-select.saving {
+            opacity: 0.6;
+            pointer-events: none;
+        }
+
+        .status-select.success {
+            animation: flash-success 0.5s ease;
+        }
+
+        .status-select.error {
+            animation: flash-error 0.5s ease;
+        }
+
+        @keyframes flash-success {
+
+            0%,
+            100% {
+                background: white;
+            }
+
+            50% {
+                background: #d4edda;
+            }
+        }
+
+        /* Modern Status Badge */
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+            background: #f0f0f0;
+            color: #333;
+            border: 1px solid transparent;
+        }
+
+        .status-badge::after {
+            content: '▼';
+            font-size: 0.6em;
+            margin-left: 6px;
+            opacity: 0.5;
+        }
+
+        .status-badge:hover {
+            filter: brightness(0.95);
+            transform: translateY(-1px);
+        }
+
+        /* Status Colors */
+        .status-badge[data-status='未處理'] {
+            background: #e9ecef;
+            color: #495057;
+        }
+
+        .status-badge[data-status='完成待取'] {
+            background: #cff4fc;
+            color: #055160;
+        }
+
+        .status-badge[data-status='已出貨'] {
+            background: #d1e7dd;
+            color: #0f5132;
+        }
+
+        .status-badge[data-status='已取消'] {
+            background: #f8d7da;
+            color: #842029;
+            text-decoration: line-through;
+        }
+
+        .status-badge[data-status='Saving'] {
+            background: #fff3cd;
+            color: #856404;
+            opacity: 0.8;
+            pointer-events: none;
+        }
+
+        /* Action Sheet Modal (Mobile Friendly) */
+        .status-modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
             width: 100%;
-            padding: 5px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.4);
+            z-index: 1000;
+            display: none;
+            justify-content: center;
+            align-items: flex-end;
+            /* Bottom sheet on mobile */
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .status-modal-overlay.open {
+            display: flex;
+            opacity: 1;
+        }
+
+        .status-action-sheet {
+            background: white;
+            width: 100%;
+            max-width: 400px;
+            border-radius: 20px 20px 0 0;
+            padding: 20px;
+            transform: translateY(100%);
+            transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        @media (min-width: 600px) {
+            .status-modal-overlay {
+                align-items: center;
+                /* Center on desktop */
+            }
+
+            .status-action-sheet {
+                border-radius: 12px;
+                transform: translateY(20px);
+                width: 300px;
+            }
+        }
+
+        .status-modal-overlay.open .status-action-sheet {
+            transform: translateY(0);
+        }
+
+        .sheet-title {
+            font-size: 1.1rem;
+            font-weight: bold;
+            margin-bottom: 15px;
+            text-align: center;
+            color: #333;
+        }
+
+        .sheet-options {
+            display: grid;
+            gap: 10px;
+        }
+
+        .sheet-option-btn {
+            background: white;
+            border: 1px solid #eee;
+            padding: 15px;
+            border-radius: 12px;
+            font-size: 1rem;
+            text-align: left;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            transition: background 0.2s;
+        }
+
+        .sheet-option-btn:hover {
+            background: #f8f9fa;
+        }
+
+        .sheet-option-btn .dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-right: 12px;
+        }
+
+        .sheet-option-btn[data-value='未處理'] .dot {
+            background: #6c757d;
+        }
+
+        .sheet-option-btn[data-value='完成待取'] .dot {
+            background: #0dcaf0;
+        }
+
+        .sheet-option-btn[data-value='已出貨'] .dot {
+            background: #198754;
+        }
+
+        .sheet-option-btn[data-value='已取消'] .dot {
+            background: #dc3545;
+        }
+
+        @keyframes flash-error {
+
+            0%,
+            100% {
+                background: white;
+            }
+
+            50% {
+                background: #f8d7da;
+            }
         }
 
         .action-btn {
@@ -131,9 +372,69 @@
             background-color: #e0a800;
         }
 
-        .btn-verify.verified {
-            background-color: #28a745;
+        /* Integrated Status Button */
+        .status-btn {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 15px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s;
+            margin-top: 5px;
+            min-width: 80px;
+            text-align: center;
+        }
+
+        /* Pending State (Wait for payment) */
+        .status-btn.pending {
+            background-color: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeeba;
+        }
+
+        .status-btn.pending:hover {
+            background-color: #ffc107;
+            color: #333;
+            border-color: #ffc107;
+        }
+
+        .status-btn.pending .btn-text-hover {
+            display: none;
+        }
+
+        .status-btn.pending:hover .btn-text-normal {
+            display: none;
+        }
+
+        .status-btn.pending:hover .btn-text-hover {
+            display: inline;
+        }
+
+        /* Verified State (Payment received) */
+        .status-btn.verified {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .status-btn.verified:hover {
+            background-color: #dc3545;
             color: white;
+            border-color: #dc3545;
+        }
+
+        .status-btn.verified .btn-text-hover {
+            display: none;
+        }
+
+        .status-btn.verified:hover .btn-text-normal {
+            display: none;
+        }
+
+        .status-btn.verified:hover .btn-text-hover {
+            display: inline;
         }
 
         .header-actions {
@@ -282,6 +583,78 @@
             background: #fff3cd;
             color: #856404;
         }
+
+        /* Global Filter Bar */
+        .global-filter-bar {
+            background: linear-gradient(135deg, #fff 0%, #f8f9fa 100%);
+            border-radius: 12px;
+            padding: 20px 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            flex-wrap: wrap;
+            border: 1px solid #eee;
+        }
+
+        .filter-label {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #333;
+            white-space: nowrap;
+        }
+
+        .filter-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            padding: 10px 20px;
+            border-radius: 25px;
+            border: 2px solid var(--primary-color);
+            cursor: pointer;
+            font-size: 0.95rem;
+            font-weight: 600;
+            transition: all 0.25s ease;
+            background: white;
+            color: #666;
+            border-color: #ccc;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .filter-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .filter-btn.active {
+            background: linear-gradient(135deg, var(--primary-color) 0%, #c45a00 100%);
+            color: white;
+            border-color: var(--primary-color);
+            box-shadow: 0 4px 15px rgba(196, 90, 0, 0.35);
+        }
+
+        .filter-btn.active:hover {
+            box-shadow: 0 6px 20px rgba(196, 90, 0, 0.45);
+        }
+
+        /* Filter count badge */
+        .filter-count {
+            display: inline-block;
+            background: rgba(255, 255, 255, 0.3);
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            margin-left: 6px;
+        }
+
+        .filter-btn:not(.active) .filter-count {
+            background: #eee;
+            color: #666;
+        }
     </style>
 </head>
 
@@ -289,7 +662,11 @@
     <header style="background: white; border-bottom: 1px solid #ddd; padding: 15px 0;">
         <div class="container" style="display:flex; justify-content:space-between; align-items:center;">
             <div style="display:flex; align-items:center; gap:20px;">
-                <h1 style="font-size: 1.5rem; margin:0;">訂單管理後台</h1>
+                <div style="display:flex; align-items:center;">
+                    <img src="brand_logo.png" alt="Logo"
+                        style="width: 45px; height: 45px; border-radius: 50%; border: 2px solid #f0f0f0; margin-right: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+                    <h1 style="font-size: 1.5rem; margin:0;">訂單管理後台</h1>
+                </div>
                 <nav>
                     <a href="admin.html" class="nav-link" style="color: #333; font-weight:bold;">訂單列表</a>
                     <span style="color:#ccc">|</span>
@@ -317,6 +694,14 @@
             </div>
         </section>
 
+        <!-- Global Filter Bar -->
+        <section class="global-filter-bar" id="globalFilterBar">
+            <div class="filter-label">📋 篩選訂單狀態：</div>
+            <div class="filter-buttons" id="globalStatusFilter">
+                <!-- Buttons will be generated by JS -->
+            </div>
+        </section>
+
         <!-- Orders Table -->
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 15px;">
             <h2 class="section-title" style="margin:0;">訂單列表</h2>
@@ -334,7 +719,7 @@
                         <th>訂購內容</th>
                         <th>金額</th>
                         <th>付款</th>
-                        <th>對帳資訊</th>
+                        <th>收款資訊</th>
                         <th>狀態</th>
                         <th>備註</th>
                         <th>操作</th>
@@ -418,7 +803,7 @@
                         </select>
                     </div>
                     <div class="form-group">
-                        <label>對帳資訊</label>
+                        <label>收款資訊</label>
                         <input type="text" id="edit-paymentInfo" placeholder="帳號末5碼/街口帳號等">
                     </div>
                 </div>
@@ -434,10 +819,10 @@
                         </select>
                     </div>
                     <div class="form-group">
-                        <label>對帳狀態</label>
+                        <label>收款狀態</label>
                         <select id="edit-paymentVerified">
-                            <option value="">未對帳</option>
-                            <option value="已對帳">✅ 已對帳</option>
+                            <option value="">未收款</option>
+                            <option value="已對帳">✅ 已收款</option>
                         </select>
                     </div>
                 </div>
@@ -456,6 +841,27 @@
     </div>
 
     <script src="script.js"></script>
+    <!-- Status Action Sheet Modal -->
+    <div class="status-modal-overlay" id="statusActionSheet" onclick="closeStatusSheet(event)">
+        <div class="status-action-sheet">
+            <div class="sheet-title">選擇訂單狀態</div>
+            <div class="sheet-options">
+                <div class="sheet-option-btn" onclick="selectStatus('未處理')" data-value="未處理">
+                    <div class="dot"></div>未處理
+                </div>
+                <div class="sheet-option-btn" onclick="selectStatus('完成待取')" data-value="完成待取">
+                    <div class="dot"></div>完成待取
+                </div>
+                <div class="sheet-option-btn" onclick="selectStatus('已出貨')" data-value="已出貨">
+                    <div class="dot"></div>已出貨
+                </div>
+                <div class="sheet-option-btn" onclick="selectStatus('已取消')" data-value="已取消">
+                    <div class="dot"></div>已取消
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script>
         document.addEventListener('DOMContentLoaded', async () => {
             if (typeof GAS_API_URL === 'undefined' || GAS_API_URL.includes("YOUR_GAS_WEB_APP_URL")) {
@@ -477,11 +883,63 @@
             }
         }
 
+        // Global filter state
+        window.activeFilters = ['未處理', '完成待取', '已出貨'];
+
+        function initGlobalFilter(orders) {
+            const filterContainer = document.getElementById('globalStatusFilter');
+            if (!filterContainer) return;
+
+            filterContainer.innerHTML = '';
+            const statuses = ['未處理', '完成待取', '已出貨', '已取消'];
+
+            // Count orders per status
+            const statusCounts = {};
+            statuses.forEach(s => statusCounts[s] = 0);
+            orders.forEach(o => {
+                if (statusCounts.hasOwnProperty(o.Status)) {
+                    statusCounts[o.Status]++;
+                }
+            });
+
+            statuses.forEach(status => {
+                const btn = document.createElement('button');
+                const isCancelled = (status === '已取消');
+                const isActive = window.activeFilters.includes(status);
+
+                btn.className = isActive ? 'filter-btn active' : 'filter-btn';
+                btn.innerHTML = `${status}<span class="filter-count">${statusCounts[status]}</span>`;
+                btn.dataset.status = status;
+
+                btn.onclick = () => {
+                    const idx = window.activeFilters.indexOf(status);
+                    if (idx > -1) {
+                        window.activeFilters.splice(idx, 1);
+                        btn.classList.remove('active');
+                    } else {
+                        window.activeFilters.push(status);
+                        btn.classList.add('active');
+                    }
+                    applyGlobalFilter();
+                };
+
+                filterContainer.appendChild(btn);
+            });
+        }
+
+        function applyGlobalFilter() {
+            if (!window.currentOrdersData) return;
+
+            // Re-render both stats and table
+            calculateAndRenderStats(window.currentOrdersData);
+            renderFilteredOrdersTable(window.currentOrdersData);
+        }
+
         function calculateAndRenderStats(orders) {
-            // Find or Create Container
+            // Find or Create Container (without filter buttons now)
             let container = document.getElementById('productStatsContainer');
             if (!container) {
-                const statsGrid = document.querySelector('.stats-grid');
+                const globalFilterBar = document.getElementById('globalFilterBar');
                 const section = document.createElement('div');
                 section.id = 'productStatsContainer';
                 section.className = 'data-table-wrapper';
@@ -491,7 +949,7 @@
                 section.style.borderRadius = '10px';
                 section.style.boxShadow = '0 2px 5px rgba(0,0,0,0.05)';
 
-                // Header with Title and Filter
+                // Header with Title only (no filter buttons - they are global now)
                 const headerDiv = document.createElement('div');
                 headerDiv.style.display = 'flex';
                 headerDiv.style.alignItems = 'center';
@@ -507,69 +965,6 @@
 
                 headerDiv.appendChild(title);
 
-                // Filter Buttons Container
-                const filterContainer = document.createElement('div');
-                filterContainer.id = 'statsFilterContainer';
-                filterContainer.style.display = 'flex';
-                filterContainer.style.gap = '8px';
-                filterContainer.style.flexWrap = 'wrap';
-                filterContainer.style.marginLeft = 'auto';
-
-                // Status Options (Updated)
-                const statuses = ['未處理', '完成待取', '已出貨', '已取消'];
-
-                statuses.forEach(status => {
-                    const btn = document.createElement('button');
-                    btn.innerText = status;
-                    // Default active unless '已取消'
-                    const isCancelled = (status === '已取消');
-                    if (!isCancelled) btn.className = 'filter-pill active';
-                    else btn.className = 'filter-pill';
-
-                    // Styles
-                    btn.style.padding = '6px 12px';
-                    btn.style.borderRadius = '20px';
-                    btn.style.border = '1px solid var(--primary-color)';
-                    btn.style.cursor = 'pointer';
-                    btn.style.fontSize = '0.85rem';
-                    btn.style.transition = 'all 0.2s';
-
-                    // Initial State Style
-                    if (!isCancelled) {
-                        btn.style.background = 'var(--primary-color)';
-                        btn.style.color = '#fff';
-                    } else {
-                        btn.style.background = '#fff';
-                        btn.style.color = '#666';
-                        btn.style.borderColor = '#ccc';
-                    }
-
-                    btn.dataset.status = status;
-
-                    btn.onclick = () => {
-                        const isActive = btn.classList.contains('active');
-                        if (isActive) {
-                            btn.classList.remove('active');
-                            // Inactive Style
-                            btn.style.background = '#fff';
-                            btn.style.color = '#666';
-                            btn.style.borderColor = '#ccc';
-                        } else {
-                            btn.classList.add('active');
-                            // Active Style
-                            btn.style.background = 'var(--primary-color)';
-                            btn.style.color = '#fff';
-                            btn.style.borderColor = 'var(--primary-color)';
-                        }
-                        if (window.currentOrdersData) {
-                            calculateAndRenderStats(window.currentOrdersData);
-                        }
-                    };
-                    filterContainer.appendChild(btn);
-                });
-
-                headerDiv.appendChild(filterContainer);
-
                 const content = document.createElement('div');
                 content.id = 'productStatsContent';
                 content.style.display = 'grid';
@@ -578,41 +973,19 @@
 
                 section.appendChild(headerDiv);
                 section.appendChild(content);
-                statsGrid.parentNode.insertBefore(section, statsGrid.nextSibling);
+                globalFilterBar.parentNode.insertBefore(section, globalFilterBar.nextSibling);
                 container = section;
             }
 
-            // Calculation Logic
-            const activeStatuses = [];
-
-            // Check DOM for active pills
-            const pills = document.querySelectorAll('#statsFilterContainer .filter-pill.active');
-            if (pills.length > 0) {
-                pills.forEach(p => activeStatuses.push(p.dataset.status));
-            } else {
-                // Fallback if UI not ready (should not happen as we just built it) 
-                // OR if user unselected all (valid case)
-                // If container exists but no pills active, activeStatuses is empty.
-
-                // However, for first load logic where container might not be in DOM yet?
-                if (!document.getElementById('statsFilterContainer')) {
-                    // First load default: All except Cancelled
-                    activeStatuses.push('未處理', '完成待取', '已出貨');
-                }
-            }
+            // Use global filter state
+            const activeStatuses = window.activeFilters || [];
 
             const productStats = {};
             let matchCount = 0;
 
             orders.forEach(o => {
-                // Multi-select Filter Logic
-                if (document.getElementById('statsFilterContainer')) {
-                    if (activeStatuses.length === 0) return; // All unselected -> Show nothing
-                    if (!activeStatuses.includes(o.Status)) return;
-                } else {
-                    // Fallback default logic
-                    if (o.Status === '已取消') return;
-                }
+                if (activeStatuses.length === 0) return;
+                if (!activeStatuses.includes(o.Status)) return;
 
                 matchCount++;
                 const itemsStr = o.Items || "";
@@ -675,6 +1048,160 @@
             });
         }
 
+        function renderFilteredOrdersTable(orders) {
+            const tbody = document.querySelector('#ordersTable tbody');
+            tbody.innerHTML = '';
+
+            const activeStatuses = window.activeFilters || [];
+
+            // Sort new to old
+            orders.sort((a, b) => {
+                const dateA = new Date(a.Timestamp);
+                const dateB = new Date(b.Timestamp);
+                const timeA = isNaN(dateA.getTime()) ? 0 : dateA.getTime();
+                const timeB = isNaN(dateB.getTime()) ? 0 : dateB.getTime();
+                return timeB - timeA;
+            });
+
+            let filteredCount = 0;
+
+            orders.forEach(o => {
+                // Apply filter
+                if (activeStatuses.length > 0 && !activeStatuses.includes(o.Status)) {
+                    return;
+                }
+
+                filteredCount++;
+                const tr = document.createElement('tr');
+                tr.dataset.order = JSON.stringify(o);
+
+                // Display Date Safely
+                let dateDisplay = o.Timestamp;
+                const dateObj = new Date(o.Timestamp);
+                if (!isNaN(dateObj.getTime())) {
+                    dateDisplay = dateObj.toLocaleString('zh-TW', { month: 'numeric', day: 'numeric', hour: 'numeric', minute: 'numeric' });
+                }
+
+                // Status Badge (Modern UI)
+                const statusBadge = `<div class="status-badge" 
+                                      id="status-badge-${o.Order_ID}"
+                                      data-status="${o.Status}"
+                                      onclick="openStatusSheet('${o.Order_ID}', '${o.Status}')">
+                                      ${o.Status}
+                                     </div>`;
+
+                // Price Display Safely
+                let priceVal = String(o.Grand_Total || o.Total_Amount || "0").replace(/[$,]/g, "");
+                let priceNum = parseFloat(priceVal) || 0;
+
+                // Payment Info Display
+                const paymentMethod = o.Payment_Method || '-';
+                const paymentInfo = o.Payment_Info || '';
+
+                // Verified Status Button Logic
+                const isVerified = (o.Payment_Verified === '已對帳') || (o.Note && o.Note.includes('[已對帳]'));
+                const btnClass = isVerified ? 'status-btn verified' : 'status-btn pending';
+                const btnContent = isVerified
+                    ? '<span class="btn-text-normal">✅ 已收款</span><span class="btn-text-hover">復原</span>'
+                    : '<span class="btn-text-normal">待收款</span><span class="btn-text-hover">確認收款</span>';
+
+                tr.innerHTML = `
+                    <td>
+                        <div style="font-weight:bold;">${o.Order_ID}</div>
+                        <div style="font-size:0.85rem; color:#666;">${dateDisplay}</div>
+                    </td>
+                    <td>
+                        <div>${o.Name}</div>
+                        <div style="font-size:0.85rem; color:#666;">${o.Phone}</div>
+                    </td>
+                    <td>${o.Group_Leader || '-'}</td>
+                    <td>
+                        ${o.Delivery_Method}<br>
+                        <span style="font-size:0.8rem; color:#888;">${o.Store_Info || ''}</span>
+                    </td>
+                    <td class="items-cell">${o.Items}</td>
+                    <td style="font-weight:bold; color:var(--primary-color);">$${priceNum.toLocaleString()}</td>
+                    <td>
+                        <div class="payment-method">${paymentMethod}</div>
+                    </td>
+                    <td class="payment-info">
+                        <div style="margin-bottom: 5px;">${paymentInfo || '-'}</div>
+                        <button type="button" class="${btnClass}" data-action="toggle-verify" data-id="${String(o.Order_ID).replace(/"/g, '&quot;')}" data-verified="${isVerified}">
+                            ${btnContent}
+                        </button>
+                    </td>
+                    <td>${statusBadge}</td>
+                    <td>
+                        <span class="note-text" title="${(o.Note || '').replace(/"/g, '&quot;')}">${o.Note || '-'}</span>
+                    </td>
+                    <td>
+                        <button class="action-btn btn-edit" onclick="openEditModal('${o.Order_ID}')">編輯</button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            // Show empty message if no results
+            if (filteredCount === 0) {
+                tbody.innerHTML = `<tr><td colspan="11" style="text-align:center; padding: 30px; color: #999;">無符合篩選條件的訂單</td></tr>`;
+            }
+        }
+
+        // --- New Action Sheet Logic ---
+        let currentEditingOrderId = null;
+
+        function openStatusSheet(orderId, currentStatus) {
+            currentEditingOrderId = orderId;
+            const sheet = document.getElementById('statusActionSheet');
+
+            // Highlight current option
+            document.querySelectorAll('.sheet-option-btn').forEach(btn => {
+                if (btn.dataset.value === currentStatus) {
+                    btn.style.background = '#f0f0f0';
+                    btn.style.fontWeight = 'bold';
+                } else {
+                    btn.style.background = 'white';
+                    btn.style.fontWeight = 'normal';
+                }
+            });
+
+            sheet.classList.add('open');
+        }
+
+        function closeStatusSheet(e) {
+            if (e.target.id === 'statusActionSheet') {
+                document.getElementById('statusActionSheet').classList.remove('open');
+                currentEditingOrderId = null;
+            }
+        }
+
+        function selectStatus(newStatus) {
+            if (!currentEditingOrderId) return;
+
+            const badge = document.getElementById(`status-badge-${currentEditingOrderId}`);
+            if (badge) {
+                // Optimistic UI Update
+                updateStatusBadgeUI(badge, newStatus, true); // true = saving state
+                autoSaveStatus(currentEditingOrderId, newStatus, badge);
+            }
+
+            document.getElementById('statusActionSheet').classList.remove('open');
+            currentEditingOrderId = null;
+        }
+
+        function updateStatusBadgeUI(badge, status, isSaving = false) {
+            badge.innerText = isSaving ? '儲存中...' : status;
+            badge.dataset.status = isSaving ? 'Saving' : status;
+            // Add/remove a class for visual feedback (e.g., spinner, different color)
+            if (isSaving) {
+                badge.classList.add('status-saving');
+            } else {
+                badge.classList.remove('status-saving');
+                // You might want to update the badge's background color based on the status here
+                // For example: badge.style.backgroundColor = getStatusColor(status);
+            }
+        }
+
         function renderDashboard(orders) {
             // Save globally for filtering logic
             window.currentOrdersData = orders;
@@ -684,7 +1211,7 @@
                 // 1. Basic Counts
                 document.getElementById('totalOrders').innerText = orders.length;
 
-                // 2. Revenue Parsing
+                // 2. Revenue Parsing (exclude cancelled)
                 const revenue = orders.reduce((sum, o) => {
                     if (o.Status === '已取消') return sum;
                     let valStr = String(o.Grand_Total || o.Total_Amount || "0").replace(/[$,]/g, "");
@@ -692,120 +1219,30 @@
                 }, 0);
                 document.getElementById('totalRevenue').innerText = `$${Math.round(revenue).toLocaleString()}`;
 
-                // 3. Product Sales Statistics (Enhanced)
-                calculateAndRenderStats(orders);
-
                 const pending = orders.filter(o => o.Status === '未處理').length;
                 document.getElementById('pendingOrders').innerText = pending;
 
-                // Table
-                const tbody = document.querySelector('#ordersTable tbody');
-                tbody.innerHTML = '';
+                // 3. Initialize Global Filter Buttons (with counts)
+                initGlobalFilter(orders);
 
-                // Sort new to old (Robust Date Parsing)
-                orders.sort((a, b) => {
-                    const dateA = new Date(a.Timestamp);
-                    const dateB = new Date(b.Timestamp);
-                    // If invalid date (e.g. Chinese format issue), treat as 0 or current
-                    const timeA = isNaN(dateA.getTime()) ? 0 : dateA.getTime();
-                    const timeB = isNaN(dateB.getTime()) ? 0 : dateB.getTime();
-                    return timeB - timeA;
-                });
+                // 4. Product Sales Statistics
+                calculateAndRenderStats(orders);
 
-                orders.forEach(o => {
-                    const tr = document.createElement('tr');
-                    tr.dataset.order = JSON.stringify(o); // Store full order data for editing
+                // 5. Render Filtered Orders Table
+                renderFilteredOrdersTable(orders);
 
-                    // Display Date Safely
-                    let dateDisplay = o.Timestamp;
-                    const dateObj = new Date(o.Timestamp);
-                    if (!isNaN(dateObj.getTime())) {
-                        dateDisplay = dateObj.toLocaleString('zh-TW', { month: 'numeric', day: 'numeric', hour: 'numeric', minute: 'numeric' });
-                    }
-
-                    // Status Dropdown
-                    const statusOptions = ['未處理', '完成待取', '已出貨', '已取消'];
-                    let statusHtml = `<select class="status-select" id="status-${o.Order_ID}">`;
-                    statusOptions.forEach(st => {
-                        const selected = (o.Status === st) ? 'selected' : '';
-                        statusHtml += `<option value="${st}" ${selected}>${st}</option>`;
-                    });
-                    statusHtml += `</select>`;
-
-                    // Price Display Safely
-                    let priceVal = String(o.Grand_Total || o.Total_Amount || "0").replace(/[$,]/g, "");
-                    let priceNum = parseFloat(priceVal) || 0;
-
-                    // Payment Info Display
-                    const paymentMethod = o.Payment_Method || '-';
-                    const paymentInfo = o.Payment_Info || '';
-
-                    // Verified Status (stored in Note field with prefix or separate field)
-                    const isVerified = (o.Payment_Verified === '已對帳') || (o.Note && o.Note.includes('[已對帳]'));
-                    const verifiedBadge = isVerified
-                        ? '<span class="verified-badge yes">✅ 已對帳</span>'
-                        : '<span class="verified-badge no">待對帳</span>';
-
-                    tr.innerHTML = `
-                        <td>
-                            <div style="font-weight:bold;">${o.Order_ID}</div>
-                            <div style="font-size:0.85rem; color:#666;">${dateDisplay}</div>
-                        </td>
-                        <td>
-                            <div>${o.Name}</div>
-                            <div style="font-size:0.85rem; color:#666;">${o.Phone}</div>
-                        </td>
-                        <td>${o.Group_Leader || '-'}</td>
-                        <td>
-                            ${o.Delivery_Method}<br>
-                            <span style="font-size:0.8rem; color:#888;">${o.Store_Info || ''}</span>
-                        </td>
-                        <td class="items-cell">${o.Items}</td>
-                        <td style="font-weight:bold; color:var(--primary-color);">$${priceNum.toLocaleString()}</td>
-                        <td>
-                            <div class="payment-method">${paymentMethod}</div>
-                        </td>
-                        <td class="payment-info">
-                            <div>${paymentInfo || '-'}</div>
-                            ${verifiedBadge}
-                        </td>
-                        <td>${statusHtml}</td>
-                        <td>
-                            <input type="text" class="note-input" id="note-${o.Order_ID}" value="${o.Note || ''}" placeholder="備註..." style="width:120px;">
-                        </td>
-                        <td>
-                            <button class="action-btn btn-save" onclick="updateOrder('${o.Order_ID}')">儲存</button>
-                            <button class="action-btn btn-edit" onclick="openEditModal('${o.Order_ID}')">編輯</button>
-                            <button class="action-btn btn-verify ${isVerified ? 'verified' : ''}" onclick="toggleVerify('${o.Order_ID}')">${isVerified ? '✓' : '對帳'}</button>
-                        </td>
-                    `;
-                    tbody.appendChild(tr);
-                });
             } catch (err) {
                 console.error("Render Error:", err);
                 alert("渲染訂單列表時發生錯誤: " + err.message);
             }
         }
 
-        async function updateOrder(orderId) {
-            const status = document.getElementById(`status-${orderId}`).value;
-            const note = document.getElementById(`note-${orderId}`).value;
-
-            const btn = document.querySelector(`button[onclick="updateOrder('${orderId}')"]`);
-            // Store original content
-            const originalHTML = btn.innerHTML;
-
-            // Set loading state with spinner
-            btn.innerHTML = '<span class="spinner-icon"></span>';
-            btn.disabled = true;
-            btn.style.opacity = '0.7';
-
+        async function autoSaveStatus(orderId, newStatus, badgeElement) {
             try {
                 const payload = {
                     action: 'updateOrder',
                     orderId: orderId,
-                    status: status,
-                    note: note
+                    status: newStatus
                 };
 
                 await fetch(GAS_API_URL, {
@@ -815,16 +1252,55 @@
                     body: JSON.stringify(payload)
                 });
 
-                // Since no-cors returns opaque, we assume success if no network error
-                alert('更新成功！');
+                // Update local dataset order (Crucial for subsequent edits)
+                const row = badgeElement.closest('tr');
+                if (row && row.dataset.order) {
+                    const orderData = JSON.parse(row.dataset.order);
+                    orderData.Status = newStatus;
+                    row.dataset.order = JSON.stringify(orderData);
+                }
+
+                // Update global data
+                if (window.currentOrdersData) {
+                    const orderIndex = window.currentOrdersData.findIndex(o => o.Order_ID === orderId);
+                    if (orderIndex !== -1) {
+                        window.currentOrdersData[orderIndex].Status = newStatus;
+                    }
+
+                    // Update stats
+                    // Pending count
+                    const pending = window.currentOrdersData.filter(o => o.Status === '未處理').length;
+                    document.getElementById('pendingOrders').innerText = pending;
+
+                    // Revenue
+                    const revenue = window.currentOrdersData.reduce((sum, o) => {
+                        if (o.Status === '已取消') return sum;
+                        let valStr = String(o.Grand_Total || o.Total_Amount || "0").replace(/[$,]/g, "");
+                        return sum + (parseFloat(valStr) || 0);
+                    }, 0);
+                    document.getElementById('totalRevenue').innerText = `$${Math.round(revenue).toLocaleString()}`;
+
+                    // Update global filter buttons
+                    initGlobalFilter(window.currentOrdersData);
+
+                    // Note: We do NOT call calculateAndRenderStats or renderFilteredOrdersTable here
+                    // because that would redraw the whole table and lose scroll position/focus.
+                    // Instead, we just updated the badge UI in place.
+                }
+
+                // Finalize UI
+                updateStatusBadgeUI(badgeElement, newStatus, false);
+
             } catch (e) {
                 console.error(e);
-                alert('更新失敗');
-            } finally {
-                // Restore original state
-                btn.innerHTML = originalHTML;
-                btn.disabled = false;
-                btn.style.opacity = '1';
+                badgeElement.innerText = '錯誤';
+                badgeElement.style.background = '#f8d7da';
+                setTimeout(() => {
+                    // Revert to something logic? Or just reload logic.
+                    // Ideally we should revert to old status.
+                    // For now, reload helps recover state.
+                    // location.reload(); 
+                }, 2000);
             }
         }
 
@@ -867,6 +1343,16 @@
         async function saveOrderEdit(e) {
             e.preventDefault();
 
+            // Find the submit button to update its state
+            const submitBtn = e.target.querySelector('button[type="submit"]');
+            const originalBtnText = submitBtn ? submitBtn.innerHTML : '💾 儲存變更';
+
+            if (submitBtn) {
+                submitBtn.innerHTML = '💾 儲存中...';
+                submitBtn.disabled = true;
+                submitBtn.style.opacity = '0.7';
+            }
+
             const orderId = document.getElementById('edit-orderId').value;
 
             const payload = {
@@ -896,50 +1382,139 @@
                     body: JSON.stringify(payload)
                 });
 
+                // Optimistic UI Update (Update local data immediately without reload)
+                if (window.currentOrdersData) {
+                    const orderIndex = window.currentOrdersData.findIndex(o => o.Order_ID === orderId);
+                    if (orderIndex !== -1) {
+                        // Map payload back to data structure keys
+                        const oldOrder = window.currentOrdersData[orderIndex];
+                        const newOrder = {
+                            ...oldOrder,
+                            Name: payload.name,
+                            Phone: payload.phone,
+                            Group_Leader: payload.groupLeader,
+                            Items: payload.items,
+                            Total_Amount: payload.totalAmount,
+                            Shipping_Fee: payload.shippingFee,
+                            Grand_Total: payload.grandTotal,
+                            Delivery_Method: payload.deliveryMethod,
+                            Store_Info: payload.storeInfo,
+                            Payment_Method: payload.paymentMethod,
+                            Payment_Info: payload.paymentInfo,
+                            Status: payload.status,
+                            Payment_Verified: payload.paymentVerified,
+                            Note: payload.note
+                        };
+                        window.currentOrdersData[orderIndex] = newOrder;
+
+                        // Re-render everything
+                        renderDashboard(window.currentOrdersData);
+                    }
+                }
+
                 alert('訂單更新成功！');
                 closeEditModal();
-                location.reload(); // Refresh to show changes
+                // No reload needed anymore
             } catch (e) {
                 console.error(e);
                 alert('更新失敗');
+                // Revert button state on error
+                if (submitBtn) {
+                    submitBtn.innerHTML = originalBtnText;
+                    submitBtn.disabled = false;
+                    submitBtn.style.opacity = '1';
+                }
             }
         }
 
-        async function toggleVerify(orderId) {
-            const noteInput = document.getElementById(`note-${orderId}`);
-            let note = noteInput.value;
+        // Toggle Verify Function (Refactored for Event Delegation)
+        async function toggleVerify(btn) {
+            const orderId = btn.dataset.id;
+            // Read current state from DOM (string "true"/"false" converted to boolean)
+            const currentlyVerified = btn.dataset.verified === 'true';
 
-            // Toggle verified status in note
-            if (note.includes('[已對帳]')) {
-                note = note.replace('[已對帳]', '').trim();
-            } else {
-                note = '[已對帳] ' + note;
-            }
-            noteInput.value = note;
+            console.log('toggleVerify called for:', orderId, 'Current:', currentlyVerified);
 
-            // Also update the Payment_Verified field
+            const originalHTML = btn.innerHTML;
+            const originalClass = btn.className;
+
+            // Set loading state
+            btn.innerHTML = '處理中...';
+            btn.disabled = true;
+            btn.style.opacity = '0.7';
+
+            // Determine new state (toggle)
+            const newVerifiedState = !currentlyVerified;
+            const newPaymentVerified = newVerifiedState ? '已對帳' : '';
+
             const payload = {
                 action: 'updateOrder',
                 orderId: orderId,
-                note: note,
-                paymentVerified: note.includes('[已對帳]') ? '已對帳' : ''
+                paymentVerified: newPaymentVerified
             };
 
             try {
+                console.log('Sending payload:', payload);
                 await fetch(GAS_API_URL, {
                     method: "POST",
                     mode: "no-cors",
                     headers: { "Content-Type": "text/plain" },
                     body: JSON.stringify(payload)
                 });
+                console.log('Fetch completed');
 
-                // Reload to reflect changes
-                location.reload();
+                // Update button UI
+                if (newVerifiedState) {
+                    btn.className = 'status-btn verified';
+                    btn.innerHTML = '<span class="btn-text-normal">✅ 已收款</span><span class="btn-text-hover">復原</span>';
+                } else {
+                    btn.className = 'status-btn pending';
+                    btn.innerHTML = '<span class="btn-text-normal">待收款</span><span class="btn-text-hover">確認收款</span>';
+                }
+
+                // CRITICAL: Update the data attribute so the next click works correctly
+                btn.dataset.verified = newVerifiedState;
+
+                // Update local data
+                const row = btn.closest('tr');
+                if (row && row.dataset.order) {
+                    const orderData = JSON.parse(row.dataset.order);
+                    orderData.Payment_Verified = newPaymentVerified;
+                    row.dataset.order = JSON.stringify(orderData);
+                }
+
+                // Update global data (for consistency if re-rendered)
+                if (window.currentOrdersData) {
+                    const orderIndex = window.currentOrdersData.findIndex(o => o.Order_ID === orderId);
+                    if (orderIndex !== -1) {
+                        window.currentOrdersData[orderIndex].Payment_Verified = newPaymentVerified;
+                    }
+                }
             } catch (e) {
-                console.error(e);
-                alert('對帳狀態更新失敗');
+                console.error('Error in toggleVerify:', e);
+                alert('收款狀態更新失敗: ' + e.message);
+                btn.innerHTML = originalHTML;
+                btn.className = originalClass;
+            } finally {
+                btn.disabled = false;
+                btn.style.opacity = '1';
             }
         }
+
+        // Event Delegation for Dynamic Table
+        document.addEventListener('DOMContentLoaded', () => {
+            const table = document.getElementById('ordersTable');
+            if (table) {
+                table.addEventListener('click', (e) => {
+                    // Find the closest button with data-action="toggle-verify"
+                    const btn = e.target.closest('button[data-action="toggle-verify"]');
+                    if (btn) {
+                        e.preventDefault(); // Prevent weird behaviors
+                        toggleVerify(btn);
+                    }
+                });
+            }
+        });
     </script>
 </body>
 
