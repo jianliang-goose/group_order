@@ -288,18 +288,34 @@ function createOrder(doc, data) {
      sheet.appendRow([
        'Timestamp', 'Order_ID', 'Group_Leader', 'Name', 'Phone', 'Items', 
        'Total_Amount', 'Shipping_Fee', 'Grand_Total', 
-       'Payment_Method', 'Payment_Info', 'Delivery_Method', 'Store_Info', 'Status', 'Note'
+       'Payment_Method', 'Payment_Info', 'Delivery_Method', 'Store_Info', 'Status', 'Payment_Verified', 'Note'
      ]);
   } else {
-     // Check if Payment_Info column exists, if not add it
+     // Check headers and force add missing columns if needed
      var headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
+     
+     // 1. Check Payment_Info
      if (headers.indexOf('Payment_Info') === -1) {
-       // Insert Payment_Info column after Payment_Method
        var paymentMethodIndex = headers.indexOf('Payment_Method');
        if (paymentMethodIndex !== -1) {
          sheet.insertColumnAfter(paymentMethodIndex + 1);
          sheet.getRange(1, paymentMethodIndex + 2).setValue('Payment_Info');
        }
+     }
+
+     // 2. Check Payment_Verified
+     // Refresh headers in case we added one above
+     headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
+     if (headers.indexOf('Payment_Verified') === -1) {
+        var statusIndex = headers.indexOf('Status');
+        // Insert after Status if possible, or just at end
+        if (statusIndex !== -1) {
+           sheet.insertColumnAfter(statusIndex + 1);
+           sheet.getRange(1, statusIndex + 2).setValue('Payment_Verified');
+        } else {
+           // Append to end
+           sheet.getRange(1, headers.length + 1).setValue('Payment_Verified');
+        }
      }
   }
 
@@ -321,6 +337,7 @@ function createOrder(doc, data) {
   newRow.push(data.deliveryMethod || '');
   newRow.push(data.storeInfo || '');
   newRow.push('未處理'); 
+  newRow.push(''); // Payment_Verified default empty
   newRow.push(''); // Note initially empty
 
   sheet.appendRow(newRow);

@@ -150,13 +150,14 @@ button {
   /* Restore to original thin font */
   font-size: 1.6rem;
   color: #fff;
-  letter-spacing: 2px;
-  /* Moderate spacing */
+  letter-spacing: 12px;
+  /* Widened to match English width */
+  margin-right: -12px;
+  /* Compensate for last char spacing */
   text-shadow: 0 2px 10px rgba(0, 0, 0, 0.9);
   line-height: 1.1;
-  text-align: justify;
-  text-align-last: justify;
-  /* Force full width alignment */
+  text-align: center;
+  /* Center align instead of huge justify */
 }
 
 .brand-name-en {
@@ -166,13 +167,12 @@ button {
   /* Smaller size to match width */
   color: #fff;
   text-shadow: 0 2px 10px rgba(0, 0, 0, 0.9);
-  text-align: justify;
-  text-align-last: justify;
-  /* Force full width alignment */
+  text-align: center;
   margin-top: 4px;
   /* Space between CH and EN */
   opacity: 0.9;
-  letter-spacing: 0;
+  letter-spacing: 1px;
+  /* Natural spacing to match width roughly */
 }
 
 /* Footer Brand Group */
@@ -193,32 +193,28 @@ button {
 .footer-text-group {
   display: flex;
   flex-direction: column;
-  width: max-content;
-  /* Ensure container fits the widest text */
 }
 
 .footer-brand-zh {
-  display: block;
   font-family: 'Ningshu', 'Noto Sans TC', sans-serif;
   font-size: 2rem;
   font-weight: normal;
   color: var(--accent-color);
-  letter-spacing: 2px;
+  letter-spacing: 12px;
+  /* Widened to match English width */
+  margin-right: -12px;
+  /* Compensate for last char spacing */
   line-height: 1.1;
-  text-align: justify;
-  text-align-last: justify;
+  text-align: center;
 }
 
 .footer-brand-en {
-  display: block;
   font-family: 'Ningshu', 'Noto Sans TC', sans-serif;
   font-size: 1rem;
   color: var(--accent-color);
   /* Match accent color */
   opacity: 0.8;
-  letter-spacing: 0;
-  text-align: justify;
-  text-align-last: justify;
+  letter-spacing: 1px;
 }
 
 /* Content Layout */
