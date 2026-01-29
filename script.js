@@ -76,6 +76,15 @@ async function fetchConfig(ignorePreload = false) {
             if (row.Key) settingsObj[row.Key] = row.Value;
         });
 
+        // HOTFIX: 強制更新圖片路徑 (Google Sheet 可能還沒改)
+        productsData.forEach(p => {
+            // 肉燥包改用 .jpg
+            if (p.ID === 'p2') p.Image = 'images/goose-sauce.jpg';
+            // 為了保險起見，也可以強制更新其他新圖
+            if (p.ID === 'p1') p.Image = 'images/goose-quarter.png';
+            if (p.ID === 'p3') p.Image = 'images/goose-whole.png';
+        });
+
         console.log("CSV Data Loaded Successfully");
         renderApp(productsData, settingsObj);
 
