@@ -239,11 +239,59 @@ function renderApp(productsArray, settingsMsg) {
 
 function renderNotices() {
     const list = document.getElementById('noticeList');
-    list.innerHTML = `
-        <li>📅 最後寄貨日：<span class="highlight-date">${settings.shipping_date || 'TBD'}</span></li>
-        <li>📅 最後接單日：<span class="highlight-date">${settings.close_date || 'TBD'}</span></li>
-        <li>📅 最後自取日：<span class="highlight-date">${settings.pickup_date || 'TBD'}</span></li>
-        <li style="margin-top: 10px;">🚚 <strong>運費規則</strong>：消費滿 <strong>$${settings.shipping_threshold || 3000}</strong> 免運費，未滿則運費 $${settings.shipping_fee || 120}。</li>
+    // Clear list styles since we are switching to divs, but we'll attach to the parent container usually
+    // Actually the parent is <ul class="notice-list" id="noticeList">. 
+    // It's better if we replace the innerHTML with our new structure, but strict <ul> requires <li>.
+    // Let's target the parent section instead for full control or just swap the UL to DIVs in JS?
+    // The HTML has <ul class="notice-list" id="noticeList"> inside <section class="notice-board">.
+    // Let's replace the whole innerHTML of notice-board to give us full freedom.
+
+    const board = document.querySelector('.notice-board');
+    if (!board) return;
+
+    board.innerHTML = `
+        <div class="notice-header">
+            <h3 class="notice-title-text">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" class="notice-icon">
+                    <path d="M8 2V5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M16 2V5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M3.5 9.08997H20.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M21 8.5V17C21 20 19.5 22 16 22H8C4.5 22 3 20 3 17V8.5C3 5.5 4.5 3.5 8 3.5H16C19.5 3.5 21 5.5 21 8.5Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                訂購重要時程
+            </h3>
+        </div>
+        
+        <div class="notice-timeline">
+            <div class="timeline-item">
+                <span class="timeline-label">最後接單</span>
+                <span class="timeline-date">${settings.close_date || '-'}</span>
+            </div>
+             <div class="timeline-divider"></div>
+            <div class="timeline-item">
+                <span class="timeline-label">最後寄貨</span>
+                <span class="timeline-date">${settings.shipping_date || '-'}</span>
+            </div>
+             <div class="timeline-divider"></div>
+            <div class="timeline-item">
+                <span class="timeline-label">最後自取</span>
+                <span class="timeline-date">${settings.pickup_date || '-'}</span>
+            </div>
+        </div>
+
+        <div class="notice-shipping-banner">
+            <div class="shipping-icon-box">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M5 18H8M8 18H19C20.1046 18 21 17.1046 21 16V9C21 7.89543 20.1046 7 19 7H16M5 18H3C2.44772 18 2 17.5523 2 17V17C2 16.4477 2.44772 16 3 16H5M5 18C5.55228 18 6 17.5523 6 17C6 16.4477 5.55228 16 5 16M8 18C7.44772 18 7 17.5523 7 17C7 16.4477 7.44772 16 8 16M16 7H14V4.5C14 3.67157 13.3284 3 12.5 3H5.5C4.67157 3 4 3.67157 4 4.5V16M16 7H11" stroke-linecap="round" stroke-linejoin="round"/>
+                    <circle cx="7" cy="18" r="2"></circle>
+                    <circle cx="17" cy="18" r="2"></circle>
+                </svg>
+            </div>
+            <div class="shipping-text">
+                <span class="shipping-title">運費規則：</span>
+                消費滿 <span class="price-highlight">$${settings.shipping_threshold || 3000}</span> 免運費 <span class="sub-text">(未滿運費 $${settings.shipping_fee || 120})</span>
+            </div>
+        </div>
     `;
 }
 

@@ -372,44 +372,179 @@ p.brand-tagline {
   }
 }
 
-/* Notices & Countdown */
+/* Notices & Countdown Board Redesign */
 .notice-board {
   position: relative;
-  background: var(--card-bg);
-  border-left: 6px solid var(--primary-color);
-  padding: 30px;
-  /* Overlap Effect */
+  background: white;
+  /* Clean white card */
+  /* Replaces border-left with a top accent */
+  border-top: 4px solid var(--primary-color);
+  padding: 0;
+  /* Clear padding, use inner elements */
   margin: -60px auto 60px;
-  /* Negative top margin pulls it up */
   max-width: 900px;
-  border-radius: var(--radius-sm);
-  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
-  /* Stronger shadow for depth */
+  border-radius: var(--radius-md);
+  /* Consistent rounding */
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
   z-index: 50;
-  /* Above the hero background, but below floating chopsticks if they reach here */
-}
-
-.notice-title {
-  color: var(--primary-color);
-  font-weight: 700;
-  margin-bottom: 10px;
+  overflow: hidden;
+  /* For inner banner corners */
   display: flex;
+  flex-direction: column;
+}
+
+.notice-header {
+  padding: 24px 30px 10px;
+  text-align: center;
+}
+
+.notice-title-text {
+  color: var(--primary-color);
+  font-size: 1.4rem;
+  font-weight: 700;
+  display: inline-flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
+  letter-spacing: 1px;
 }
 
-.notice-list {
-  list-style: none;
+.notice-icon {
+  color: var(--accent-color);
 }
 
-.notice-list li {
+/* Timeline Layout for Dates */
+.notice-timeline {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  padding: 20px 40px 30px;
+  flex-wrap: wrap;
+  /* Safe wrapping on small mobile */
+  gap: 20px;
+}
+
+.timeline-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  min-width: 140px;
+}
+
+.timeline-label {
+  font-size: 0.9rem;
+  color: #888;
   margin-bottom: 6px;
-  font-size: 0.95rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 1px;
 }
 
-.highlight-date {
+.timeline-date {
+  font-size: 1.5rem;
   font-weight: 700;
   color: var(--text-dark);
+  font-family: 'Outfit', sans-serif;
+  /* Use number friendly font */
+}
+
+/* Vertical divider between dates */
+.timeline-divider {
+  width: 1px;
+  height: 40px;
+  background-color: #eee;
+  display: block;
+}
+
+/* Shipping Banner at Bottom */
+.notice-shipping-banner {
+  background: #FFF8F0;
+  /* Soft orange/cream background */
+  padding: 16px 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 15px;
+  border-top: 1px solid #FFE0B2;
+}
+
+.shipping-icon-box {
+  background: white;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--primary-color);
+  box-shadow: 0 2px 8px rgba(185, 78, 0, 0.1);
+}
+
+.shipping-text {
+  font-size: 1.05rem;
+  color: var(--text-dark);
+}
+
+.shipping-title {
+  font-weight: 700;
+  color: var(--primary-dark);
+}
+
+.price-highlight {
+  color: #D32F2F;
+  /* Red for emphasis */
+  font-weight: 800;
+  font-size: 1.2rem;
+}
+
+.sub-text {
+  color: #777;
+  font-size: 0.9rem;
+  margin-left: 5px;
+}
+
+/* Mobile Adjustments */
+@media (max-width: 768px) {
+  .notice-timeline {
+    flex-direction: column;
+    gap: 15px;
+    padding: 20px;
+  }
+
+  .timeline-divider {
+    width: 60px;
+    height: 1px;
+    /* Horizontal line on mobile */
+  }
+
+  .notice-shipping-banner {
+    flex-direction: column;
+    text-align: center;
+    padding: 20px;
+  }
+
+  .sub-text {
+    display: block;
+    /* Break line on mobile */
+    margin: 5px 0 0;
+  }
+
+  .timeline-item {
+    width: 100%;
+    flex-direction: row;
+    justify-content: space-between;
+    border-bottom: 1px dashed #eee;
+    padding-bottom: 8px;
+  }
+
+  .timeline-divider {
+    display: none;
+    /* Hide standard dividers in favor of border-bottom */
+  }
+
+  .timeline-item:last-child {
+    border-bottom: none;
+  }
 }
 
 /* Product Section */
