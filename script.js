@@ -78,11 +78,11 @@ async function fetchConfig(ignorePreload = false) {
 
         // HOTFIX: 強制更新圖片路徑 (Google Sheet 可能還沒改)
         productsData.forEach(p => {
-            // 肉燥包改用 .jpg
-            if (p.ID === 'p2') p.Image = 'images/goose-sauce.jpg';
+            // 肉燥包改用 .jpg (加上 timestamp 強制刷新快取)
+            if (p.ID === 'p2') p.Image = 'images/goose-sauce.jpg?v=2';
             // 為了保險起見，也可以強制更新其他新圖
-            if (p.ID === 'p1') p.Image = 'images/goose-quarter.png';
-            if (p.ID === 'p3') p.Image = 'images/goose-whole.png';
+            if (p.ID === 'p1') p.Image = 'images/goose-quarter.png?v=2';
+            if (p.ID === 'p3') p.Image = 'images/goose-whole.png?v=2';
         });
 
         console.log("CSV Data Loaded Successfully");
