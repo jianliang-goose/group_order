@@ -16,7 +16,7 @@ const PRELOADED_CONFIG = {
       "Name": "肥仔鵝肉燥包",
       "Price": 300,
       "Description": "每買 2 盒「1/4 茶香鵝肉」，即可以 $250 加購 1 包！(原價 $300)",
-      "Image": "images/goose-sauce.png",
+      "Image": "images/goose-sauce.jpg",
       "Category": "addon",
       "DiscountPrice": 250,
       "PromoTag": "加購優惠",
