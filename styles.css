@@ -963,3 +963,35 @@ footer {
     padding: 25px;
   }
 }
+
+/* Ultra-Wide Screen Fix: Anchor chopsticks to the right edge of viewport */
+@media (min-width: 1400px) {
+  .hero-chopsticks {
+    right: calc(50% - 900px);
+    /* Keeps it anchored relative to center but pushes it further right as screen widens */
+    /* Alternatively, anchor to viewport right but accounting for container max-width context if needed. 
+       Actually, since .hero-chopsticks is absolute inside .hero-container (max 1200px), 
+       but we want it relative to the SCREEN edge for ultra-wide feel?
+       Wait, .hero-container is max-width: 1200px with overflow:visible usually?
+       Let's check .hero-section overflow settings.
+       .hero-section has overflow: hidden.
+       .hero-container has width: 100% and max-width: 1200px.
+       The chopsticks are absolute to .hero-container.
+       On ultra-wide screens, the container is centered, so the "right: -25%" is relative to the 1200px container.
+       This means it stays at a fixed distance from the center.
+       If the user feels it's "floating" (悬空), it might be too far from the edge of the physical screen?
+       OR too far left?
+       The user image shows it floating in the middle of the wood texture on the right.
+       
+       Let's try to push it to the right edge of the viewport.
+       To do this inside a centered container:
+       right: calc( -1 * ( (100vw - 100%) / 2 ) - 50px );
+       Explanation: (100vw - 100%) / 2 is the distance from container edge to viewport edge.
+       We negate it to go outwards to the right.
+    */
+    right: calc(-1 * ((100vw - 1200px) / 2) + 50px);
+    /* Fallback for when calc matches constraints, but let's be safe */
+    max-width: 900px;
+    /* Cap size if needed */
+  }
+}
