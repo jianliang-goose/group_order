@@ -129,13 +129,15 @@ button {
   width: 70px;
   height: 70px;
   border-radius: 50%;
-  border: 3px solid rgba(255, 255, 255, 0.8);
+  border: none;
+  /* Remove white border */
   box-shadow: 0 5px 20px rgba(0, 0, 0, 0.6);
 }
 
 .brand-name-mini {
   font-family: 'Ningshu', 'Noto Sans TC', sans-serif;
-  font-weight: 700;
+  font-weight: normal;
+  /* Restore to original thin font */
   font-size: 1.6rem;
   color: #fff;
   letter-spacing: 3px;
