@@ -117,6 +117,8 @@ function doPost(e) {
     // Dispatch based on action
     if (data.action === 'updateOrder') {
       return updateOrder(doc, data);
+    } else if (data.action === 'updateOrderFull') {
+      return updateOrderFull(doc, data);
     } else if (data.action === 'saveSettings') {
       return saveSettings(doc, data);
     } else if (data.items || data.totalAmount || data.phone || !data.action) {
@@ -145,12 +147,18 @@ function updateOrder(doc, data) {
   var idIndex = headers.indexOf('Order_ID');
   var statusIndex = headers.indexOf('Status');
   var noteIndex = headers.indexOf('Note');
+  var paymentVerifiedIndex = headers.indexOf('Payment_Verified');
 
   // Add Note column if missing
   if (noteIndex === -1) {
     sheet.getRange(1, headers.length + 1).setValue('Note');
     noteIndex = headers.length; 
-    // Re-fetch to be safe (though we know the index)
+  }
+
+  // Add Payment_Verified column if missing
+  if (paymentVerifiedIndex === -1) {
+    sheet.getRange(1, headers.length + 1).setValue('Payment_Verified');
+    paymentVerifiedIndex = headers.length;
   }
 
   // Find Row
@@ -173,6 +181,62 @@ function updateOrder(doc, data) {
   if (data.note !== undefined) { // Allow empty string
     sheet.getRange(rowIndex, noteIndex + 1).setValue(data.note);
   }
+  if (data.paymentVerified !== undefined) {
+    sheet.getRange(rowIndex, paymentVerifiedIndex + 1).setValue(data.paymentVerified);
+  }
+
+  return ContentService.createTextOutput(JSON.stringify({ "result": "success" }))
+      .setMimeType(ContentService.MimeType.JSON);
+}
+
+function updateOrderFull(doc, data) {
+  var sheet = doc.getSheetByName('Orders');
+  var rows = sheet.getDataRange().getValues();
+  var headers = rows[0];
+  
+  // Find Order Row
+  var idIndex = headers.indexOf('Order_ID');
+  var rowIndex = -1;
+  for (var i = 1; i < rows.length; i++) {
+    if (String(rows[i][idIndex]) === String(data.orderId)) {
+      rowIndex = i + 1; // 1-based
+      break;
+    }
+  }
+
+  if (rowIndex === -1) {
+    throw new Error("Order not found: " + data.orderId);
+  }
+
+  // Helper function to set cell value by column name
+  function setCell(columnName, value) {
+    var colIndex = headers.indexOf(columnName);
+    if (colIndex === -1) {
+      // Add column if missing
+      colIndex = headers.length;
+      sheet.getRange(1, colIndex + 1).setValue(columnName);
+      headers.push(columnName);
+    }
+    if (value !== undefined) {
+      sheet.getRange(rowIndex, colIndex + 1).setValue(value);
+    }
+  }
+
+  // Update all fields
+  setCell('Name', data.name);
+  setCell('Phone', "'" + data.phone);
+  setCell('Group_Leader', data.groupLeader);
+  setCell('Items', data.items);
+  setCell('Total_Amount', data.totalAmount);
+  setCell('Shipping_Fee', data.shippingFee);
+  setCell('Grand_Total', data.grandTotal);
+  setCell('Delivery_Method', data.deliveryMethod);
+  setCell('Store_Info', data.storeInfo);
+  setCell('Payment_Method', data.paymentMethod);
+  setCell('Payment_Info', data.paymentInfo);
+  setCell('Status', data.status);
+  setCell('Payment_Verified', data.paymentVerified);
+  setCell('Note', data.note);
 
   return ContentService.createTextOutput(JSON.stringify({ "result": "success" }))
       .setMimeType(ContentService.MimeType.JSON);

@@ -103,6 +103,7 @@
             color: white;
             margin-right: 5px;
             font-size: 0.85rem;
+            margin-bottom: 3px;
         }
 
         .btn-save {
@@ -111,6 +112,28 @@
 
         .btn-save:hover {
             background-color: #218838;
+        }
+
+        .btn-edit {
+            background-color: #007bff;
+        }
+
+        .btn-edit:hover {
+            background-color: #0056b3;
+        }
+
+        .btn-verify {
+            background-color: #ffc107;
+            color: #333;
+        }
+
+        .btn-verify:hover {
+            background-color: #e0a800;
+        }
+
+        .btn-verify.verified {
+            background-color: #28a745;
+            color: white;
         }
 
         .header-actions {
@@ -128,6 +151,136 @@
 
         .nav-link:hover {
             text-decoration: underline;
+        }
+
+        /* Payment Info Styles */
+        .payment-info {
+            font-size: 0.8rem;
+            color: #666;
+            max-width: 150px;
+        }
+
+        .payment-method {
+            font-weight: 600;
+            color: #333;
+        }
+
+        /* Edit Modal */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 15px;
+        }
+
+        .modal-header h3 {
+            margin: 0;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #666;
+        }
+
+        .modal-form .form-group {
+            margin-bottom: 15px;
+        }
+
+        .modal-form label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .modal-form input,
+        .modal-form select,
+        .modal-form textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 1rem;
+        }
+
+        .modal-form textarea {
+            min-height: 80px;
+            resize: vertical;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .modal-actions button {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+
+        .modal-actions .btn-primary {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .modal-actions .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        /* Verified Badge */
+        .verified-badge {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .verified-badge.yes {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .verified-badge.no {
+            background: #fff3cd;
+            color: #856404;
         }
     </style>
 </head>
@@ -179,7 +332,9 @@
                         <th>團購主</th>
                         <th>取貨方式</th>
                         <th>訂購內容</th>
-                        <th>總金額</th>
+                        <th>金額</th>
+                        <th>付款</th>
+                        <th>對帳資訊</th>
                         <th>狀態</th>
                         <th>備註</th>
                         <th>操作</th>
@@ -187,12 +342,118 @@
                 </thead>
                 <tbody>
                     <tr>
-                        <td colspan="9" style="text-align:center; padding: 30px;">載入中...</td>
+                        <td colspan="11" style="text-align:center; padding: 30px;">載入中...</td>
                     </tr>
                 </tbody>
             </table>
         </div>
     </main>
+
+    <!-- Edit Order Modal -->
+    <div class="modal-overlay" id="editModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>✏️ 編輯訂單</h3>
+                <button class="modal-close" onclick="closeEditModal()">&times;</button>
+            </div>
+            <form class="modal-form" onsubmit="saveOrderEdit(event)">
+                <input type="hidden" id="edit-orderId">
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                    <div class="form-group">
+                        <label>姓名</label>
+                        <input type="text" id="edit-name" required>
+                    </div>
+                    <div class="form-group">
+                        <label>電話</label>
+                        <input type="text" id="edit-phone" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>團購主</label>
+                    <input type="text" id="edit-groupLeader">
+                </div>
+
+                <div class="form-group">
+                    <label>訂購內容</label>
+                    <textarea id="edit-items"></textarea>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px;">
+                    <div class="form-group">
+                        <label>商品金額</label>
+                        <input type="number" id="edit-totalAmount">
+                    </div>
+                    <div class="form-group">
+                        <label>運費</label>
+                        <input type="number" id="edit-shippingFee">
+                    </div>
+                    <div class="form-group">
+                        <label>應付總額</label>
+                        <input type="number" id="edit-grandTotal">
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                    <div class="form-group">
+                        <label>取貨方式</label>
+                        <select id="edit-deliveryMethod">
+                            <option value="現場自取">現場自取</option>
+                            <option value="冷凍店到店">冷凍店到店</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>超商/門市資訊</label>
+                        <input type="text" id="edit-storeInfo">
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                    <div class="form-group">
+                        <label>付款方式</label>
+                        <select id="edit-paymentMethod">
+                            <option value="ATM轉帳">ATM轉帳</option>
+                            <option value="街口支付">街口支付</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>對帳資訊</label>
+                        <input type="text" id="edit-paymentInfo" placeholder="帳號末5碼/街口帳號等">
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                    <div class="form-group">
+                        <label>訂單狀態</label>
+                        <select id="edit-status">
+                            <option value="未處理">未處理</option>
+                            <option value="完成待取">完成待取</option>
+                            <option value="已出貨">已出貨</option>
+                            <option value="已取消">已取消</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>對帳狀態</label>
+                        <select id="edit-paymentVerified">
+                            <option value="">未對帳</option>
+                            <option value="已對帳">✅ 已對帳</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>備註</label>
+                    <textarea id="edit-note" placeholder="內部備註..."></textarea>
+                </div>
+
+                <div class="modal-actions">
+                    <button type="submit" class="btn-primary">💾 儲存變更</button>
+                    <button type="button" class="btn-secondary" onclick="closeEditModal()">取消</button>
+                </div>
+            </form>
+        </div>
+    </div>
 
     <script src="script.js"></script>
     <script>
@@ -453,6 +714,7 @@
 
                 orders.forEach(o => {
                     const tr = document.createElement('tr');
+                    tr.dataset.order = JSON.stringify(o); // Store full order data for editing
 
                     // Display Date Safely
                     let dateDisplay = o.Timestamp;
@@ -474,6 +736,16 @@
                     let priceVal = String(o.Grand_Total || o.Total_Amount || "0").replace(/[$,]/g, "");
                     let priceNum = parseFloat(priceVal) || 0;
 
+                    // Payment Info Display
+                    const paymentMethod = o.Payment_Method || '-';
+                    const paymentInfo = o.Payment_Info || '';
+
+                    // Verified Status (stored in Note field with prefix or separate field)
+                    const isVerified = (o.Payment_Verified === '已對帳') || (o.Note && o.Note.includes('[已對帳]'));
+                    const verifiedBadge = isVerified
+                        ? '<span class="verified-badge yes">✅ 已對帳</span>'
+                        : '<span class="verified-badge no">待對帳</span>';
+
                     tr.innerHTML = `
                         <td>
                             <div style="font-weight:bold;">${o.Order_ID}</div>
@@ -490,12 +762,21 @@
                         </td>
                         <td class="items-cell">${o.Items}</td>
                         <td style="font-weight:bold; color:var(--primary-color);">$${priceNum.toLocaleString()}</td>
+                        <td>
+                            <div class="payment-method">${paymentMethod}</div>
+                        </td>
+                        <td class="payment-info">
+                            <div>${paymentInfo || '-'}</div>
+                            ${verifiedBadge}
+                        </td>
                         <td>${statusHtml}</td>
                         <td>
-                            <input type="text" class="note-input" id="note-${o.Order_ID}" value="${o.Note || ''}" placeholder="備註...">
+                            <input type="text" class="note-input" id="note-${o.Order_ID}" value="${o.Note || ''}" placeholder="備註..." style="width:120px;">
                         </td>
                         <td>
                             <button class="action-btn btn-save" onclick="updateOrder('${o.Order_ID}')">儲存</button>
+                            <button class="action-btn btn-edit" onclick="openEditModal('${o.Order_ID}')">編輯</button>
+                            <button class="action-btn btn-verify ${isVerified ? 'verified' : ''}" onclick="toggleVerify('${o.Order_ID}')">${isVerified ? '✓' : '對帳'}</button>
                         </td>
                     `;
                     tbody.appendChild(tr);
@@ -544,6 +825,119 @@
                 btn.innerHTML = originalHTML;
                 btn.disabled = false;
                 btn.style.opacity = '1';
+            }
+        }
+
+        // Open Edit Modal
+        function openEditModal(orderId) {
+            // Find the order row and get stored data
+            const row = document.querySelector(`tr[data-order*="${orderId}"]`);
+            if (!row) {
+                alert('找不到訂單資料');
+                return;
+            }
+
+            const order = JSON.parse(row.dataset.order);
+
+            // Populate form fields
+            document.getElementById('edit-orderId').value = order.Order_ID;
+            document.getElementById('edit-name').value = order.Name || '';
+            document.getElementById('edit-phone').value = (order.Phone || '').replace(/^'/, '');
+            document.getElementById('edit-groupLeader').value = order.Group_Leader || '';
+            document.getElementById('edit-items').value = order.Items || '';
+            document.getElementById('edit-totalAmount').value = parseInt(String(order.Total_Amount || 0).replace(/[$,]/g, '')) || 0;
+            document.getElementById('edit-shippingFee').value = parseInt(order.Shipping_Fee) || 0;
+            document.getElementById('edit-grandTotal').value = parseInt(String(order.Grand_Total || 0).replace(/[$,]/g, '')) || 0;
+            document.getElementById('edit-deliveryMethod').value = order.Delivery_Method || '現場自取';
+            document.getElementById('edit-storeInfo').value = order.Store_Info || '';
+            document.getElementById('edit-paymentMethod').value = order.Payment_Method || 'ATM轉帳';
+            document.getElementById('edit-paymentInfo').value = order.Payment_Info || '';
+            document.getElementById('edit-status').value = order.Status || '未處理';
+            document.getElementById('edit-paymentVerified').value = order.Payment_Verified || '';
+            document.getElementById('edit-note').value = order.Note || '';
+
+            // Show modal
+            document.getElementById('editModal').classList.add('active');
+        }
+
+        function closeEditModal() {
+            document.getElementById('editModal').classList.remove('active');
+        }
+
+        async function saveOrderEdit(e) {
+            e.preventDefault();
+
+            const orderId = document.getElementById('edit-orderId').value;
+
+            const payload = {
+                action: 'updateOrderFull',
+                orderId: orderId,
+                name: document.getElementById('edit-name').value,
+                phone: document.getElementById('edit-phone').value,
+                groupLeader: document.getElementById('edit-groupLeader').value,
+                items: document.getElementById('edit-items').value,
+                totalAmount: parseInt(document.getElementById('edit-totalAmount').value) || 0,
+                shippingFee: parseInt(document.getElementById('edit-shippingFee').value) || 0,
+                grandTotal: parseInt(document.getElementById('edit-grandTotal').value) || 0,
+                deliveryMethod: document.getElementById('edit-deliveryMethod').value,
+                storeInfo: document.getElementById('edit-storeInfo').value,
+                paymentMethod: document.getElementById('edit-paymentMethod').value,
+                paymentInfo: document.getElementById('edit-paymentInfo').value,
+                status: document.getElementById('edit-status').value,
+                paymentVerified: document.getElementById('edit-paymentVerified').value,
+                note: document.getElementById('edit-note').value
+            };
+
+            try {
+                await fetch(GAS_API_URL, {
+                    method: "POST",
+                    mode: "no-cors",
+                    headers: { "Content-Type": "text/plain" },
+                    body: JSON.stringify(payload)
+                });
+
+                alert('訂單更新成功！');
+                closeEditModal();
+                location.reload(); // Refresh to show changes
+            } catch (e) {
+                console.error(e);
+                alert('更新失敗');
+            }
+        }
+
+        async function toggleVerify(orderId) {
+            const noteInput = document.getElementById(`note-${orderId}`);
+            let note = noteInput.value;
+
+            // Toggle verified status in note
+            if (note.includes('[已對帳]')) {
+                note = note.replace('[已對帳]', '').trim();
+            } else {
+                note = '[已對帳] ' + note;
+            }
+            noteInput.value = note;
+
+            // Also update the Payment_Verified field
+            const payload = {
+                action: 'updateOrder',
+                orderId: orderId,
+                note: note,
+                paymentVerified: note.includes('[已對帳]') ? '已對帳' : ''
+            };
+
+            try {
+                await fetch(GAS_API_URL, {
+                    method: "POST",
+                    mode: "no-cors",
+                    headers: { "Content-Type": "text/plain" },
+                    body: JSON.stringify(payload)
+                });
+
+                // Reload to reflect changes
+                location.reload();
+            } catch (e) {
+                console.error(e);
+                alert('對帳狀態更新失敗');
             }
         }
     </script>
