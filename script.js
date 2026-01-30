@@ -32,25 +32,23 @@ async function fetchConfig(ignorePreload = false) {
     try {
         console.log("Fetching data from Google CSV...");
 
-        // Cache busting
-        const ts = Date.now();
-        const appendTs = (url) => url + `&_t=${ts}`;
+
 
         let prodRes, setRes;
 
         try {
             // Try direct fetch first (works in production usually)
             [prodRes, setRes] = await Promise.all([
-                fetch(appendTs(PRODUCTS_CSV_URL)),
-                fetch(appendTs(SETTINGS_CSV_URL))
+                fetch(PRODUCTS_CSV_URL),
+                fetch(SETTINGS_CSV_URL)
             ]);
             if (!prodRes.ok || !setRes.ok) throw new Error("Direct fetch failed");
         } catch (directError) {
             console.warn("Direct fetch failed (likely CORS on local), trying proxy...", directError);
             // Fallback to CORS Proxy for local testing
             [prodRes, setRes] = await Promise.all([
-                fetch(CORS_PROXY + encodeURIComponent(appendTs(PRODUCTS_CSV_URL))),
-                fetch(CORS_PROXY + encodeURIComponent(appendTs(SETTINGS_CSV_URL)))
+                fetch(CORS_PROXY + encodeURIComponent(PRODUCTS_CSV_URL)),
+                fetch(CORS_PROXY + encodeURIComponent(SETTINGS_CSV_URL))
             ]);
         }
 
