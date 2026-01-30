@@ -736,22 +736,6 @@
 
     <main class="dashboard-container">
         <!-- Statistics -->
-        <section class="stats-grid">
-            <div class="stat-card">
-                <div class="stat-value" id="totalOrders">0</div>
-                <div class="stat-label">總訂單數</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-value" id="totalRevenue">$0</div>
-                <div class="stat-label">總營業額</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-value" id="pendingOrders">0</div>
-                <div class="stat-label">未處理訂單</div>
-            </div>
-        </section>
-
-        <!-- Global Filter Bar -->
         <!-- Global Filter Bar -->
         <section class="global-filter-bar" id="globalFilterBar">
             <div class="filter-group">
@@ -776,6 +760,22 @@
                         已收款
                     </button>
                 </div>
+            </div>
+        </section>
+
+        <!-- Statistics -->
+        <section class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-value" id="totalOrders">0</div>
+                <div class="stat-label">總訂單數</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="totalRevenue">$0</div>
+                <div class="stat-label">總營業額</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="pendingOrders">0</div>
+                <div class="stat-label">未處理訂單</div>
             </div>
         </section>
 
@@ -1024,34 +1024,106 @@
             applyGlobalFilter();
         }
 
-        function applyGlobalFilter() {
-            if (!window.currentOrdersData) return;
-            // Re-render both stats and table
-            calculateAndRenderStats(window.currentOrdersData);
-            renderFilteredOrdersTable(window.currentOrdersData);
-        }
-
-        function calculateAndRenderStats(orders) {
-            // Find or Create Container logic omitted for brevity (assumed existing or created)
-            let container = document.getElementById('productStatsContainer');
-            // ... (Creation logic is same as before if needed to be robust, but largely unchanged)
-
+        // Helper to get filtered data considering all active filters
+        function getFilteredOrders(orders) {
             const activeStatuses = window.activeFilterState.statuses;
             const paymentFilter = window.activeFilterState.payment;
 
+            return orders.filter(o => {
+                // 1. Status Filter
+                if (activeStatuses.length > 0 && !activeStatuses.includes(o.Status)) return false;
+
+                // 2. Payment Filter
+                const checkVerified = (o.Payment_Verified === '已對帳') || (o.Note && o.Note.includes('[已對帳]'));
+                if (paymentFilter === 'paid' && !checkVerified) return false;
+                if (paymentFilter === 'unpaid' && checkVerified) return false;
+
+                return true;
+            });
+        }
+
+        function applyGlobalFilter() {
+            if (!window.currentOrdersData) return;
+
+            // 1. Get Filtered Data
+            const filteredOrders = getFilteredOrders(window.currentOrdersData);
+
+            // 2. Update Top Stats (Dynamic!)
+            updateTopStats(filteredOrders);
+
+            // 3. Re-render Product Stats & Table with Filtered Data
+            renderProductStats(filteredOrders);
+            renderOrdersTable(filteredOrders);
+        }
+
+        function updateTopStats(orders) {
+            // Count
+            document.getElementById('totalOrders').innerText = orders.length;
+
+            // Revenue (exclude cancelled if they somehow got in, but filters usually handle this unless 'Cancelled' is selected)
+            // Note: If user selects 'Cancelled', we probably should show revenue as 0 or include it? 
+            // Usually revenue implies 'valid' revenue. Let's exclude '已取消' from revenue sum even if filtered.
+            const revenue = orders.reduce((sum, o) => {
+                if (o.Status === '已取消') return sum;
+                let valStr = String(o.Grand_Total || o.Total_Amount || "0").replace(/[$,]/g, "");
+                return sum + (parseFloat(valStr) || 0);
+            }, 0);
+            document.getElementById('totalRevenue').innerText = `$${Math.round(revenue).toLocaleString()}`;
+
+            // Pending (from the visible set)
+            const pending = orders.filter(o => o.Status === '未處理').length;
+            document.getElementById('pendingOrders').innerText = pending;
+        }
+
+        // Renamed from calculateAndRenderStats to be more clear it accepts data
+        function renderProductStats(orders) {
+            // Find or Create Container 
+            let container = document.getElementById('productStatsContainer');
+            // ... (Same creation logic as before, omitted for brevity but assumed present in DOM or created once)
+            // If it doesn't exist, we create it.
+            if (!container) {
+                // ... (reuse existing creation code pattern if needed, or assume it exists from init)
+                const globalFilterBar = document.getElementById('globalFilterBar');
+                const section = document.createElement('div');
+                section.id = 'productStatsContainer';
+                section.className = 'data-table-wrapper';
+                section.style.marginBottom = '30px';
+                section.style.padding = '25px';
+                section.style.background = '#fff';
+                section.style.borderRadius = '10px';
+                section.style.boxShadow = '0 2px 5px rgba(0,0,0,0.05)';
+
+                const headerDiv = document.createElement('div');
+                headerDiv.style.display = 'flex';
+                headerDiv.style.alignItems = 'center';
+                headerDiv.style.marginBottom = '20px';
+                headerDiv.style.borderBottom = '1px solid #eee';
+                headerDiv.style.paddingBottom = '15px';
+
+                const title = document.createElement('h3');
+                title.innerText = '📊 商品銷售統計';
+                title.style.margin = '0';
+                title.style.color = '#333';
+                title.style.fontSize = '1.3rem';
+                headerDiv.appendChild(title);
+
+                const content = document.createElement('div');
+                content.id = 'productStatsContent';
+                content.style.display = 'grid';
+                content.style.gridTemplateColumns = 'repeat(auto-fill, minmax(220px, 1fr))';
+                content.style.gap = '20px';
+
+                section.appendChild(headerDiv);
+                section.appendChild(content);
+                // Insert AFTER Filter Bar (which is now at top, or wherever it is)
+                globalFilterBar.parentNode.insertBefore(section, globalFilterBar.nextSibling);
+                container = section;
+            }
+
             const productStats = {};
-            let matchCount = 0;
 
             orders.forEach(o => {
-                // 1. Check Status Filter
-                if (activeStatuses.length > 0 && !activeStatuses.includes(o.Status)) return;
-
-                // 2. Check Payment Filter
-                const isVerified = (o.Payment_Verified === '已對帳') || (o.Note && o.Note.includes('[已對帳]'));
-                if (paymentFilter === 'paid' && !isVerified) return;
-                if (paymentFilter === 'unpaid' && isVerified) return;
-
-                matchCount++;
+                // Items parsing
                 const itemsStr = o.Items || "";
                 const itemParts = itemsStr.split(/,\s*/);
                 itemParts.forEach(part => {
@@ -1068,17 +1140,15 @@
                 });
             });
 
-            // Render Results... (Existing rendering logic)
-            // Need to grab the content container again just in case
+            // Render Results
             const contentDiv = document.getElementById('productStatsContent');
             if (contentDiv) {
                 contentDiv.innerHTML = '';
                 const sortedItems = Object.entries(productStats).sort((a, b) => b[1] - a[1]);
-                if (matchCount === 0 || sortedItems.length === 0) {
+                if (orders.length === 0 || sortedItems.length === 0) {
                     contentDiv.innerHTML = `<div style="grid-column: 1/-1; text-align:center; padding:30px; color:#999; background:#f9f9f9; border-radius:8px;">無符合條件的銷售數據</div>`;
                 } else {
                     sortedItems.forEach(([name, qty]) => {
-                        // ... render card logic
                         const card = document.createElement('div');
                         card.style.background = '#fff';
                         card.style.padding = '15px';
@@ -1107,12 +1177,10 @@
             }
         }
 
-        function renderFilteredOrdersTable(orders) {
+        // Renamed from renderFilteredOrdersTable
+        function renderOrdersTable(orders) {
             const tbody = document.querySelector('#ordersTable tbody');
             tbody.innerHTML = '';
-
-            const activeStatuses = window.activeFilterState.statuses;
-            const paymentFilter = window.activeFilterState.payment;
 
             // Sort new to old
             orders.sort((a, b) => {
@@ -1121,20 +1189,13 @@
                 return (isNaN(dateB.getTime()) ? 0 : dateB.getTime()) - (isNaN(dateA.getTime()) ? 0 : dateA.getTime());
             });
 
-            let filteredCount = 0;
+            if (orders.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="11" style="text-align:center; padding: 30px; color: #999;">無符合篩選條件的訂單</td></tr>`;
+                return;
+            }
 
             orders.forEach(o => {
-                // 1. Status Filter
-                if (activeStatuses.length > 0 && !activeStatuses.includes(o.Status)) return;
-
-                // 2. Payment Filter
-                const checkVerified = (o.Payment_Verified === '已對帳') || (o.Note && o.Note.includes('[已對帳]'));
-                if (paymentFilter === 'paid' && !checkVerified) return;
-                if (paymentFilter === 'unpaid' && checkVerified) return;
-
-                filteredCount++;
-                // ... (rest of rendering logic) -> Logic continues below, just replacing the filter block
-
+                // No internal filtering!
                 const tr = document.createElement('tr');
                 tr.dataset.order = JSON.stringify(o);
 
@@ -1331,39 +1392,23 @@
                     }
 
                     // Update stats
-                    // Pending count
-                    const pending = window.currentOrdersData.filter(o => o.Status === '未處理').length;
-                    document.getElementById('pendingOrders').innerText = pending;
-
-                    // Revenue
-                    const revenue = window.currentOrdersData.reduce((sum, o) => {
-                        if (o.Status === '已取消') return sum;
-                        let valStr = String(o.Grand_Total || o.Total_Amount || "0").replace(/[$,]/g, "");
-                        return sum + (parseFloat(valStr) || 0);
-                    }, 0);
-                    document.getElementById('totalRevenue').innerText = `$${Math.round(revenue).toLocaleString()}`;
-
-                    // Update global filter buttons
+                    // Update stats and UI via central filter function
+                    // This ensures all counters and tables update correctly based on the new status
                     initGlobalFilter(window.currentOrdersData);
-
-                    // Note: We do NOT call calculateAndRenderStats or renderFilteredOrdersTable here
-                    // because that would redraw the whole table and lose scroll position/focus.
-                    // Instead, we just updated the badge UI in place.
+                    applyGlobalFilter();
                 }
 
-                // Finalize UI
-                updateStatusBadgeUI(badgeElement, newStatus, false);
+                // Finalize UI (Badge update is handled by table re-render in applyGlobalFilter usually,
+                // but if the row persists, we might want to ensure it looks 'saved'.
+                // However, applyGlobalFilter re-renders the whole table, so this badge element reference might be lost.
+                // That is fine, the re-render will show the new status.
 
             } catch (e) {
                 console.error(e);
-                badgeElement.innerText = '錯誤';
-                badgeElement.style.background = '#f8d7da';
-                setTimeout(() => {
-                    // Revert to something logic? Or just reload logic.
-                    // Ideally we should revert to old status.
-                    // For now, reload helps recover state.
-                    // location.reload(); 
-                }, 2000);
+                if (badgeElement) {
+                    badgeElement.innerText = '錯誤';
+                    badgeElement.style.background = '#f8d7da';
+                }
             }
         }
 
