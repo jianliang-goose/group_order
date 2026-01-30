@@ -452,17 +452,12 @@
                             <span style="color:#666;">ID:</span>
                             <input type="text" class="form-input p-id" value="${p.ID || ''}" style="width:80px; padding:4px; text-align:center;" placeholder="ID">
                         </div>
-                        <div style="flex-grow:1; display:flex; justify-content:flex-end; gap:10px; flex-wrap: wrap;">
-                             <select class="form-input p-category" style="width:auto;">
-                                <option value="main" ${p.Category === 'main' ? 'selected' : ''}>🍗 主餐</option>
-                                <option value="addon" ${p.Category === 'addon' ? 'selected' : ''}>➕ 加購</option>
-                                <option value="snack" ${p.Category === 'snack' ? 'selected' : ''}>🍟 單點</option>
-                            </select>
+                        <div style="flex-grow:1; display:flex; justify-content:flex-end; gap:10px;">
                             <button type="button" onclick="removeProduct(${index})" style="background:#fff0f0; color:#d32f2f; border:1px solid #ffcdd2; border-radius:4px; padding:4px 10px; font-size:0.85rem; cursor:pointer;">
                                 🗑️ 刪除
                             </button>
                         </div>
-                    </div >
+                    </div>
                     
                     <div class="form-grid">
                         <div class="form-group">
@@ -546,7 +541,7 @@
             productDivs.forEach(div => {
                 updated.push({
                     ID: div.querySelector('.p-id').value,
-                    Category: div.querySelector('.p-category').value,
+                    // Category removed
                     Name: div.querySelector('.p-name').value,
                     Price: div.querySelector('.p-price').value,
                     DiscountPrice: div.querySelector('.p-discount').value,
@@ -566,7 +561,7 @@
                 ID: 'p' + Date.now().toString().slice(-4),
                 Name: '',
                 Price: 0,
-                Category: 'main',
+                // Category removed
                 Description: '',
                 Image: '',
                 DiscountPrice: '',
