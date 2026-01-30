@@ -606,30 +606,7 @@
                 btn.style.opacity = '1';
             }
         }
-        // CSV Parser Helper
-        function parseCSV(csvText) {
-            const lines = csvText.trim().split(/\r?\n/);
-            if (lines.length < 2) return [];
-            const headers = lines[0].split(',').map(h => h.trim());
-            const result = [];
-            for (let i = 1; i < lines.length; i++) {
-                const currentLine = lines[i];
-                if (!currentLine.trim()) continue;
-                // Simple split for robustness if no quotes used, but let's assume simple CSV for now
-                // or just use script.js one if available.
-                // Re-implementing a basic split:
-                const values = currentLine.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
-                const row = {};
-                headers.forEach((header, index) => {
-                    let val = values[index] || '';
-                    val = val.trim();
-                    if (val.startsWith('"') && val.endsWith('"')) val = val.slice(1, -1);
-                    row[header] = val;
-                });
-                result.push(row);
-            }
-            return result;
-        }
+
     </script>
 </body>
 
