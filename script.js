@@ -617,13 +617,20 @@ async function submitOrder(e) {
     });
 
     // Generate Order ID locally (YYMMDD-RRR)
+    // Generate Order ID (YYMMDD-HHMMC)
+    // C = Safe Character (avoiding I, O, S, Z to prevent confusion with 1, 0, 5, 2)
     const now = new Date();
     const dateStr = now.getFullYear().toString().slice(-2) +
         (now.getMonth() + 1).toString().padStart(2, '0') +
         now.getDate().toString().padStart(2, '0');
-    // Using 5 digits random number: 10000 - 99999
-    const randomSuffix = Math.floor(10000 + Math.random() * 90000);
-    const orderId = `${dateStr}-${randomSuffix}`;
+
+    const timeStr = now.getHours().toString().padStart(2, '0') +
+        now.getMinutes().toString().padStart(2, '0');
+
+    const safeChars = "ABCDEFGHJKLMNPQRTUVWXY"; // Excludes I, O, S, Z
+    const randomChar = safeChars.charAt(Math.floor(Math.random() * safeChars.length));
+
+    const orderId = `${dateStr}-${timeStr}${randomChar}`;
 
     const payload = {
         action: 'createOrder', // Explicit action for backend
