@@ -198,20 +198,19 @@
                     <label class="form-label">取貨方式 <span style="color:red">*</span></label>
                     <div class="radio-group">
                         <label class="radio-option">
-                            <input type="radio" name="deliveryMethod" value="self" onchange="toggleDeliveryOptions()"
-                                checked>
-                            <span>現場自取 (免運)</span>
+                            <input type="radio" name="deliveryMethod" value="shipping"
+                                onchange="toggleDeliveryOptions()" checked>
+                            <span>超商冷凍店到店</span>
                         </label>
                         <label class="radio-option">
-                            <input type="radio" name="deliveryMethod" value="shipping"
-                                onchange="toggleDeliveryOptions()">
-                            <span>超商冷凍店到店</span>
+                            <input type="radio" name="deliveryMethod" value="self" onchange="toggleDeliveryOptions()">
+                            <span>現場自取 (免運)</span>
                         </label>
                     </div>
                 </div>
 
                 <!-- Hidden by default, shown if shipping selected -->
-                <div id="shippingOptions" class="sub-options">
+                <div id="shippingOptions" class="sub-options active">
                     <div class="form-group">
                         <label class="form-label">選擇超商</label>
                         <div class="radio-group">
@@ -228,14 +227,14 @@
                         <input type="text" class="form-input" id="storeInfo" placeholder="例如：全家三重旺旺店">
                         <div class="store-search-help" style="margin-top:8px; font-size:0.9rem;">
                             <span style="color:#666;">不知道店號？點此查詢：</span>
-                            <a href="https://emap.pcsc.com.tw/" target="_blank" class="store-link link-711"
-                                style="color:#E11F26; font-weight:bold; margin-right:10px; text-decoration:none;">
-                                🏪 7-11 門市查詢
-                            </a>
                             <a href="https://www.family.com.tw/marketing/inquiry.aspx" target="_blank"
                                 class="store-link link-fm"
                                 style="color:#00A84D; font-weight:bold; text-decoration:none;">
                                 🏪 全家門市查詢
+                            </a>
+                            <a href="https://emap.pcsc.com.tw/" target="_blank" class="store-link link-711"
+                                style="color:#E11F26; font-weight:bold; margin-right:10px; text-decoration:none;">
+                                🏪 7-11 門市查詢
                             </a>
                         </div>
                     </div>
@@ -381,19 +380,30 @@
                 <p class="copyright">&copy; 2026 建良鵝肉. All Rights Reserved.</p>
             </div>
             <div class="footer-social">
-                <p>加入 LINE 好友．聯絡我們</p>
-                <img src="https://qr-official.line.me/gs/M_063ifost_GW.png?oat_content=qr" alt="建良鵝肉 LINE QR Code"
-                    class="qr-code">
+                <a href="https://lin.ee/uLbdSkD" target="_blank">
+                    <img src="https://scdn.line-apps.com/n/line_add_friends/btn/zh-Hant.png" alt="加入好友" height="36"
+                        border="0">
+                </a>
             </div>
         </div>
         <div class="container">
             <div class="developer-credit">
-                ✨ Website Designed by <a href="http://evelynytliu.github.io/" target="_blank">Evelyn Liu</a> ✨
+                ✦ 此團購系統由 <a href="http://evelynytliu.github.io/" target="_blank">Evelyn Liu</a> 設計製作 ✦
             </div>
         </div>
     </footer>
 
+
+    <!-- Floating Cart Button -->
+    <div id="floatingCart" class="floating-cart" onclick="scrollToOrderSummary()">
+        <div class="cart-icon">🛒</div>
+        <div class="cart-info">
+            <div id="floatingCartShipping" class="cart-shipping-text">差 $3000 免運</div>
+        </div>
+    </div>
+
     <script src="script.js?v=20260129"></script>
+
 </body>
 
 </html>

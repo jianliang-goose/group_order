@@ -1103,26 +1103,15 @@ footer {
 }
 
 .footer-social {
-  text-align: center;
-  background: rgba(255, 255, 255, 0.05);
-  padding: 20px;
-  border-radius: 16px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.qr-code {
-  width: 140px;
-  height: 140px;
-  border-radius: 8px;
-  margin-top: 10px;
-  border: 4px solid white;
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-  transition: transform 0.3s;
-}
 
-.qr-code:hover {
-  transform: scale(1.05);
-}
+
+
 
 @media (max-width: 700px) {
   .footer-content {
@@ -1151,6 +1140,7 @@ footer {
   font-size: 0.9rem;
   color: #aaa;
   letter-spacing: 0.5px;
+  padding-bottom: 70px;
 }
 
 .developer-credit a {
@@ -1244,5 +1234,113 @@ footer {
     /* Fallback for when calc matches constraints, but let's be safe */
     max-width: 900px;
     /* Cap size if needed */
+  }
+}
+
+/* Floating Cart Button Styles */
+/* Floating Cart Button Styles */
+.floating-cart {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+  color: white;
+  padding: 8px 16px;
+  border-radius: 50px;
+  box-shadow: 0 8px 20px rgba(185, 78, 0, 0.4);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  z-index: 9999;
+  transition: all 0.3s ease;
+  font-family: var(--font-main);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(5px);
+
+  /* Entrance Animation */
+  animation: floatUp 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55) both;
+}
+
+@keyframes floatUp {
+  from {
+    opacity: 0;
+    transform: translateY(100px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.floating-cart:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 25px rgba(185, 78, 0, 0.5);
+}
+
+.floating-cart:active {
+  transform: scale(0.98);
+}
+
+/* Celebration Mode */
+.floating-cart.celebrate {
+  background: linear-gradient(135deg, #2E7D32, #43A047);
+  /* Green Gradient */
+  box-shadow: 0 10px 30px rgba(46, 125, 50, 0.5);
+  animation: pulseCelebration 2s infinite;
+}
+
+@keyframes pulseCelebration {
+  0% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(76, 175, 80, 0.7);
+  }
+
+  50% {
+    transform: scale(1.05);
+    box-shadow: 0 0 0 15px rgba(76, 175, 80, 0);
+  }
+
+  100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(76, 175, 80, 0);
+  }
+}
+
+.cart-icon {
+  font-size: 1.25rem;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+}
+
+.cart-info {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.cart-shipping-text {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #fff;
+  white-space: nowrap;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+/* Mobile Responsiveness for Floating Cart */
+@media (max-width: 768px) {
+  .floating-cart {
+    bottom: 15px;
+    right: 15px;
+    padding: 6px 14px;
+    gap: 6px;
+  }
+
+  .cart-icon {
+    font-size: 1.4rem;
+  }
+
+  .cart-shipping-text {
+    font-size: 1rem;
   }
 }

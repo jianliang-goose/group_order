@@ -198,14 +198,28 @@ function renderApp(productsArray, settingsMsg) {
     // Render Group Leaders
     const leaderSelect = document.getElementById('groupLeader');
     if (leaderSelect && settings.group_leaders) {
-        const leaders = settings.group_leaders.split(',');
-        leaderSelect.innerHTML = ''; // Clear default
-        leaders.forEach(name => {
-            const opt = document.createElement('option');
-            opt.value = name.trim();
-            opt.textContent = name.trim();
-            leaderSelect.appendChild(opt);
-        });
+        // Support both half-width and full-width commas
+        const leaders = settings.group_leaders.split(/[,，]/);
+
+        // Only clear if we have valid leaders to add
+        if (leaders.length > 0 && leaders[0].trim()) {
+            leaderSelect.innerHTML = '';
+
+            leaders.forEach(name => {
+                const cleanName = name.trim();
+                if (cleanName) {
+                    const opt = document.createElement('option');
+                    opt.value = cleanName;
+                    opt.textContent = cleanName;
+                    leaderSelect.appendChild(opt);
+                }
+            });
+
+            // If the user didn't include "無" or "None", and the list isn't empty, 
+            // we might want to ensure there is a default option or just trust the user.
+            // But usually for "Group Leader", "None" is a valid choice.
+            // Let's rely on the user adding it as per placeholder "例如: 無, 宛儒, 小明"
+        }
     }
 
     // 2. Process Products
@@ -455,6 +469,37 @@ function calculateTotal() {
     document.getElementById('subTotalDisplay').innerText = `$${itemTotal.toLocaleString()}`;
     document.getElementById('shippingDisplay').innerText = shippingFee === 0 ? "免運費" : `$${shippingFee}`;
     document.getElementById('grandTotalDisplay').innerText = `$${grandTotal.toLocaleString()}`;
+
+    // Update Floating Cart
+    const floatShipping = document.getElementById('floatingCartShipping');
+    const floatBtn = document.getElementById('floatingCart');
+
+    if (floatShipping && floatBtn) {
+        if (deliveryMethod === 'self') {
+            floatShipping.innerHTML = `🌟 現場自取免運費`;
+            floatShipping.style.color = '#fff';
+            floatBtn.classList.add('celebrate'); // Always celebrate self pickup (free)
+        } else {
+            // Shipping Mode
+            const remaining = threshold - itemTotal;
+            if (remaining > 0) {
+                floatShipping.innerHTML = `差 <span style="font-weight:800; color:#FFD54F;">$${remaining}</span> 免運`;
+                floatShipping.style.color = 'rgba(255,255,255,0.95)';
+                floatBtn.classList.remove('celebrate');
+            } else {
+                floatShipping.innerHTML = `免運`;
+                floatShipping.style.color = '#fff';
+                floatBtn.classList.add('celebrate');
+            }
+        }
+
+        // Bump animation on change
+        // floatBtn.classList.remove('bump'); // Reset animation
+        // void floatBtn.offsetWidth; // Trigger reflow
+        // floatBtn.classList.add('bump'); // Add animation class if defined (or use transforms manually)
+        floatBtn.style.transform = 'scale(1.1)';
+        setTimeout(() => floatBtn.style.transform = '', 200);
+    }
 }
 
 // Toggle Delivery Options visibility
@@ -610,5 +655,36 @@ async function submitOrder(e) {
         alert("訂單送出失敗，請聯絡客服。");
         submitBtn.disabled = false;
         submitBtn.innerText = "確認送出訂單";
+    }
+}
+
+// Function to Scroll to Order Summary
+function scrollToOrderSummary() {
+    // Target the summary section specifically
+    const summarySection = document.querySelector('.order-summary');
+
+    if (summarySection) {
+        // Calculate position with offset (e.g. 80px from top)
+        const yOffset = -80;
+        const y = summarySection.getBoundingClientRect().top + window.pageYOffset + yOffset;
+
+        window.scrollTo({
+            top: y,
+            behavior: 'smooth'
+        });
+
+        // Add a temporary highlight effect for better UX
+        const originalTransition = summarySection.style.transition;
+        const originalBg = summarySection.style.backgroundColor;
+
+        summarySection.style.transition = 'background-color 0.5s ease';
+        summarySection.style.backgroundColor = '#FFF8E1'; // Light yellow highlight
+
+        setTimeout(() => {
+            summarySection.style.backgroundColor = originalBg;
+            setTimeout(() => {
+                summarySection.style.transition = originalTransition;
+            }, 500);
+        }, 1500);
     }
 }
