@@ -863,8 +863,19 @@ function initTrackingPage() {
             stepShipped.classList.remove('active');
 
             // Strict Status Mapping
-            // Step 2 (Confirmed): Active if Confirmed, Paid, Shipped, or Done
-            if (statusText === '已確認' ||
+            // Step 2 (Confirmed): Active if (Order Status is Confirmed/Paid/Shipped) OR (Payment is Verified)
+            const isPaymentVerified = order.paymentStatus && (
+                order.paymentStatus === 'Verify' ||
+                order.paymentStatus.includes('已核對') ||
+                order.paymentStatus.includes('已付款') ||
+                order.paymentStatus.includes('已對帳') ||
+                order.paymentStatus.includes('完成') ||
+                order.paymentStatus.includes('ok') ||
+                order.paymentStatus.toLowerCase() === 'true'
+            );
+
+            if (isPaymentVerified ||
+                statusText === '已確認' ||
                 statusText === '已付款' ||
                 statusText.includes('出貨') ||
                 statusText.includes('寄出') ||
