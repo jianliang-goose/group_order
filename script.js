@@ -856,40 +856,49 @@ function initTrackingPage() {
             }
 
             // Timeline
+            const stepOrdered = card.querySelector('.timeline-step'); // First step (Ordered)
             const stepConfirmed = card.querySelector('.step-confirmed');
             const stepShipped = card.querySelector('.step-shipped');
 
+            // Ensure Ordered is active by default
+            stepOrdered.classList.add('active');
             stepConfirmed.classList.remove('active');
             stepShipped.classList.remove('active');
 
-            // Strict Status Mapping
-            // Step 2 (Confirmed): Active if (Order Status is Confirmed/Paid/Shipped) OR (Payment is Verified)
-            const isPaymentVerified = order.paymentStatus && (
-                order.paymentStatus === 'Verify' ||
-                order.paymentStatus.includes('已核對') ||
-                order.paymentStatus.includes('已付款') ||
-                order.paymentStatus.includes('已對帳') ||
-                order.paymentStatus.includes('完成') ||
-                order.paymentStatus.includes('ok') ||
-                order.paymentStatus.toLowerCase() === 'true'
-            );
+            if (statusText === '已取消' || statusText.includes('取消')) {
+                // If Cancelled, EVERYTHING off
+                stepOrdered.classList.remove('active');
+            } else {
+                // Normal Logic: Strict Status Mapping
 
-            if (isPaymentVerified ||
-                statusText === '已確認' ||
-                statusText === '已付款' ||
-                statusText.includes('出貨') ||
-                statusText.includes('寄出') ||
-                statusText.includes('已取') ||
-                statusText.includes('完成')) {
-                stepConfirmed.classList.add('active');
-            }
+                // Step 2 (Confirmed): Active if (Order Status is Confirmed/Paid/Shipped) OR (Payment is Verified)
+                const isPaymentVerified = order.paymentStatus && (
+                    order.paymentStatus === 'Verify' ||
+                    order.paymentStatus.includes('已核對') ||
+                    order.paymentStatus.includes('已付款') ||
+                    order.paymentStatus.includes('已對帳') ||
+                    order.paymentStatus.includes('完成') ||
+                    order.paymentStatus.includes('ok') ||
+                    order.paymentStatus.toLowerCase() === 'true'
+                );
 
-            // Step 3 (Shipped): Active if Shipped or Done
-            if (statusText.includes('出貨') ||
-                statusText.includes('寄出') ||
-                statusText.includes('已取') ||
-                statusText.includes('完成')) {
-                stepShipped.classList.add('active');
+                if (isPaymentVerified ||
+                    statusText === '已確認' ||
+                    statusText === '已付款' ||
+                    statusText.includes('出貨') ||
+                    statusText.includes('寄出') ||
+                    statusText.includes('已取') ||
+                    statusText.includes('完成')) {
+                    stepConfirmed.classList.add('active');
+                }
+
+                // Step 3 (Shipped): Active if Shipped or Done
+                if (statusText.includes('出貨') ||
+                    statusText.includes('寄出') ||
+                    statusText.includes('已取') ||
+                    statusText.includes('完成')) {
+                    stepShipped.classList.add('active');
+                }
             }
 
             resultsList.appendChild(card);
