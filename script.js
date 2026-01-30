@@ -20,19 +20,28 @@ const fallbackSettings = {
     shipping_fee: 120,
     close_date: "2026/02/10",
     shipping_date: "2026/02/09",
-    pickup_date: "2026/02/15 (19:00 前)",
-    is_open: "true"
+    pickup_date: "2026/02/15 (19:00 前)"
 };
 
-// ...
+// Initialize
+document.addEventListener('DOMContentLoaded', async () => {
+    // Only run main shop logic if we are on the shop page
+    if (document.getElementById('productList')) {
+        await fetchConfig();
+    }
+});
+
+// Google Sheet Published CSV URLs (Fast Loading)
+const PRODUCTS_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQd_Hya-NceMfrF79aibzVQ8SoUqHI5nL_DHpGhtG8lCDUT4y_iNA2XzS9R-uJqWJtNk2XaMfP86vvL/pub?gid=598932868&single=true&output=csv";
+const SETTINGS_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQd_Hya-NceMfrF79aibzVQ8SoUqHI5nL_DHpGhtG8lCDUT4y_iNA2XzS9R-uJqWJtNk2XaMfP86vvL/pub?gid=1252826992&single=true&output=csv";
+
+const CORS_PROXY = "https://api.allorigins.win/raw?url=";
 
 async function fetchConfig(ignorePreload = false) {
     // Note: ignorePreload parameter is kept for compatibility but CSV is fast enough to replace it.
 
     try {
         console.log("Fetching data from Google CSV...");
-
-
 
         let prodRes, setRes;
 
@@ -61,6 +70,12 @@ async function fetchConfig(ignorePreload = false) {
         const productsData = parseCSV(prodText);
         const settingsData = parseCSV(setText);
 
+        // Validation: Ensure we actually got data
+        if (!productsData || productsData.length === 0) {
+            console.error("Parsed Product CSV is empty:", prodText);
+            throw new Error("Product data is empty");
+        }
+
         // Transform Settings Array to Object {Key: Value}
         const settingsObj = {};
         settingsData.forEach(row => {
@@ -81,75 +96,67 @@ async function fetchConfig(ignorePreload = false) {
 
     } catch (e) {
         console.error("Failed to load CSV config:", e);
-        alert("無法載入最新設定，將使用預設資料。(請檢查網路或稍後再試)");
+        // Show a more friendly error or use fallback silently?
+        // Let's use fallback but notify in console.
+        // Also check if we should alert user.
+        console.warn("Switching to fallback data due to load error.");
         renderApp(fallbackProducts, fallbackSettings);
     }
 }
 
-// Simple CSV Parser
+// Robust CSV Parser
 function parseCSV(csvText) {
     const lines = csvText.trim().split(/\r?\n/);
     if (lines.length < 2) return [];
 
-    const headers = lines[0].split(',').map(h => h.trim());
+    const headers = parseCSVLine(lines[0]).map(h => h.trim());
     const result = [];
 
     for (let i = 1; i < lines.length; i++) {
-        // Handle simple CSV splitting (Note: doesn't handle commas inside quotes perfectly, but sufficient for simple data)
-        // For better robustness with description text that might contain commas, we should use a regex or library.
-        // Let's use a slightly better regex split for robustness.
         const currentLine = lines[i];
         if (!currentLine.trim()) continue;
 
-        // Regex to match CSV values (handling quotes)
-        const re = /(?:,|\n|^)("(?:(?:"")*|[^"]*)*"|[^",\n]*|(?:\n|$))/g;
-        const matches = [];
-        let match;
-        while ((match = re.exec(currentLine)) !== null) {
-            // Remove leading delimiter
-            let val = match[1];
-            if (val.startsWith(',')) val = val.substring(1);
-            // Remove quotes if present
-            if (val.startsWith('"') && val.endsWith('"')) {
-                val = val.substring(1, val.length - 1).replace(/""/g, '"');
-            }
-            matches.push(val.trim());
-        }
-        // The regex might produce one extra empty match at the end or begin depending on implementation details
-        // A simpler approach for now to avoid regex complexity bugs in limited environment:
-        // Use basic split if we assume descriptions don't have commas, OR just strictly column count.
-        // Let's stick to a robust enough regex helper or simple split if complexity is high.
-        // Actually, let's use a known simple parser snippet from StackOverflow for correctness.
-
-        const row = {};
         const values = parseCSVLine(currentLine);
+        const row = {};
 
         headers.forEach((header, index) => {
-            row[header] = values[index] || '';
+            // Handle potential undefined values if row is short
+            row[header] = (values[index] !== undefined) ? values[index].trim() : '';
         });
         result.push(row);
     }
     return result;
 }
 
+// State-machine based CSV line parser to handle quotes and commas correctly
 function parseCSVLine(text) {
-    let ret = [''], i = 0, p = '', s = true;
-    for (let l in text) {
-        l = text[l];
-        if ('"' === l) {
-            s = !s;
-            if ('"' === p) {
-                ret[i] += '"';
-                l = '-';
-            } else if ('' === p)
-                l = '-';
-        } else if (s && ',' === l)
-            l = ret[++i] = '';
-        else
-            ret[i] += l;
-        p = l;
+    const res = [];
+    let entry = "";
+    let insideQuote = false;
+
+    for (let i = 0; i < text.length; i++) {
+        const char = text[i];
+
+        if (char === '"') {
+            // Check for escaped quote ("")
+            if (insideQuote && text[i + 1] === '"') {
+                entry += '"';
+                i++; // Skip next quote
+            } else {
+                // Toggle quote state
+                insideQuote = !insideQuote;
+            }
+        } else if (char === ',' && !insideQuote) {
+            // Delimiter found (and not inside quotes)
+            res.push(entry);
+            entry = "";
+        } else {
+            entry += char;
+        }
     }
-    return ret;
+    // Push the last entry
+    res.push(entry);
+    return res;
 }
 
 function renderApp(productsArray, settingsMsg) {
