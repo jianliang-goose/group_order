@@ -314,13 +314,13 @@ function renderNotices() {
         
         <div class="notice-timeline">
             <div class="timeline-item">
+                <span class="timeline-label">最後寄貨(冷凍)</span>
+                <span class="timeline-date">${settings.shipping_date || '-'}</span>
+            </div>
+            <div class="timeline-divider"></div>
+            <div class="timeline-item">
                 <span class="timeline-label">最後接單</span>
                 <span class="timeline-date">${settings.close_date || '-'}</span>
-            </div>
-             <div class="timeline-divider"></div>
-            <div class="timeline-item">
-                <span class="timeline-label">最後寄貨</span>
-                <span class="timeline-date">${settings.shipping_date || '-'}</span>
             </div>
              <div class="timeline-divider"></div>
             <div class="timeline-item">
@@ -616,7 +616,17 @@ async function submitOrder(e) {
         }
     });
 
+    // Generate Order ID locally (YYMMDD-RRR)
+    const now = new Date();
+    const dateStr = now.getFullYear().toString().slice(-2) +
+        (now.getMonth() + 1).toString().padStart(2, '0') +
+        now.getDate().toString().padStart(2, '0');
+    const randomSuffix = Math.floor(100 + Math.random() * 900);
+    const orderId = `${dateStr}-${randomSuffix}`;
+
     const payload = {
+        action: 'createOrder', // Explicit action for backend
+        orderId: orderId, // Send generated ID
         groupLeader: document.getElementById('groupLeader') ? document.getElementById('groupLeader').value : '無',
         name: document.getElementById('customerName').value,
         phone: document.getElementById('customerPhone').value,
@@ -654,7 +664,8 @@ async function submitOrder(e) {
         successSection.style.display = 'block';
 
         // Fill Data
-        document.getElementById('successDate').innerText = new Date().toLocaleString('zh-TW', { hour12: false });
+        document.getElementById('successDate').innerText = now.toLocaleString('zh-TW', { hour12: false });
+        document.getElementById('successOrderId').innerText = orderId;
         document.getElementById('successName').innerText = payload.name;
         document.getElementById('successTotal').innerText = `$${total.toLocaleString()}`;
         document.getElementById('successPayment').innerText = `${payload.paymentMethod}\n(${paymentInfo})`;

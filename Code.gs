@@ -322,7 +322,7 @@ function createOrder(doc, data) {
 
   var newRow = [];
   var timestamp = new Date();
-  var orderId = Utilities.formatDate(timestamp, Session.getScriptTimeZone(), "yyyyMMdd-HHmmss");
+  var orderId = data.orderId || (Utilities.formatDate(timestamp, Session.getScriptTimeZone(), "yyMMdd") + "-" + Math.floor(100 + Math.random() * 900));
   
   newRow.push(timestamp);
   newRow.push(orderId);
