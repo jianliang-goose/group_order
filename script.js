@@ -20,22 +20,11 @@ const fallbackSettings = {
     shipping_fee: 120,
     close_date: "2026/02/10",
     shipping_date: "2026/02/09",
-    pickup_date: "2026/02/15 (19:00 前)"
+    pickup_date: "2026/02/15 (19:00 前)",
+    is_open: "true"
 };
 
-// Initialize
-document.addEventListener('DOMContentLoaded', async () => {
-    // Only run main shop logic if we are on the shop page
-    if (document.getElementById('productList')) {
-        await fetchConfig();
-    }
-});
-
-// Google Sheet Published CSV URLs (Fast Loading)
-const PRODUCTS_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQd_Hya-NceMfrF79aibzVQ8SoUqHI5nL_DHpGhtG8lCDUT4y_iNA2XzS9R-uJqWJtNk2XaMfP86vvL/pub?gid=598932868&single=true&output=csv";
-const SETTINGS_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQd_Hya-NceMfrF79aibzVQ8SoUqHI5nL_DHpGhtG8lCDUT4y_iNA2XzS9R-uJqWJtNk2XaMfP86vvL/pub?gid=1252826992&single=true&output=csv";
-
-const CORS_PROXY = "https://api.allorigins.win/raw?url=";
+// ...
 
 async function fetchConfig(ignorePreload = false) {
     // Note: ignorePreload parameter is kept for compatibility but CSV is fast enough to replace it.
@@ -43,21 +32,25 @@ async function fetchConfig(ignorePreload = false) {
     try {
         console.log("Fetching data from Google CSV...");
 
+        // Cache busting
+        const ts = Date.now();
+        const appendTs = (url) => url + `&_t=${ts}`;
+
         let prodRes, setRes;
 
         try {
             // Try direct fetch first (works in production usually)
             [prodRes, setRes] = await Promise.all([
-                fetch(PRODUCTS_CSV_URL),
-                fetch(SETTINGS_CSV_URL)
+                fetch(appendTs(PRODUCTS_CSV_URL)),
+                fetch(appendTs(SETTINGS_CSV_URL))
             ]);
             if (!prodRes.ok || !setRes.ok) throw new Error("Direct fetch failed");
         } catch (directError) {
             console.warn("Direct fetch failed (likely CORS on local), trying proxy...", directError);
             // Fallback to CORS Proxy for local testing
             [prodRes, setRes] = await Promise.all([
-                fetch(CORS_PROXY + encodeURIComponent(PRODUCTS_CSV_URL)),
-                fetch(CORS_PROXY + encodeURIComponent(SETTINGS_CSV_URL))
+                fetch(CORS_PROXY + encodeURIComponent(appendTs(PRODUCTS_CSV_URL))),
+                fetch(CORS_PROXY + encodeURIComponent(appendTs(SETTINGS_CSV_URL)))
             ]);
         }
 
