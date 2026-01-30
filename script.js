@@ -825,9 +825,9 @@ function initTrackingPage() {
 
         if (data.paymentStatus && (
             data.paymentStatus === 'Verify' ||
-            data.paymentStatus === '已核對' ||
-            data.paymentStatus === '已付款' ||
-            data.paymentStatus === '已對帳' ||
+            data.paymentStatus.includes('已核對') ||
+            data.paymentStatus.includes('已付款') ||
+            data.paymentStatus.includes('已對帳') ||
             data.paymentStatus.includes('完成') ||
             data.paymentStatus.includes('ok') ||
             data.paymentStatus.toLowerCase() === 'true'
@@ -835,8 +835,8 @@ function initTrackingPage() {
             paymentDisplay = '<span style="color:green; font-weight:bold;">已付款 (核對成功)</span>';
         } else {
             // Unverified
-            // If the status is empty, assume unverified. 
-            // If it has some other text (like "Check"), show it as warning or just raw text? 
+            // If the status is empty, assume unverified.
+            // If it has some other text (like "Check"), show it as warning or just raw text?
             // Better to show raw text if it's not explicitly "Unverified"
             paymentDisplay = `<span style="color:#e6a23c;">${data.paymentMethod} (未核對/待付款)</span>`;
             if (data.paymentInfo) {
