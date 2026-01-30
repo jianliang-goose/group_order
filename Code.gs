@@ -122,6 +122,8 @@ function doPost(e) {
       return updateOrderFull(doc, data);
     } else if (data.action === 'saveSettings') {
       return saveSettings(doc, data);
+    } else if (data.action === 'searchOrder') {
+      return searchOrder(doc, data);
     } else if (data.items || data.totalAmount || data.phone || !data.action) {
        // Heuristic: If it has order-like fields OR no action (legacy support), treat as order
        return createOrder(doc, data);
@@ -349,4 +351,73 @@ function createOrder(doc, data) {
   return ContentService
     .createTextOutput(JSON.stringify({ "result": "success", "orderId": orderId }))
     .setMimeType(ContentService.MimeType.JSON);
+}
+
+function searchOrder(doc, data) {
+  var sheet = doc.getSheetByName('Orders');
+  // If no orders yet
+  if (!sheet) {
+      return ContentService.createTextOutput(JSON.stringify({ "result": "error", "error": "No orders found" }))
+          .setMimeType(ContentService.MimeType.JSON);
+  }
+
+  var rows = sheet.getDataRange().getValues();
+  var headers = rows[0];
+
+  var idIndex = headers.indexOf('Order_ID');
+  var phoneIndex = headers.indexOf('Phone');
+
+  // Input sanitization
+  var searchId = (data.orderId || '').trim().toUpperCase();
+  var searchPhone = (data.phone || '').toString().replace(/\D/g, ''); // Digits only
+
+  if (!searchId || !searchPhone) {
+      return ContentService.createTextOutput(JSON.stringify({ "result": "error", "error": "Missing ID or Phone" }))
+          .setMimeType(ContentService.MimeType.JSON);
+  }
+
+  for (var i = 1; i < rows.length; i++) {
+    var row = rows[i];
+    var currentId = String(row[idIndex] || '').trim().toUpperCase();
+    var currentPhone = String(row[phoneIndex] || '').replace(/\D/g, '');
+
+    // Strict ID verification + Phone verification
+    if (currentId === searchId) {
+        // Phone fuzzy match: Check if input ends with stored or stored ends with input
+        if (currentPhone.endsWith(searchPhone) || searchPhone.endsWith(currentPhone)) {
+             // Found! Return limited data
+             // Define helper to safely get value
+             var getValue = function(colName) {
+                 var idx = headers.indexOf(colName);
+                 return idx !== -1 ? row[idx] : '';
+             };
+
+             var resultData = {
+                 orderId: currentId,
+                 createdDate: getValue('Timestamp'), 
+                 status: getValue('Status') || '未處理',
+                 items: getValue('Items'),
+                 totalAmount: getValue('Total_Amount'),
+                 paymentStatus: getValue('Payment_Verified') || '未核對',
+                 deliveryMethod: getValue('Delivery_Method'),
+                 storeInfo: getValue('Store_Info'),
+                 paymentMethod: getValue('Payment_Method'),
+                 paymentInfo: getValue('Payment_Info'),
+                 shippingFee: getValue('Shipping_Fee'),
+                 grandTotal: getValue('Grand_Total'),
+                 result: "success"
+             };
+             
+             return ContentService.createTextOutput(JSON.stringify(resultData))
+                 .setMimeType(ContentService.MimeType.JSON);
+        } else {
+             // ID matches but Phone doesn't -> Access Denied
+             return ContentService.createTextOutput(JSON.stringify({ "result": "error", "error": "Security Check Failed" }))
+                 .setMimeType(ContentService.MimeType.JSON);
+        }
+    }
+  }
+
+  return ContentService.createTextOutput(JSON.stringify({ "result": "error", "error": "Order Not Found" }))
+      .setMimeType(ContentService.MimeType.JSON);
 }

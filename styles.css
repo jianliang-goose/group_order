@@ -167,6 +167,28 @@ button {
   box-shadow: 0 5px 20px rgba(0, 0, 0, 0.6);
 }
 
+.tracking-link-nav {
+  margin-left: auto;
+  /* Push to right */
+  color: #fff;
+  text-decoration: none;
+  font-weight: bold;
+  padding: 8px 15px;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  border-radius: 20px;
+  transition: all 0.3s;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  background: rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(5px);
+}
+
+.tracking-link-nav:hover {
+  background: white;
+  color: var(--accent-color);
+}
+
 /* Text Group for alignment */
 .brand-text-group {
   display: flex;

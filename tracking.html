@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>訂單查詢 - 建良鵝肉</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=Outfit:wght@400;600&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="styles.css?v=20260130">
+    <style>
+        body {
+            background-color: #f9f9f9;
+            /* Mild contrast for the card */
+            min-height: 100vh;
+        }
+
+        .tracking-container {
+            max-width: 600px;
+            margin: 40px auto;
+            padding: 20px;
+        }
+
+        .tracking-card {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .tracking-title {
+            text-align: center;
+            color: #c45a00;
+            margin-bottom: 20px;
+            font-size: 1.8rem;
+            font-weight: 700;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #555;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+            box-sizing: border-box;
+            transition: border-color 0.3s;
+        }
+
+        .form-input:focus {
+            border-color: #c45a00;
+            outline: none;
+        }
+
+        .search-btn {
+            width: 100%;
+            padding: 12px;
+            background: #c45a00;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: background 0.3s;
+            font-weight: bold;
+        }
+
+        .search-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        .search-btn:hover:not(:disabled) {
+            background: #a04600;
+        }
+
+        .result-card {
+            margin-top: 30px;
+            display: none;
+            /* Hidden by default */
+            animation: fadeIn 0.5s ease;
+            border-top: 2px dashed #eee;
+            padding-top: 20px;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .back-link {
+            display: block;
+            text-align: center;
+            margin-top: 20px;
+            color: #666;
+            text-decoration: none;
+            font-size: 0.9rem;
+        }
+
+        .back-link:hover {
+            color: #c45a00;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 20px;
+            color: white;
+            font-size: 0.95rem;
+            font-weight: bold;
+        }
+
+        /* Status Colors */
+        .status-badge.pending {
+            background: #6c757d;
+        }
+
+        /* Default/Unknown */
+        .status-badge.confirmed {
+            background: #28a745;
+        }
+
+        /* Paid/Verified */
+        .status-badge.shipped {
+            background: #007bff;
+        }
+
+        /* Shipped */
+
+        .timeline {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.8rem;
+            color: #ccc;
+        }
+
+        .timeline-step {
+            text-align: center;
+            position: relative;
+            flex: 1;
+        }
+
+        .timeline-step div:first-child {
+            font-size: 1.2rem;
+            margin-bottom: 5px;
+        }
+
+        .timeline-step.active {
+            color: #c45a00;
+            font-weight: bold;
+        }
+
+        .timeline-step.active div:first-child {
+            transform: scale(1.1);
+        }
+
+        /* Reusing detail styles from index.html via styles.css mostly, but defining basics here just in case */
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            border-bottom: 1px solid #f0f0f0;
+            padding-bottom: 6px;
+        }
+
+        .detail-row:last-child {
+            border-bottom: none;
+        }
+
+        .detail-label {
+            font-weight: bold;
+            color: #777;
+            flex: 0 0 100px;
+        }
+
+        .detail-value {
+            color: #333;
+            flex: 1;
+            text-align: right;
+        }
+
+        /* Mobile adjustment for items */
+        .detail-row.block-mobile {
+            display: block;
+        }
+
+        .detail-row.block-mobile .detail-value {
+            text-align: left;
+            margin-top: 4px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <nav
+        style="background: white; padding: 15px 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); display: flex; justify-content: space-between; align-items: center;">
+        <a href="index.html"
+            style="text-decoration:none; font-weight: bold; font-size: 1.2rem; color: #c45a00; display:flex; align-items:center;">
+            <img src="images/logo.png" alt="" style="height:30px; margin-right:10px; display:none;">
+            <!-- Placeholder if icon exists -->
+            建良鵝肉
+        </a>
+        <a href="index.html"
+            style="text-decoration: none; color: #555; padding:5px 10px; border:1px solid #eee; border-radius:5px;">回首頁</a>
+    </nav>
+
+    <div class="tracking-container">
+        <div class="tracking-card">
+            <h2 class="tracking-title">訂單查詢</h2>
+            <p style="text-align:center; color:#666; margin-bottom:25px; font-size:0.95rem;">
+                為了保護您的隱私，請輸入<br>
+                <strong>「訂單編號」</strong>與<strong>「手機號碼」</strong>進行查詢
+            </p>
+
+            <form id="trackingForm">
+                <div class="form-group">
+                    <label class="form-label" for="trackId">訂單編號 (Order ID)</label>
+                    <input type="text" id="trackId" class="form-input" placeholder="例如：60130-1420K" required
+                        style="text-transform: uppercase;">
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="trackPhone">手機號碼 (Phone)</label>
+                    <input type="tel" id="trackPhone" class="form-input" placeholder="例如：0912345678" required>
+                </div>
+                <button type="submit" class="search-btn" id="searchBtn">查詢訂單</button>
+            </form>
+
+            <div id="loading" style="display:none; text-align:center; margin-top:20px; color:#666;">
+                <span style="display:inline-block; animation: spin 1s linear infinite;">⏳</span> 查詢中...
+            </div>
+
+            <div id="resultCard" class="result-card">
+                <div
+                    style="border-bottom:1px solid #eee; padding-bottom:15px; margin-bottom:15px; display:flex; justify-content:space-between; align-items:center;">
+                    <div style="font-weight:bold; font-size:1.1rem;">訂單狀態</div>
+                    <div id="resStatusBadge" class="status-badge pending">處理中</div>
+                </div>
+
+                <div class="detail-row">
+                    <div class="detail-label">訂購日期</div>
+                    <div class="detail-value" id="resDate">-</div>
+                </div>
+                <!-- Remove Group Leader from public tracking to privacy? Or keep it? keeping is fine -->
+                <div class="detail-row">
+                    <div class="detail-label">總金額</div>
+                    <div class="detail-value" id="resTotal" style="color:#c45a00; font-weight:bold;">-</div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-label">付款狀態</div>
+                    <div class="detail-value" id="resPaymentStatus">-</div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-label">取貨方式</div>
+                    <div class="detail-value" id="resDelivery">-</div>
+                </div>
+                <!-- Store Info shown if applicable -->
+                <div class="detail-row block-mobile">
+                    <div class="detail-label" style="margin-bottom:5px;">訂購內容</div>
+                    <div class="detail-value" id="resItems" style="font-size:0.95rem; line-height:1.5; color:#555;">-
+                    </div>
+                </div>
+
+                <!-- Simple Timeline -->
+                <div class="timeline">
+                    <div class="timeline-step active">
+                        <div>📝</div>
+                        <div>已下單</div>
+                    </div>
+                    <div class="timeline-step" id="stepConfirmed">
+                        <div>💰</div>
+                        <div>已確認</div>
+                    </div>
+                    <div class="timeline-step" id="stepShipped">
+                        <div>📦</div>
+                        <div>已出貨/取貨</div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="errorMsg"
+                style="display:none; background:#ffebee; color:#c62828; padding:15px; border-radius:8px; margin-top:20px; text-align:center;">
+                查無此訂單，請確認編號與手機號碼是否正確。
+            </div>
+
+        </div>
+
+        <div style="text-align:center; margin-top:30px;">
+            <a href="index.html" class="back-link">← 返回首頁購物</a>
+        </div>
+    </div>
+
+    <!-- Reusing script.js -->
+    <script src="script.js?v=20260130"></script>
+    <script>
+        // Init Tracking Page
+        document.addEventListener('DOMContentLoaded', () => {
+            if (typeof initTrackingPage === 'function') {
+                initTrackingPage();
+            } else {
+                console.error("initTrackingPage not found in script.js");
+            }
+        });
+    </script>
+</body>
+
+</html>

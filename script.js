@@ -726,3 +726,143 @@ function scrollToOrderSummary() {
         }, 1500);
     }
 }
+
+// --- Tracking Page Logic ---
+function initTrackingPage() {
+    console.log("Tracking Page Initialized");
+    const form = document.getElementById('trackingForm');
+    const searchBtn = document.getElementById('searchBtn');
+    const loading = document.getElementById('loading');
+    const resultCard = document.getElementById('resultCard');
+    const errorMsg = document.getElementById('errorMsg');
+
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const orderId = document.getElementById('trackId').value.trim().toUpperCase();
+        const phone = document.getElementById('trackPhone').value.trim();
+
+        if (!orderId || !phone) {
+            alert("請輸入完整資訊");
+            return;
+        }
+
+        // Reset UI
+        resultCard.style.display = 'none';
+        errorMsg.style.display = 'none';
+        loading.style.display = 'block';
+        searchBtn.disabled = true;
+        searchBtn.innerText = "查詢中...";
+
+        try {
+            // Using POST to avoid sensitive data in URL logs
+            const payload = JSON.stringify({
+                action: 'searchOrder',
+                orderId: orderId,
+                phone: phone
+            });
+
+            // GAS Web App POST request
+            const res = await fetch(GAS_API_URL, {
+                method: 'POST',
+                body: payload,
+                // Default mode 'cors' allows reading response if server supports it.
+                // GAS web app usually does if following redirects.
+            });
+
+            if (!res.ok) throw new Error("Network response was not ok");
+
+            const data = await res.json();
+
+            if (data.result === 'success') {
+                renderTrackingResult(data);
+            } else {
+                errorMsg.style.display = 'block';
+                errorMsg.innerText = data.error === "Security Check Failed" ?
+                    "手機號碼與訂單不符，請確認。" : "查無此訂單 (請確認編號格式正確)";
+            }
+
+        } catch (err) {
+            console.error(err);
+            errorMsg.innerText = "系統連線錯誤，請稍後再試。";
+            errorMsg.style.display = 'block';
+        } finally {
+            loading.style.display = 'none';
+            searchBtn.disabled = false;
+            searchBtn.innerText = "查詢訂單";
+        }
+    });
+
+    function renderTrackingResult(data) {
+        resultCard.style.display = 'block';
+
+        // Populate fields
+        // Parse date carefully
+        const dateObj = new Date(data.createdDate);
+        const dateStr = !isNaN(dateObj) ? dateObj.toLocaleString('zh-TW', { hour12: false }) : data.createdDate;
+
+        document.getElementById('resDate').innerText = dateStr;
+        document.getElementById('resTotal').innerText = '$' + Number(data.totalAmount).toLocaleString();
+
+        // Status Badge Logic - Direct mapping from Sheet Status
+        const statusBadge = document.getElementById('resStatusBadge');
+        statusBadge.className = 'status-badge';
+        let statusText = data.status || '未處理';
+
+        // Map status to colors
+        if (statusText === '已確認' || statusText === '已付款' || statusText.includes('完成')) {
+            statusBadge.classList.add('confirmed');
+        } else if (statusText.includes('出貨') || statusText.includes('寄出') || statusText.includes('取貨')) {
+            statusBadge.classList.add('shipped');
+        } else {
+            statusBadge.classList.add('pending');
+        }
+        statusBadge.innerText = statusText;
+
+        // Payment Status
+        const payStatusDiv = document.getElementById('resPaymentStatus');
+        let paymentDisplay = '';
+
+        if (data.paymentStatus === 'Verify' || data.paymentStatus === '已核對' || data.paymentStatus === '已付款') {
+            paymentDisplay = '<span style="color:green; font-weight:bold;">已付款 (核對成功)</span>';
+        } else {
+            // Unverified
+            paymentDisplay = `<span style="color:#e6a23c;">${data.paymentMethod} (未核對/待付款)</span>`;
+            if (data.paymentInfo) {
+                paymentDisplay += `<br><small style="color:#888;">${data.paymentInfo}</small>`;
+            }
+        }
+        payStatusDiv.innerHTML = paymentDisplay;
+
+        // Delivery
+        document.getElementById('resDelivery').innerText = data.deliveryMethod + (data.storeInfo ? ` (${data.storeInfo})` : '');
+
+        // Shipping Fee & Grand Total if needed? 
+        // User asked for "info from sheet".
+
+        // Items
+        if (data.items) {
+            const itemsHtml = data.items.split(', ').map(item => `<div>• ${item}</div>`).join('');
+            document.getElementById('resItems').innerHTML = itemsHtml;
+        } else {
+            document.getElementById('resItems').innerText = '-';
+        }
+
+        // Timeline Visualization
+        const stepConfirmed = document.getElementById('stepConfirmed');
+        const stepShipped = document.getElementById('stepShipped');
+
+        stepConfirmed.classList.remove('active');
+        stepShipped.classList.remove('active');
+
+        // Logic based on status text keywords
+        if (statusText !== '未處理' && statusText !== '取消') {
+            stepConfirmed.classList.add('active'); // Assume active if not new
+        }
+
+        if (statusText.includes('出貨') || statusText.includes('寄出') || statusText.includes('已取') || statusText.includes('完成')) {
+            stepConfirmed.classList.add('active');
+            stepShipped.classList.add('active');
+        }
+    }
+}
