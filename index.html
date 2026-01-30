@@ -131,14 +131,7 @@
                     <span class="brand-name-mini">建良鵝肉</span>
                     <span class="brand-name-en">JianLiang Goose</span>
                 </div>
-                <a href="tracking.html" class="tracking-link-nav">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                        stroke-linecap="round" stroke-linejoin="round">
-                        <circle cx="11" cy="11" r="8"></circle>
-                        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-                    </svg>
-                    訂單查詢
-                </a>
+                <!-- Order Lookup Removed from Header -->
             </div>
 
             <div class="hero-content">
@@ -367,8 +360,45 @@
                     📸 <strong>請截圖保存此畫面</strong> 以方便核對訂單
                 </div>
 
-                <br>
-                <a href="javascript:location.reload()" class="back-home-btn">回到首頁</a>
+                <div class="success-actions" style="margin-top:25px; border-top:1px dashed #eee; padding-top:20px;">
+
+                    <p style="text-align:center; color:#555; margin-bottom:15px; font-weight:500;">
+                        您可以透過以下方式查詢訂單進度：
+                    </p>
+
+                    <div style="display:flex; justify-content:center; gap:15px; flex-wrap:wrap; margin-bottom:20px;">
+                        <!-- Order Lookup Button -->
+                        <a href="tracking.html" class="action-btn-lookup" style="
+                            display: inline-flex;
+                            align-items: center;
+                            gap: 8px;
+                            background: white; 
+                            color: #333; 
+                            border: 1px solid #ccc; 
+                            padding: 10px 20px; 
+                            border-radius: 8px; 
+                            text-decoration: none; 
+                            font-weight: bold;
+                            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+                            transition: all 0.2s;">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="11" cy="11" r="8"></circle>
+                                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                            </svg>
+                            網站訂單查詢
+                        </a>
+
+                        <!-- Line Button -->
+                        <a href="https://lin.ee/uLbdSkD" target="_blank" style="display:inline-block; height: 42px;">
+                            <img src="https://scdn.line-apps.com/n/line_add_friends/btn/zh-Hant.png" alt="加入好友"
+                                height="42" border="0">
+                        </a>
+                    </div>
+
+                    <a href="javascript:location.reload()" class="back-home-btn"
+                        style="background:var(--primary-color); color:white; width:100%; display:block; text-align:center; box-sizing:border-box;">回到首頁繼續購物</a>
+                </div>
             </div>
         </section>
 
