@@ -621,7 +621,8 @@ async function submitOrder(e) {
     const dateStr = now.getFullYear().toString().slice(-2) +
         (now.getMonth() + 1).toString().padStart(2, '0') +
         now.getDate().toString().padStart(2, '0');
-    const randomSuffix = Math.floor(100 + Math.random() * 900);
+    // Using 5 digits random number: 10000 - 99999
+    const randomSuffix = Math.floor(10000 + Math.random() * 90000);
     const orderId = `${dateStr}-${randomSuffix}`;
 
     const payload = {
