@@ -359,17 +359,33 @@
                     value = `${year}/${month}/${day}`;
                 }
 
-                // Special handling for is_open boolean/string mismatch
-                if (key === 'is_open') {
-                    value = String(value).toLowerCase();
-                }
+                // Skip is_open in the loose loop, we handle it explicitly below for safety
+                if (key === 'is_open') continue;
 
                 if (form.elements[key]) {
                     form.elements[key].value = value;
                 }
             }
 
-            // 2. Render Products
+            // 2. Excessive handling for 'is_open' to prevent blank dropdowns
+            let isOpenVal = data.settings['is_open'];
+            // Normalize
+            if (isOpenVal === undefined || isOpenVal === null) {
+                isOpenVal = 'true'; // Default to Open if missing
+            } else {
+                isOpenVal = String(isOpenVal).trim().toLowerCase();
+            }
+
+            // Map common truthy/falsy values
+            if (['true', 'yes', 'on', '1'].includes(isOpenVal)) isOpenVal = 'true';
+            else if (['false', 'no', 'off', '0'].includes(isOpenVal)) isOpenVal = 'false';
+            else isOpenVal = 'true'; // Fallback default
+
+            if (form.elements['is_open']) {
+                form.elements['is_open'].value = isOpenVal;
+            }
+
+            // 3. Render Products
             currentProducts = data.products || [];
             renderProducts(currentProducts);
         }
