@@ -233,16 +233,11 @@
         <div class="tracking-card">
             <h2 class="tracking-title">訂單查詢</h2>
             <p style="text-align:center; color:#666; margin-bottom:25px; font-size:0.95rem;">
-                為了保護您的隱私，請輸入<br>
-                <strong>「訂單編號」</strong>與<strong>「手機號碼」</strong>進行查詢
+                請輸入您的<strong>「手機號碼」</strong>查詢歷史訂單
             </p>
 
             <form id="trackingForm">
-                <div class="form-group">
-                    <label class="form-label" for="trackId">訂單編號 (Order ID)</label>
-                    <input type="text" id="trackId" class="form-input" placeholder="例如：60130-1420K" required
-                        style="text-transform: uppercase;">
-                </div>
+                <!-- Order ID removed for phone-only lookup -->
                 <div class="form-group">
                     <label class="form-label" for="trackPhone">手機號碼 (Phone)</label>
                     <input type="tel" id="trackPhone" class="form-input" placeholder="例如：0912345678" required>
@@ -254,34 +249,39 @@
                 <span style="display:inline-block; animation: spin 1s linear infinite;">⏳</span> 查詢中...
             </div>
 
-            <div id="resultCard" class="result-card">
+            <div id="resultsList"></div>
+
+            <!-- Template for Result Card -->
+            <div id="resultTemplate" class="result-card" style="display:none;">
                 <div
                     style="border-bottom:1px solid #eee; padding-bottom:15px; margin-bottom:15px; display:flex; justify-content:space-between; align-items:center;">
-                    <div style="font-weight:bold; font-size:1.1rem;">訂單狀態</div>
-                    <div id="resStatusBadge" class="status-badge pending">處理中</div>
+                    <div style="font-weight:bold; font-size:1.1rem;">
+                        訂單 #<span class="res-id"></span>
+                    </div>
+                    <div class="status-badge res-status-badge">處理中</div>
                 </div>
 
                 <div class="detail-row">
                     <div class="detail-label">訂購日期</div>
-                    <div class="detail-value" id="resDate">-</div>
+                    <div class="detail-value res-date">-</div>
                 </div>
                 <!-- Remove Group Leader from public tracking to privacy? Or keep it? keeping is fine -->
                 <div class="detail-row">
                     <div class="detail-label">總金額</div>
-                    <div class="detail-value" id="resTotal" style="color:#c45a00; font-weight:bold;">-</div>
+                    <div class="detail-value res-total" style="color:#c45a00; font-weight:bold;">-</div>
                 </div>
                 <div class="detail-row">
                     <div class="detail-label">付款狀態</div>
-                    <div class="detail-value" id="resPaymentStatus">-</div>
+                    <div class="detail-value res-payment-status">-</div>
                 </div>
                 <div class="detail-row">
                     <div class="detail-label">取貨方式</div>
-                    <div class="detail-value" id="resDelivery">-</div>
+                    <div class="detail-value res-delivery">-</div>
                 </div>
                 <!-- Store Info shown if applicable -->
                 <div class="detail-row block-mobile">
                     <div class="detail-label" style="margin-bottom:5px;">訂購內容</div>
-                    <div class="detail-value" id="resItems" style="font-size:0.95rem; line-height:1.5; color:#555;">-
+                    <div class="detail-value res-items" style="font-size:0.95rem; line-height:1.5; color:#555;">-
                     </div>
                 </div>
 
@@ -291,11 +291,11 @@
                         <div>📝</div>
                         <div>已下單</div>
                     </div>
-                    <div class="timeline-step" id="stepConfirmed">
+                    <div class="timeline-step step-confirmed">
                         <div>💰</div>
                         <div>已確認</div>
                     </div>
-                    <div class="timeline-step" id="stepShipped">
+                    <div class="timeline-step step-shipped">
                         <div>📦</div>
                         <div>已出貨/取貨</div>
                     </div>

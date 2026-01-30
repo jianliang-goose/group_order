@@ -378,57 +378,55 @@ function searchOrder(doc, data) {
   var idIndex = getColIdx('Order_ID') !== undefined ? getColIdx('Order_ID') : headers.indexOf('Order_ID');
   var phoneIndex = getColIdx('Phone') !== undefined ? getColIdx('Phone') : headers.indexOf('Phone');
 
-  // Input sanitization
-  var searchId = (data.orderId || '').trim().toUpperCase();
+  // Input sanitization: Only Phone needed
   var searchPhone = (data.phone || '').toString().replace(/\D/g, ''); // Digits only
 
-  if (!searchId || !searchPhone) {
-      return ContentService.createTextOutput(JSON.stringify({ "result": "error", "error": "Missing ID or Phone" }))
+  if (!searchPhone) {
+      return ContentService.createTextOutput(JSON.stringify({ "result": "error", "error": "Missing Phone Number" }))
           .setMimeType(ContentService.MimeType.JSON);
   }
 
+  var foundOrders = [];
+
+  // Iterate rows (skip header)
   for (var i = 1; i < rows.length; i++) {
     var row = rows[i];
-    var currentId = String(row[idIndex] || '').trim().toUpperCase();
     var currentPhone = String(row[phoneIndex] || '').replace(/\D/g, '');
 
-    // Strict ID verification + Phone verification
-    if (currentId === searchId) {
-        // Phone fuzzy match: Check if input ends with stored or stored ends with input
-        if (currentPhone.endsWith(searchPhone) || searchPhone.endsWith(currentPhone)) {
-             // Found! Return limited data
-             // Define helper to safely get value using robust map
-             var getValue = function(colName) {
-                 var idx = getColIdx(colName);
-                 return idx !== undefined ? row[idx] : '';
-             };
+    // Phone fuzzy match: Check if input ends with stored or stored ends with input
+    if (currentPhone !== '' && (currentPhone.endsWith(searchPhone) || searchPhone.endsWith(currentPhone))) {
+         
+         var getValue = function(colName) {
+             var idx = getColIdx(colName);
+             return idx !== undefined ? row[idx] : '';
+         };
 
-             var resultData = {
-                 orderId: currentId,
-                 createdDate: getValue('Timestamp'), 
-                 status: getValue('Status') || '未處理',
-                 items: getValue('Items'),
-                 totalAmount: getValue('Total_Amount'),
-                 paymentStatus: getValue('Payment_Verified') || getValue('Payment Verified') || getValue('PaymentVerified') || getValue('對帳狀態') || getValue('對帳') || '未核對',
-                 deliveryMethod: getValue('Delivery_Method'),
-                 storeInfo: getValue('Store_Info'),
-                 paymentMethod: getValue('Payment_Method'),
-                 paymentInfo: getValue('Payment_Info'),
-                 shippingFee: getValue('Shipping_Fee'),
-                 grandTotal: getValue('Grand_Total'),
-                 result: "success"
-             };
-             
-             return ContentService.createTextOutput(JSON.stringify(resultData))
-                 .setMimeType(ContentService.MimeType.JSON);
-        } else {
-             // ID matches but Phone doesn't -> Access Denied
-             return ContentService.createTextOutput(JSON.stringify({ "result": "error", "error": "Security Check Failed" }))
-                 .setMimeType(ContentService.MimeType.JSON);
-        }
+         foundOrders.push({
+             orderId: String(row[idIndex] || '').trim(),
+             createdDate: getValue('Timestamp'), 
+             status: getValue('Status') || '未處理',
+             items: getValue('Items'),
+             totalAmount: getValue('Total_Amount'),
+             paymentStatus: getValue('Payment_Verified') || getValue('Payment Verified') || getValue('PaymentVerified') || getValue('對帳狀態') || getValue('對帳') || '未核對',
+             deliveryMethod: getValue('Delivery_Method'),
+             storeInfo: getValue('Store_Info'),
+             paymentMethod: getValue('Payment_Method'),
+             paymentInfo: getValue('Payment_Info'),
+             shippingFee: getValue('Shipping_Fee'),
+             grandTotal: getValue('Grand_Total')
+         });
     }
   }
 
-  return ContentService.createTextOutput(JSON.stringify({ "result": "error", "error": "Order Not Found" }))
-      .setMimeType(ContentService.MimeType.JSON);
+  if (foundOrders.length > 0) {
+      // Sort by date descending (newest first)? 
+      // Assuming rows are time sorted, just reverse.
+      foundOrders.reverse();
+
+      return ContentService.createTextOutput(JSON.stringify({ "result": "success", "orders": foundOrders }))
+          .setMimeType(ContentService.MimeType.JSON);
+  } else {
+      return ContentService.createTextOutput(JSON.stringify({ "result": "error", "error": "Order Not Found" }))
+          .setMimeType(ContentService.MimeType.JSON);
+  }
 }

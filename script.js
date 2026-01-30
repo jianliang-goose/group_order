@@ -733,32 +733,29 @@ function initTrackingPage() {
     const form = document.getElementById('trackingForm');
     const searchBtn = document.getElementById('searchBtn');
     const loading = document.getElementById('loading');
-    const resultCard = document.getElementById('resultCard');
+    const resultsList = document.getElementById('resultsList');
     const errorMsg = document.getElementById('errorMsg');
 
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
 
-        const orderId = document.getElementById('trackId').value.trim().toUpperCase();
         const phone = document.getElementById('trackPhone').value.trim();
 
-        if (!orderId || !phone) {
-            alert("請輸入完整資訊");
+        if (!phone) {
+            alert("請輸入手機號碼");
             return;
         }
 
         // Reset UI
-        resultCard.style.display = 'none';
+        resultsList.innerHTML = ''; // Clear previous results
         errorMsg.style.display = 'none';
         loading.style.display = 'block';
         searchBtn.disabled = true;
         searchBtn.innerText = "查詢中...";
 
         try {
-            // Using POST to avoid sensitive data in URL logs
             const payload = JSON.stringify({
                 action: 'searchOrder',
-                orderId: orderId,
                 phone: phone
             });
 
@@ -766,20 +763,18 @@ function initTrackingPage() {
             const res = await fetch(GAS_API_URL, {
                 method: 'POST',
                 body: payload,
-                // Default mode 'cors' allows reading response if server supports it.
-                // GAS web app usually does if following redirects.
             });
 
             if (!res.ok) throw new Error("Network response was not ok");
 
             const data = await res.json();
 
-            if (data.result === 'success') {
-                renderTrackingResult(data);
+            if (data.result === 'success' && data.orders && data.orders.length > 0) {
+                renderTrackingResults(data.orders);
             } else {
                 errorMsg.style.display = 'block';
-                errorMsg.innerText = data.error === "Security Check Failed" ?
-                    "手機號碼與訂單不符，請確認。" : "查無此訂單 (請確認編號格式正確)";
+                errorMsg.innerText = data.error === "Missing Phone Number" ?
+                    "請輸入手機號碼" : "查無此號碼的訂單，請確認輸入是否正確。";
             }
 
         } catch (err) {
@@ -793,89 +788,89 @@ function initTrackingPage() {
         }
     });
 
-    function renderTrackingResult(data) {
-        resultCard.style.display = 'block';
+    function renderTrackingResults(orders) {
+        const template = document.getElementById('resultTemplate');
 
-        // Populate fields
-        // Parse date carefully
-        const dateObj = new Date(data.createdDate);
-        const dateStr = !isNaN(dateObj) ? dateObj.toLocaleString('zh-TW', { hour12: false }) : data.createdDate;
+        orders.forEach(order => {
+            const card = template.cloneNode(true);
+            card.style.display = 'block';
+            card.removeAttribute('id'); // Remove duplicate ID
+            card.style.marginBottom = '20px'; // Add space between cards
 
-        document.getElementById('resDate').innerText = dateStr;
-        document.getElementById('resTotal').innerText = '$' + Number(data.totalAmount).toLocaleString();
+            // Populate fields
+            card.querySelector('.res-id').innerText = order.orderId || '???';
 
-        // Status Badge Logic - Direct mapping from Sheet Status
-        const statusBadge = document.getElementById('resStatusBadge');
-        statusBadge.className = 'status-badge';
-        let statusText = data.status || '未處理';
+            const dateObj = new Date(order.createdDate);
+            const dateStr = !isNaN(dateObj) ? dateObj.toLocaleString('zh-TW', { hour12: false }) : order.createdDate;
+            card.querySelector('.res-date').innerText = dateStr;
 
-        // Map status to colors
-        if (statusText === '已確認' || statusText === '已付款' || statusText.includes('完成')) {
-            statusBadge.classList.add('confirmed');
-        } else if (statusText.includes('出貨') || statusText.includes('寄出') || statusText.includes('取貨')) {
-            statusBadge.classList.add('shipped');
-        } else {
-            statusBadge.classList.add('pending');
-        }
-        statusBadge.innerText = statusText;
+            card.querySelector('.res-total').innerText = '$' + Number(order.totalAmount).toLocaleString();
 
-        // Payment Status
-        const payStatusDiv = document.getElementById('resPaymentStatus');
-        let paymentDisplay = '';
+            // Status Badge
+            const statusBadge = card.querySelector('.res-status-badge');
+            statusBadge.className = 'status-badge res-status-badge'; // Reset classes
+            let statusText = order.status || '未處理';
 
-        if (data.paymentStatus && (
-            data.paymentStatus === 'Verify' ||
-            data.paymentStatus.includes('已核對') ||
-            data.paymentStatus.includes('已付款') ||
-            data.paymentStatus.includes('已對帳') ||
-            data.paymentStatus.includes('完成') ||
-            data.paymentStatus.includes('ok') ||
-            data.paymentStatus.toLowerCase() === 'true'
-        )) {
-            paymentDisplay = '<span style="color:green; font-weight:bold;">已付款 (核對成功)</span>';
-        } else {
-            // Unverified
-            // If the status is empty, assume unverified.
-            // If it has some other text (like "Check"), show it as warning or just raw text?
-            // Better to show raw text if it's not explicitly "Unverified"
-            paymentDisplay = `<span style="color:#e6a23c;">${data.paymentMethod} (未核對/待付款)</span>`;
-            if (data.paymentInfo) {
-                paymentDisplay += `<br><small style="color:#888;">${data.paymentInfo}</small>`;
+            if (statusText === '已確認' || statusText === '已付款' || statusText.includes('完成')) {
+                statusBadge.classList.add('confirmed');
+            } else if (statusText.includes('出貨') || statusText.includes('寄出') || statusText.includes('取貨')) {
+                statusBadge.classList.add('shipped');
+            } else {
+                statusBadge.classList.add('pending');
             }
-            // DEBUG: Show what backend returned
-            paymentDisplay += `<br><span style="font-size:10px; color:#ccc;">(系統狀態值: ${data.paymentStatus})</span>`;
-        }
-        payStatusDiv.innerHTML = paymentDisplay;
+            statusBadge.innerText = statusText;
 
-        // Delivery
-        document.getElementById('resDelivery').innerText = data.deliveryMethod + (data.storeInfo ? ` (${data.storeInfo})` : '');
+            // Payment Status
+            const payStatusDiv = card.querySelector('.res-payment-status');
+            let paymentDisplay = '';
 
-        // Shipping Fee & Grand Total if needed? 
-        // User asked for "info from sheet".
+            if (order.paymentStatus && (
+                order.paymentStatus === 'Verify' ||
+                order.paymentStatus.includes('已核對') ||
+                order.paymentStatus.includes('已付款') ||
+                order.paymentStatus.includes('已對帳') ||
+                order.paymentStatus.includes('完成') ||
+                order.paymentStatus.includes('ok') ||
+                order.paymentStatus.toLowerCase() === 'true'
+            )) {
+                paymentDisplay = '<span style="color:green; font-weight:bold;">已付款 (核對成功)</span>';
+            } else {
+                paymentDisplay = `<span style="color:#e6a23c;">${order.paymentMethod} (未核對/待付款)</span>`;
+                if (order.paymentInfo) {
+                    paymentDisplay += `<br><small style="color:#888;">${order.paymentInfo}</small>`;
+                }
+                // DEBUG
+                paymentDisplay += `<br><span style="font-size:10px; color:#ccc;">(系統狀態值: ${order.paymentStatus})</span>`;
+            }
+            payStatusDiv.innerHTML = paymentDisplay;
 
-        // Items
-        if (data.items) {
-            const itemsHtml = data.items.split(', ').map(item => `<div>• ${item}</div>`).join('');
-            document.getElementById('resItems').innerHTML = itemsHtml;
-        } else {
-            document.getElementById('resItems').innerText = '-';
-        }
+            // Delivery
+            card.querySelector('.res-delivery').innerText = order.deliveryMethod + (order.storeInfo ? ` (${order.storeInfo})` : '');
 
-        // Timeline Visualization
-        const stepConfirmed = document.getElementById('stepConfirmed');
-        const stepShipped = document.getElementById('stepShipped');
+            // Items
+            if (order.items) {
+                const itemsHtml = order.items.split(', ').map(item => `<div>• ${item}</div>`).join('');
+                card.querySelector('.res-items').innerHTML = itemsHtml;
+            } else {
+                card.querySelector('.res-items').innerText = '-';
+            }
 
-        stepConfirmed.classList.remove('active');
-        stepShipped.classList.remove('active');
+            // Timeline
+            const stepConfirmed = card.querySelector('.step-confirmed');
+            const stepShipped = card.querySelector('.step-shipped');
 
-        // Logic based on status text keywords
-        if (statusText !== '未處理' && statusText !== '取消') {
-            stepConfirmed.classList.add('active'); // Assume active if not new
-        }
+            stepConfirmed.classList.remove('active');
+            stepShipped.classList.remove('active');
 
-        if (statusText.includes('出貨') || statusText.includes('寄出') || statusText.includes('已取') || statusText.includes('完成')) {
-            stepConfirmed.classList.add('active');
-            stepShipped.classList.add('active');
-        }
+            if (statusText !== '未處理' && statusText !== '取消') {
+                stepConfirmed.classList.add('active');
+            }
+            if (statusText.includes('出貨') || statusText.includes('寄出') || statusText.includes('已取') || statusText.includes('完成')) {
+                stepConfirmed.classList.add('active');
+                stepShipped.classList.add('active');
+            }
+
+            resultsList.appendChild(card);
+        });
     }
 }
