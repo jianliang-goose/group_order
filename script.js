@@ -167,15 +167,34 @@ function renderApp(productsArray, settingsMsg) {
     renderNotices();
 
     // Check Global Open/Close status
-    if (settings.is_open === 'false') {
-        document.body.innerHTML = `
-            <div style="display:flex; justify-content:center; align-items:center; height:100vh; flex-direction:column; text-align:center; padding:20px;">
-                <h1>⛔ 目前暫停接單</h1>
-                <p>感謝您的支持，目前表單已關閉。</p>
-                <p>若有疑問請聯繫管理員。</p>
-            </div>
-        `;
-        return; // Stop rendering
+    const isOpenVal = String(settings.is_open).toLowerCase().trim();
+    const isClosed = ['false', '0', 'off', 'no', 'close'].includes(isOpenVal);
+
+    if (isClosed) {
+        // 1. Add Class for Styling (disable inputs, opacity)
+        document.body.classList.add('shop-closed-mode');
+
+        // 2. Add Banner
+        const banner = document.createElement('div');
+        banner.className = 'shop-closed-banner';
+        banner.innerHTML = '⛔ 目前暫停接單中，僅供瀏覽商品';
+        document.body.prepend(banner);
+
+        // 3. Update Submit Button Status immediately (though CSS handles interaction)
+        // We wait for DOM ready basically, but renderApp is called after DOMContentLoaded usually.
+        setTimeout(() => {
+            const submitBtn = document.getElementById('submitBtn');
+            if (submitBtn) {
+                submitBtn.innerText = "⛔ 此團暫停接單";
+                submitBtn.disabled = true;
+            }
+        }, 100);
+    } else {
+        // Ensure no closed state if open (re-render safety)
+        document.body.classList.remove('shop-closed-mode');
+        // Remove banner if exists
+        const oldBanner = document.querySelector('.shop-closed-banner');
+        if (oldBanner) oldBanner.remove();
     }
 
     // Render Group Leaders

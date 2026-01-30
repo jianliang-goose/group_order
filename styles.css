@@ -42,6 +42,39 @@ body {
   line-height: 1.6;
 }
 
+/* Shop Closed State */
+.shop-closed-banner {
+  background: #dc3545;
+  color: white;
+  text-align: center;
+  padding: 12px;
+  font-weight: bold;
+  position: sticky;
+  top: 0;
+  z-index: 9999;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  font-size: 1.1rem;
+  letter-spacing: 0.5px;
+}
+
+.shop-closed-mode .qty-btn,
+.shop-closed-mode .qty-input,
+.shop-closed-mode .submit-btn {
+  pointer-events: none;
+  opacity: 0.6;
+  filter: grayscale(1);
+}
+
+.shop-closed-mode .submit-btn {
+  background: #999 !important;
+  border-color: #999 !important;
+  cursor: not-allowed !important;
+}
+
+.shop-closed-mode .product-card {
+  opacity: 0.8;
+}
+
 h1,
 h2,
 h3,
