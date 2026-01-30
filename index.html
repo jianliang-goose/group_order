@@ -72,7 +72,7 @@
 
         .detail-row {
             display: flex;
-            justify-content: span;
+            justify-content: space-between;
             margin-bottom: 10px;
             border-bottom: 1px solid #eee;
             padding-bottom: 5px;
@@ -225,7 +225,7 @@
                     </div>
                     <div class="form-group">
                         <label class="form-label">收件門市 (店名/店號) <span style="color:red">*</span></label>
-                        <input type="text" class="form-input" id="storeInfo" placeholder="例如：全家三重旺旺店">
+                        <input type="text" class="form-input" id="storeInfo" placeholder="例如：全家新竹東園店/020814">
                         <div class="store-search-help" style="margin-top:8px; font-size:0.9rem;">
                             <span style="color:#666;">不知道店號？點此查詢：</span>
                             <a href="https://www.family.com.tw/marketing/inquiry.aspx" target="_blank"
@@ -345,9 +345,9 @@
                         <div class="detail-label">取貨方式</div>
                         <div class="detail-value" id="successDelivery">-</div>
                     </div>
-                    <div class="detail-row" style="flex-direction:column;">
-                        <div class="detail-label" style="margin-bottom:5px;">訂購內容</div>
-                        <div class="detail-value" id="successItems" style="font-size:0.9rem; line-height:1.5;">-</div>
+                    <div class="detail-row" style="display:block;">
+                        <div class="detail-label" style="margin-bottom:2px;">訂購內容</div>
+                        <div class="detail-value" id="successItems" style="font-size:0.9rem; line-height:1.4;">-</div>
                     </div>
                 </div>
 
