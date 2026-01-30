@@ -842,6 +842,8 @@ function initTrackingPage() {
             if (data.paymentInfo) {
                 paymentDisplay += `<br><small style="color:#888;">${data.paymentInfo}</small>`;
             }
+            // DEBUG: Show what backend returned
+            paymentDisplay += `<br><span style="font-size:10px; color:#ccc;">(系統狀態值: ${data.paymentStatus})</span>`;
         }
         payStatusDiv.innerHTML = paymentDisplay;
 
