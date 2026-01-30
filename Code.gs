@@ -409,7 +409,7 @@ function searchOrder(doc, data) {
                  status: getValue('Status') || '未處理',
                  items: getValue('Items'),
                  totalAmount: getValue('Total_Amount'),
-                 paymentStatus: getValue('Payment_Verified') || getValue('Payment Verified') || '未核對',
+                 paymentStatus: getValue('Payment_Verified') || getValue('Payment Verified') || getValue('PaymentVerified') || getValue('對帳狀態') || getValue('對帳') || '未核對',
                  deliveryMethod: getValue('Delivery_Method'),
                  storeInfo: getValue('Store_Info'),
                  paymentMethod: getValue('Payment_Method'),
