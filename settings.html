@@ -358,6 +358,12 @@
                     const day = String(d.getDate()).padStart(2, '0');
                     value = `${year}/${month}/${day}`;
                 }
+
+                // Special handling for is_open boolean/string mismatch
+                if (key === 'is_open') {
+                    value = String(value).toLowerCase();
+                }
+
                 if (form.elements[key]) {
                     form.elements[key].value = value;
                 }
