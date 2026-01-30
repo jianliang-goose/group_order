@@ -620,7 +620,7 @@ async function submitOrder(e) {
     // Generate Order ID (YYMMDD-HHMMC)
     // C = Safe Character (avoiding I, O, S, Z to prevent confusion with 1, 0, 5, 2)
     const now = new Date();
-    const dateStr = now.getFullYear().toString().slice(-2) +
+    const dateStr = now.getFullYear().toString().slice(-1) +
         (now.getMonth() + 1).toString().padStart(2, '0') +
         now.getDate().toString().padStart(2, '0');
 

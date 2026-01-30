@@ -324,7 +324,8 @@ function createOrder(doc, data) {
   var timestamp = new Date();
   var safeChars = "ABCDEFGHJKLMNPQRTUVWXY";
   var randomChar = safeChars.charAt(Math.floor(Math.random() * safeChars.length));
-  var orderId = data.orderId || (Utilities.formatDate(timestamp, Session.getScriptTimeZone(), "yyMMdd-HHmm") + randomChar);
+  var dateStr = Utilities.formatDate(timestamp, Session.getScriptTimeZone(), "yyMMdd-HHmm");
+  var orderId = data.orderId || (dateStr.substring(1) + randomChar);
   
   newRow.push(timestamp);
   newRow.push(orderId);
