@@ -61,6 +61,7 @@ const PRELOADED_CONFIG = {
     "shipping_date": "2026-02-08T16:00:00.000Z",
     "pickup_date": "2026/02/15 (19:00 前)",
     "shipping_threshold": 3000,
-    "shipping_fee": 120
+    "shipping_fee": 120,
+    "group_leaders": "無(個人訂購),宛儒,Evelyn"
   }
 };

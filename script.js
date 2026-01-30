@@ -20,7 +20,8 @@ const fallbackSettings = {
     shipping_fee: 120,
     close_date: "2026/02/10",
     shipping_date: "2026/02/09",
-    pickup_date: "2026/02/15 (19:00 前)"
+    pickup_date: "2026/02/15 (19:00 前)",
+    group_leaders: "無(個人訂購),宛儒,Evelyn"
 };
 
 // Initialize
@@ -47,17 +48,19 @@ async function fetchConfig(ignorePreload = false) {
 
         try {
             // Try direct fetch first (works in production usually)
+            const timestamp = Date.now();
             [prodRes, setRes] = await Promise.all([
-                fetch(PRODUCTS_CSV_URL),
-                fetch(SETTINGS_CSV_URL)
+                fetch(PRODUCTS_CSV_URL + `&t=${timestamp}`),
+                fetch(SETTINGS_CSV_URL + `&t=${timestamp}`)
             ]);
             if (!prodRes.ok || !setRes.ok) throw new Error("Direct fetch failed");
         } catch (directError) {
             console.warn("Direct fetch failed (likely CORS on local), trying proxy...", directError);
             // Fallback to CORS Proxy for local testing
+            const timestamp = Date.now();
             [prodRes, setRes] = await Promise.all([
-                fetch(CORS_PROXY + encodeURIComponent(PRODUCTS_CSV_URL)),
-                fetch(CORS_PROXY + encodeURIComponent(SETTINGS_CSV_URL))
+                fetch(CORS_PROXY + encodeURIComponent(PRODUCTS_CSV_URL + `&t=${timestamp}`)),
+                fetch(CORS_PROXY + encodeURIComponent(SETTINGS_CSV_URL + `&t=${timestamp}`))
             ]);
         }
 
@@ -77,9 +80,19 @@ async function fetchConfig(ignorePreload = false) {
         }
 
         // Transform Settings Array to Object {Key: Value}
+        // Case-insensitive matching for Key/Value columns
         const settingsObj = {};
         settingsData.forEach(row => {
-            if (row.Key) settingsObj[row.Key] = row.Value;
+            // Find keys that match "Key" and "Value" case-insensitively
+            const rowKeys = Object.keys(row);
+            const keyCol = rowKeys.find(k => k.toLowerCase() === 'key');
+            const valCol = rowKeys.find(k => k.toLowerCase() === 'value');
+
+            if (keyCol && row[keyCol]) {
+                const keyName = String(row[keyCol]).trim();
+                const valData = valCol && row[valCol] ? String(row[valCol]).trim() : '';
+                settingsObj[keyName] = valData;
+            }
         });
 
         // HOTFIX: 強制更新圖片路徑 (Google Sheet 可能還沒改)
@@ -92,11 +105,15 @@ async function fetchConfig(ignorePreload = false) {
         });
 
         console.log("CSV Data Loaded Successfully");
-        renderApp(productsData, settingsObj);
+        // Merge with fallback settings to ensure important keys exist (like group_leaders if missing in CSV)
+        const finalSettings = { ...fallbackSettings, ...settingsObj };
+
+        console.log("Settings Loaded:", finalSettings);
+
+        renderApp(productsData, finalSettings);
 
     } catch (e) {
-        console.error("Failed to load CSV config:", e);
-        // Show a more friendly error or use fallback silently?
+        console.error("Config Load Error:", e);
         // Let's use fallback but notify in console.
         // Also check if we should alert user.
         console.warn("Switching to fallback data due to load error.");
@@ -233,12 +250,14 @@ function renderApp(productsArray, settingsMsg) {
         const id = p.ID;
         products[id] = {
             name: p.Name,
-            price: p.Price,
-            discountPrice: p.DiscountPrice || null,
-            image: p.Image || 'images/goose-whole.png', // Fallback image
+            price: Number(p.Price), // Ensure number
+            description: p.Description || '',
+            category: p.Category || 'main',
+            discountPrice: p.DiscountPrice ? Number(p.DiscountPrice) : null,
+            image: p.Image || 'images/goose-whole.png',
             promoTag: p.PromoTag || '',
-            promoDesc: p.PromoDesc || '', // This stores the Target Product ID for conditional discounts
-            promoTargetQty: parseInt(p.PromoTargetQty) || 2 // Default 2 if not strict
+            promoDesc: p.PromoDesc || '',
+            promoTargetQty: parseInt(p.PromoTargetQty) || 2
         };
         cart[id] = 0;
 
@@ -248,12 +267,12 @@ function renderApp(productsArray, settingsMsg) {
         card.innerHTML = `
             <img src="${products[id].image}" alt="${p.Name}" class="product-image">
             <div class="product-info">
-                ${p.PromoTag ? `<span class="promo-tag">${p.PromoTag}</span>` : ''}
                 <h3 class="product-title">${p.Name}</h3>
-                <div class="product-price">
-                    $${p.Price} 
-                    ${p.DiscountPrice ? `<span class="price-original"></span>` : ''}
+                <div class="product-price-row">
+                    <span class="product-price">$${p.Price}</span>
+                    ${p.PromoTag ? `<span class="promo-tag">${p.PromoTag}</span>` : ''}
                 </div>
+                ${p.DiscountPrice ? `<span class="price-original"></span>` : ''} 
                 <p class="product-desc">${p.Description || ''}</p>
                 <div class="quantity-control">
                     <button class="qty-btn minus" onclick="updateQty('${id}', -1)">-</button>

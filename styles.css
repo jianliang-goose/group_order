@@ -1344,3 +1344,33 @@ footer {
     font-size: 1rem;
   }
 }
+
+/* Update for Product Price Row */
+.product-price-row {
+  display: flex;
+  align-items: baseline;
+  /* Align text baselines */
+  gap: 10px;
+  margin-top: 5px;
+  margin-bottom: 8px;
+}
+
+.product-price {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: #bf360c;
+}
+
+/* Adjust promo tag to be inline */
+.promo-tag {
+  display: inline-block;
+  background: #FFF3E0;
+  color: #E65100;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  margin-bottom: 0;
+  vertical-align: middle;
+  line-height: normal;
+}
