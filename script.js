@@ -246,11 +246,11 @@ function renderApp(productsArray, settingsMsg) {
     listEl.innerHTML = '';
 
     productsArray.forEach(p => {
-        // Normalize keys
+        // Normalize keys (Sheet headers might be capitalized)
         const id = p.ID;
         products[id] = {
             name: p.Name,
-            price: Number(p.Price),
+            price: Number(p.Price), // Ensure number
             description: p.Description || '',
             category: p.Category || 'main',
             discountPrice: p.DiscountPrice ? Number(p.DiscountPrice) : null,
@@ -260,64 +260,28 @@ function renderApp(productsArray, settingsMsg) {
             promoTargetQty: parseInt(p.PromoTargetQty) || 2
         };
         cart[id] = 0;
-    });
 
-    // Filtering & Sorting Groups
-    const categories = [
-        { key: 'main', label: '🍗 招牌主餐' },
-        { key: 'addon', label: '➕ 加購優惠' },
-        { key: 'snack', label: '🍟 單點小品' }
-    ];
-
-    const groupedProducts = { main: [], addon: [], snack: [] };
-
-    productsArray.forEach(p => {
-        const cat = p.Category || 'main';
-        if (groupedProducts[cat]) {
-            groupedProducts[cat].push(p);
-        } else {
-            // Fallback for unknown categories
-            if (!groupedProducts['snack']) groupedProducts['snack'] = [];
-            groupedProducts['snack'].push(p);
-        }
-    });
-
-    // Render by Group
-    categories.forEach(cat => {
-        const groupItems = groupedProducts[cat.key];
-        if (groupItems && groupItems.length > 0) {
-            // Render Header
-            const header = document.createElement('h2');
-            header.className = 'category-title';
-            header.style.cssText = "width:100%; font-size:1.5rem; margin:30px 0 15px; color:#B94E00; border-bottom: 2px solid #eee; padding-bottom:10px;";
-            header.innerText = cat.label;
-            listEl.appendChild(header);
-
-            // Render Items
-            groupItems.forEach(p => {
-                const id = p.ID;
-                const card = document.createElement('article');
-                card.className = 'product-card';
-                card.innerHTML = `
-                    <img src="${products[id].image}" alt="${p.Name}" class="product-image">
-                    <div class="product-info">
-                        <h3 class="product-title">${p.Name}</h3>
-                        <div class="product-price-row">
-                            <span class="product-price">$${p.Price}</span>
-                            ${p.PromoTag ? `<span class="promo-tag">${p.PromoTag}</span>` : ''}
-                        </div>
-                        ${p.DiscountPrice ? `<span class="price-original"></span>` : ''} 
-                        <p class="product-desc">${p.Description || ''}</p>
-                        <div class="quantity-control">
-                            <button class="qty-btn minus" onclick="updateQty('${id}', -1)">-</button>
-                            <input type="number" class="qty-input" id="qty-${id}" value="0" readonly>
-                            <button class="qty-btn plus" onclick="updateQty('${id}', 1)">+</button>
-                        </div>
-                    </div>
-                `;
-                listEl.appendChild(card);
-            });
-        }
+        // Render Card
+        const card = document.createElement('article');
+        card.className = 'product-card';
+        card.innerHTML = `
+            <img src="${products[id].image}" alt="${p.Name}" class="product-image">
+            <div class="product-info">
+                <h3 class="product-title">${p.Name}</h3>
+                <div class="product-price-row">
+                    <span class="product-price">$${p.Price}</span>
+                    ${p.PromoTag ? `<span class="promo-tag">${p.PromoTag}</span>` : ''}
+                </div>
+                ${p.DiscountPrice ? `<span class="price-original"></span>` : ''} 
+                <p class="product-desc">${p.Description || ''}</p>
+                <div class="quantity-control">
+                    <button class="qty-btn minus" onclick="updateQty('${id}', -1)">-</button>
+                    <input type="number" class="qty-input" id="qty-${id}" value="0" readonly>
+                    <button class="qty-btn plus" onclick="updateQty('${id}', 1)">+</button>
+                </div>
+            </div>
+        `;
+        listEl.appendChild(card);
     });
 
     calculateTotal();
