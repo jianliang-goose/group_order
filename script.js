@@ -862,11 +862,22 @@ function initTrackingPage() {
             stepConfirmed.classList.remove('active');
             stepShipped.classList.remove('active');
 
-            if (statusText !== '未處理' && statusText !== '取消') {
+            // Strict Status Mapping
+            // Step 2 (Confirmed): Active if Confirmed, Paid, Shipped, or Done
+            if (statusText === '已確認' ||
+                statusText === '已付款' ||
+                statusText.includes('出貨') ||
+                statusText.includes('寄出') ||
+                statusText.includes('已取') ||
+                statusText.includes('完成')) {
                 stepConfirmed.classList.add('active');
             }
-            if (statusText.includes('出貨') || statusText.includes('寄出') || statusText.includes('已取') || statusText.includes('完成')) {
-                stepConfirmed.classList.add('active');
+
+            // Step 3 (Shipped): Active if Shipped or Done
+            if (statusText.includes('出貨') ||
+                statusText.includes('寄出') ||
+                statusText.includes('已取') ||
+                statusText.includes('完成')) {
                 stepShipped.classList.add('active');
             }
 
