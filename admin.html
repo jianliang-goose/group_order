@@ -592,68 +592,125 @@
             margin-bottom: 25px;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
             display: flex;
-            align-items: center;
+            flex-direction: column;
+            /* Stack groups vertically */
             gap: 20px;
-            flex-wrap: wrap;
             border: 1px solid #eee;
         }
 
+        .filter-group {
+            display: flex;
+            align-items: center;
+            /* Vertically center label with buttons */
+            gap: 15px;
+        }
+
         .filter-label {
-            font-size: 1.1rem;
+            font-size: 1rem;
             font-weight: 600;
             color: #333;
             white-space: nowrap;
+            min-width: 100px;
+            /* Fixed width for alignment */
         }
 
         .filter-buttons {
             display: flex;
             gap: 10px;
             flex-wrap: wrap;
+            flex: 1;
+            /* Take remaining space */
+        }
+
+        .filter-divider {
+            height: 1px;
+            background: #e0e0e0;
+            width: 100%;
+            margin: 0;
+            border: none;
         }
 
         .filter-btn {
-            padding: 10px 20px;
-            border-radius: 25px;
-            border: 2px solid var(--primary-color);
+            padding: 8px 16px;
+            border-radius: 20px;
+            border: 1px solid #ddd;
             cursor: pointer;
-            font-size: 0.95rem;
-            font-weight: 600;
-            transition: all 0.25s ease;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
             background: white;
-            color: #666;
-            border-color: #ccc;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            color: #555;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            display: inline-flex;
+            align-items: center;
         }
 
         .filter-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            transform: translateY(-1px);
+            background: #f8f9fa;
+            border-color: #bbb;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
         }
 
         .filter-btn.active {
-            background: linear-gradient(135deg, var(--primary-color) 0%, #c45a00 100%);
+            background: var(--primary-color);
             color: white;
             border-color: var(--primary-color);
-            box-shadow: 0 4px 15px rgba(196, 90, 0, 0.35);
-        }
-
-        .filter-btn.active:hover {
-            box-shadow: 0 6px 20px rgba(196, 90, 0, 0.45);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
         }
 
         /* Filter count badge */
-        .filter-count {
-            display: inline-block;
-            background: rgba(255, 255, 255, 0.3);
-            padding: 2px 8px;
-            border-radius: 12px;
-            font-size: 0.8rem;
-            margin-left: 6px;
+        .filter-btn .filter-count {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0, 0, 0, 0.1);
+            color: currentColor;
+            padding: 0 6px;
+            border-radius: 10px;
+            font-size: 0.75rem;
+            margin-left: 8px;
+            height: 18px;
+            min-width: 18px;
         }
 
-        .filter-btn:not(.active) .filter-count {
-            background: #eee;
-            color: #666;
+        .filter-btn.active .filter-count {
+            background: rgba(255, 255, 255, 0.25);
+            color: white;
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .global-filter-bar {
+                padding: 15px;
+                gap: 15px;
+            }
+
+            .filter-group {
+                flex-direction: column;
+                /* Stack on mobile */
+                align-items: flex-start;
+                gap: 10px;
+            }
+
+            .filter-label {
+                min-width: auto;
+                font-size: 0.95rem;
+                margin-bottom: 2px;
+            }
+
+            .filter-buttons {
+                width: 100%;
+                gap: 8px;
+            }
+
+            .filter-btn {
+                padding: 6px 12px;
+                font-size: 0.85rem;
+                flex: 1 1 auto;
+                /* Grow to fill space nicely */
+                justify-content: center;
+            }
         }
     </style>
 </head>
@@ -695,8 +752,8 @@
         </section>
 
         <!-- Global Filter Bar -->
-        <section class="global-filter-bar" id="globalFilterBar"
-            style="display: flex; flex-direction: column; gap: 15px;">
+        <!-- Global Filter Bar -->
+        <section class="global-filter-bar" id="globalFilterBar">
             <div class="filter-group">
                 <div class="filter-label">📋 訂單狀態：</div>
                 <div class="filter-buttons" id="globalStatusFilter">
@@ -704,14 +761,20 @@
                 </div>
             </div>
 
-            <div style="height: 1px; background: #eee; width: 100%;"></div>
+            <hr class="filter-divider">
 
             <div class="filter-group">
                 <div class="filter-label">💰 收款狀態：</div>
                 <div class="filter-buttons" id="paymentStatusFilter">
-                    <button class="filter-btn active" onclick="setPaymentFilter('all', this)">全部</button>
-                    <button class="filter-btn" onclick="setPaymentFilter('unpaid', this)">待收款</button>
-                    <button class="filter-btn" onclick="setPaymentFilter('paid', this)">已收款</button>
+                    <button class="filter-btn active" onclick="setPaymentFilter('all', this)">
+                        全部
+                    </button>
+                    <button class="filter-btn" onclick="setPaymentFilter('unpaid', this)">
+                        待收款
+                    </button>
+                    <button class="filter-btn" onclick="setPaymentFilter('paid', this)">
+                        已收款
+                    </button>
                 </div>
             </div>
         </section>
