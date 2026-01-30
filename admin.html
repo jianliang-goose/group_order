@@ -1330,30 +1330,12 @@
             // Save globally for filtering logic
             window.currentOrdersData = orders;
 
-            // Stats
             try {
-                // 1. Basic Counts
-                document.getElementById('totalOrders').innerText = orders.length;
-
-                // 2. Revenue Parsing (exclude cancelled)
-                const revenue = orders.reduce((sum, o) => {
-                    if (o.Status === '已取消') return sum;
-                    let valStr = String(o.Grand_Total || o.Total_Amount || "0").replace(/[$,]/g, "");
-                    return sum + (parseFloat(valStr) || 0);
-                }, 0);
-                document.getElementById('totalRevenue').innerText = `$${Math.round(revenue).toLocaleString()}`;
-
-                const pending = orders.filter(o => o.Status === '未處理').length;
-                document.getElementById('pendingOrders').innerText = pending;
-
-                // 3. Initialize Global Filter Buttons (with counts)
+                // Initialize Filter Buttons (Counts based on all data)
                 initGlobalFilter(orders);
 
-                // 4. Product Sales Statistics
-                calculateAndRenderStats(orders);
-
-                // 5. Render Filtered Orders Table
-                renderFilteredOrdersTable(orders);
+                // Apply default filter to render Top Stats, Product Stats, and Table
+                applyGlobalFilter();
 
             } catch (err) {
                 console.error("Render Error:", err);
