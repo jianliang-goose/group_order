@@ -364,8 +364,19 @@ function searchOrder(doc, data) {
   var rows = sheet.getDataRange().getValues();
   var headers = rows[0];
 
-  var idIndex = headers.indexOf('Order_ID');
-  var phoneIndex = headers.indexOf('Phone');
+  // Robust Header Lookup
+  var normalize = function(str) { return String(str).toLowerCase().replace(/[^a-z0-9]/g, ''); };
+  var headerMap = {};
+  headers.forEach(function(h, idx) {
+      headerMap[normalize(h)] = idx;
+  });
+
+  var getColIdx = function(name) {
+      return headerMap[normalize(name)];
+  };
+
+  var idIndex = getColIdx('Order_ID') !== undefined ? getColIdx('Order_ID') : headers.indexOf('Order_ID');
+  var phoneIndex = getColIdx('Phone') !== undefined ? getColIdx('Phone') : headers.indexOf('Phone');
 
   // Input sanitization
   var searchId = (data.orderId || '').trim().toUpperCase();
@@ -386,10 +397,10 @@ function searchOrder(doc, data) {
         // Phone fuzzy match: Check if input ends with stored or stored ends with input
         if (currentPhone.endsWith(searchPhone) || searchPhone.endsWith(currentPhone)) {
              // Found! Return limited data
-             // Define helper to safely get value
+             // Define helper to safely get value using robust map
              var getValue = function(colName) {
-                 var idx = headers.indexOf(colName);
-                 return idx !== -1 ? row[idx] : '';
+                 var idx = getColIdx(colName);
+                 return idx !== undefined ? row[idx] : '';
              };
 
              var resultData = {
@@ -398,7 +409,7 @@ function searchOrder(doc, data) {
                  status: getValue('Status') || '未處理',
                  items: getValue('Items'),
                  totalAmount: getValue('Total_Amount'),
-                 paymentStatus: getValue('Payment_Verified') || '未核對',
+                 paymentStatus: getValue('Payment_Verified') || getValue('Payment Verified') || '未核對',
                  deliveryMethod: getValue('Delivery_Method'),
                  storeInfo: getValue('Store_Info'),
                  paymentMethod: getValue('Payment_Method'),
