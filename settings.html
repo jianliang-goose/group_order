@@ -367,22 +367,38 @@
                 }
             }
 
-            // 2. Excessive handling for 'is_open' to prevent blank dropdowns
+            // 2. Explicit handling for 'is_open'
             let isOpenVal = data.settings['is_open'];
-            // Normalize
+            const isOpenSelect = form.elements['is_open'];
+
             if (isOpenVal === undefined || isOpenVal === null) {
-                isOpenVal = 'true'; // Default to Open if missing
+                // Case: Missing Data - User requested to be notified
+                // 1. Add 'Not Set' option
+                const opt = document.createElement('option');
+                opt.value = "";
+                opt.text = "⚠️ 資料未設定 (請選擇狀態)";
+                opt.selected = true;
+                opt.disabled = true; // Cannot re-select this once changed
+                isOpenSelect.insertBefore(opt, isOpenSelect.firstChild);
+
+                // 2. Select it
+                isOpenSelect.value = "";
+
+                // 3. Notify User (as requested)
+                console.warn("Setting 'is_open' is missing.");
+                // alert("⚠️ 注意：系統未讀取到「接單狀態」，請確認並重新儲存。");
+
             } else {
+                // Normalization
                 isOpenVal = String(isOpenVal).trim().toLowerCase();
-            }
 
-            // Map common truthy/falsy values
-            if (['true', 'yes', 'on', '1'].includes(isOpenVal)) isOpenVal = 'true';
-            else if (['false', 'no', 'off', '0'].includes(isOpenVal)) isOpenVal = 'false';
-            else isOpenVal = 'true'; // Fallback default
+                // Map common truthy/falsy values
+                if (['true', 'yes', 'on', '1'].includes(isOpenVal)) isOpenVal = 'true';
+                else if (['false', 'no', 'off', '0'].includes(isOpenVal)) isOpenVal = 'false';
 
-            if (form.elements['is_open']) {
-                form.elements['is_open'].value = isOpenVal;
+                if (isOpenSelect) {
+                    isOpenSelect.value = isOpenVal;
+                }
             }
 
             // 3. Render Products

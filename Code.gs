@@ -47,7 +47,8 @@ function getConfig(doc) {
       ['pickup_date', '2026/02/15 (19:00 前)'],
       ['shipping_threshold', '3000'],
       ['shipping_fee', '120'],
-      ['group_leaders', '無,宛儒']
+      ['group_leaders', '無,宛儒'],
+      ['is_open', 'true']
     ];
     defaultSettings.forEach(row => settingSheet.appendRow(row));
   }
