@@ -58,6 +58,42 @@
             min-width: 1000px;
         }
 
+        /* Navigation Links */
+        .admin-nav {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: #f8f9fa;
+            padding: 5px;
+            border-radius: 25px;
+        }
+
+        .nav-link {
+            text-decoration: none;
+            color: #666;
+            padding: 8px 18px;
+            border-radius: 20px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            border: 1px solid transparent;
+        }
+
+        .nav-link:hover {
+            background: white;
+            color: var(--primary-color);
+            border-color: #eee;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        }
+
+        .nav-link.active {
+            background: var(--primary-color);
+            color: white !important;
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
+        }
+
         .data-table th,
         .data-table td {
             padding: 12px 15px;
@@ -724,9 +760,8 @@
                         style="width: 45px; height: 45px; border-radius: 50%; border: 2px solid #f0f0f0; margin-right: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
                     <h1 style="font-size: 1.5rem; margin:0;">訂單管理後台</h1>
                 </div>
-                <nav>
-                    <a href="admin.html" class="nav-link" style="color: #333; font-weight:bold;">訂單列表</a>
-                    <span style="color:#ccc">|</span>
+                <nav class="admin-nav">
+                    <a href="admin.html" class="nav-link active">📋 訂單列表</a>
                     <a href="settings.html" class="nav-link">⚙️ 商店設定</a>
                 </nav>
             </div>
