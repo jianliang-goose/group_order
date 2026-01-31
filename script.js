@@ -39,12 +39,30 @@ const CORS_PROXY = "https://api.allorigins.win/raw?url=";
 async function fetchConfig(ignorePreload = false) {
     // Note: ignorePreload parameter is kept for compatibility but CSV is fast enough to replace it.
 
+    // Helper to update UI status
+    const updateStatus = (msg) => {
+        const noticeEl = document.getElementById('noticeList');
+        const productEl = document.querySelector('#productList .loading-spinner');
+
+        // Update Notice Board
+        if (noticeEl) {
+            noticeEl.innerHTML = `<li style="list-style:none; text-align:center;"><span class="spinner-small" style="display:inline-block; vertical-align:middle; border:2px solid #ccc; border-top:2px solid var(--primary-color); border-radius:50%; width:16px; height:16px; animation:spin 1s linear infinite; margin-right:8px;"></span><span style="vertical-align:middle;">${msg}</span></li>`;
+        }
+
+        // Update Product List
+        if (productEl) {
+            productEl.innerHTML = `<span class="spinner-small" style="display:inline-block; vertical-align:middle; border:2px solid #ccc; border-top:2px solid var(--primary-color); border-radius:50%; width:20px; height:20px; animation:spin 1s linear infinite; margin-right:10px;"></span><span style="vertical-align:middle; font-size:1.1rem; color:#666;">${msg}</span>`;
+        }
+    };
+
     try {
+        updateStatus("正在建立連線...");
         console.log("Fetching data from Google CSV...");
 
         let prodRes, setRes;
 
         try {
+            updateStatus("讀取最新菜單與設定 (CSV)...");
             // Try direct fetch first (works in production usually)
             const timestamp = Date.now();
             [prodRes, setRes] = await Promise.all([
@@ -53,6 +71,7 @@ async function fetchConfig(ignorePreload = false) {
             ]);
             if (!prodRes.ok || !setRes.ok) throw new Error("Direct fetch failed");
         } catch (directError) {
+            updateStatus("切換至備用線路...");
             console.warn("Direct fetch failed (likely CORS on local), trying proxy...", directError);
             // Fallback to CORS Proxy for local testing
             const timestamp = Date.now();
@@ -64,6 +83,7 @@ async function fetchConfig(ignorePreload = false) {
 
         if (!prodRes.ok || !setRes.ok) throw new Error("Failed to fetch CSV data even with proxy");
 
+        updateStatus("解析資料結構...");
         const prodText = await prodRes.text();
         const setText = await setRes.text();
 
@@ -111,9 +131,9 @@ async function fetchConfig(ignorePreload = false) {
         console.log("CSV Data Loaded Successfully");
 
         // Smart Check: If CSV is stale (missing new 'schedule_desc' field), force fetch from API
-        // Relaxed check: Also trigger if content is suspiciously empty
-        if (!settingsObj.schedule_desc || settingsObj.schedule_desc.length < 2) {
-            console.warn("CSV is stale (missing or empty schedule_desc), fetching fresh data from API...");
+        if (!settingsObj.schedule_desc) {
+            updateStatus("偵測到設定更新，從雲端同步中...");
+            console.warn("CSV is stale (missing schedule_desc), fetching fresh data from API...");
             try {
                 const apiRes = await fetch(GAS_API_URL + '?type=config');
                 const apiData = await apiRes.json();
@@ -130,34 +150,13 @@ async function fetchConfig(ignorePreload = false) {
                 }
             } catch (apiErr) {
                 console.error("API Fallback failed:", apiErr);
+                // Don't throw, just use CSV data
             }
         }
 
+        updateStatus("資料準備就緒，正在顯示...");
         // Merge with fallback settings to ensure important keys exist (like group_leaders if missing in CSV)
-        let finalSettings = { ...fallbackSettings, ...settingsObj };
-
-        // SUPER HOTFIX: Check LocalStorage for Admin Cached Settings (Immediate Update)
-        try {
-            const adminCache = localStorage.getItem('admin_cached_settings');
-            if (adminCache) {
-                const cacheData = JSON.parse(adminCache);
-                const TEN_MINS = 10 * 60 * 1000;
-                if (Date.now() - cacheData.timestamp < TEN_MINS) {
-                    console.log("Using Admin LocalStorage Cache for immediate update");
-                    const cachedSettings = cacheData.data;
-
-                    // Decode cached settings (they are stored encoded)
-                    if (cachedSettings.schedule_desc) {
-                        cachedSettings.schedule_desc = cachedSettings.schedule_desc.replace(/\\n/g, '\n');
-                    }
-
-                    // Merge CACHE on top of everything
-                    finalSettings = { ...finalSettings, ...cachedSettings };
-                }
-            }
-        } catch (e) {
-            console.warn("Admin cache check failed", e);
-        }
+        const finalSettings = { ...fallbackSettings, ...settingsObj };
 
         console.log("Settings Loaded:", finalSettings);
 
@@ -165,8 +164,27 @@ async function fetchConfig(ignorePreload = false) {
 
     } catch (e) {
         console.error("Config Load Error:", e);
-        // Let's use fallback but notify in console.
-        // Also check if we should alert user.
+
+        // Notify user about fallback with detailed error
+        const noticeEl = document.getElementById('noticeList');
+        const productEl = document.querySelector('#productList .loading-spinner');
+
+        const errorHtml = `
+            <div style="text-align:center; padding:20px; color:#B94E00;">
+                <h3 style="margin-bottom:10px;">⚠️ 載入發生錯誤</h3>
+                <p style="margin-bottom:10px;">${e.message || "發生未知錯誤"}</p>
+                <div style="font-size:0.9rem; color:#666;">已切換至備用資料模式，您仍可瀏覽測試。</div>
+            </div>
+        `;
+
+        if (noticeEl) noticeEl.innerHTML = `<li>⚠️ 載入異常</li>`;
+        if (productEl) {
+            // Replace the spinner directly
+            const grid = document.getElementById('productList');
+            if (grid) grid.innerHTML = errorHtml;
+            else productEl.innerHTML = "⚠️ 載入失敗";
+        }
+
         console.warn("Switching to fallback data due to load error.");
         renderApp(fallbackProducts, fallbackSettings);
     }
@@ -375,7 +393,7 @@ function renderNotices() {
                 letter-spacing: 0.5px;
             ">
                 <span style="display:block; font-family: var(--font-main); font-weight: bold; color: var(--primary-color); font-size: 1.2rem; margin-bottom: 12px; letter-spacing: 1px;">NEWS & NOTICE</span>
-                ${(settings.schedule_desc || '最後寄貨(冷凍)：2026/02/09\n最後接單：2026/02/10\n最後自取：2026/02/15 (19:00 前)').trim()}
+                ${settings.schedule_desc || '最後寄貨(冷凍)：2026/02/09\n最後接單：2026/02/10\n最後自取：2026/02/15 (19:00 前)'}
             </div>
         </div>
 
