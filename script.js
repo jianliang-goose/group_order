@@ -109,6 +109,30 @@ async function fetchConfig(ignorePreload = false) {
         });
 
         console.log("CSV Data Loaded Successfully");
+
+        // Smart Check: If CSV is stale (missing new 'schedule_desc' field), force fetch from API
+        if (!settingsObj.schedule_desc) {
+            console.warn("CSV is stale (missing schedule_desc), fetching fresh data from API...");
+            try {
+                const apiRes = await fetch(GAS_API_URL + '?type=config');
+                const apiData = await apiRes.json();
+
+                if (apiData.settings) {
+                    // Merge API settings (live) into CSV settings
+                    Object.assign(settingsObj, apiData.settings);
+                    // Also handle products if needed, but usually settings are the critical dynamic part
+                    console.log("Fresh data loaded from API");
+
+                    // Decode newline from API data if present
+                    if (settingsObj.schedule_desc) {
+                        settingsObj.schedule_desc = settingsObj.schedule_desc.replace(/\\n/g, '\n');
+                    }
+                }
+            } catch (apiErr) {
+                console.error("API Fallback failed:", apiErr);
+            }
+        }
+
         // Merge with fallback settings to ensure important keys exist (like group_leaders if missing in CSV)
         const finalSettings = { ...fallbackSettings, ...settingsObj };
 
