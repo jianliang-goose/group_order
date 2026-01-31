@@ -172,8 +172,7 @@ button {
 }
 
 .tracking-link-nav {
-  margin-left: auto;
-  /* Push to right */
+  /* margin-left: auto; Removed to allow flexible placement */
   color: #fff;
   text-decoration: none;
   font-weight: bold;
@@ -1142,6 +1141,7 @@ footer {
   display: flex;
   align-items: center;
   justify-content: center;
+  gap: 20px;
 }
 
 
