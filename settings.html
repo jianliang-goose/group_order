@@ -517,10 +517,8 @@
                         <input type="text" class="form-input p-desc" value="${p.Description || ''}" placeholder="描述內容...">
                     </div>
 
-                    <div class="form-group">
-                        <label class="form-label">圖片網址</label>
-                        <input type="text" class="form-input p-image" value="${p.Image || ''}" placeholder="images/filename.png">
-                    </div>
+                    <!-- Hidden Image Field (Preserved but hidden from UI) -->
+                    <input type="hidden" class="form-input p-image" value="${p.Image || 'images/new_product.JPG'}">
 
                     <!-- Promo Section -->
                     <details class="promo-details" style="background:#f9f9f9; border-radius:6px; border:1px solid #eee; margin-top:10px;">

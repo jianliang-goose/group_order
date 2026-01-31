@@ -323,7 +323,7 @@ function renderApp(productsArray, settingsMsg) {
             description: p.Description || '',
             category: p.Category || 'main',
             discountPrice: p.DiscountPrice ? Number(p.DiscountPrice) : null,
-            image: p.Image || 'images/goose-whole.png',
+            image: p.Image || 'images/new_product.JPG',
             promoTag: p.PromoTag || '',
             promoDesc: p.PromoDesc || '',
             promoTargetQty: parseInt(p.PromoTargetQty) || 2
