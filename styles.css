@@ -246,7 +246,7 @@ button {
   width: 50px;
   height: 50px;
   border-radius: 50%;
-  border: 2px solid var(--accent-color);
+  border: none;
 }
 
 .footer-text-group {
@@ -258,7 +258,7 @@ button {
   font-family: 'Ningshu', 'Noto Sans TC', sans-serif;
   font-size: 2rem;
   font-weight: normal;
-  color: var(--accent-color);
+  color: #fff;
   letter-spacing: 12px;
   /* Widened to match English width */
   margin-right: -12px;
@@ -270,7 +270,7 @@ button {
 .footer-brand-en {
   font-family: 'Ningshu', 'Noto Sans TC', sans-serif;
   font-size: 1rem;
-  color: var(--accent-color);
+  color: #fff;
   /* Match accent color */
   opacity: 0.8;
   letter-spacing: 1px;
