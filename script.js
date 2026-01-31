@@ -304,7 +304,7 @@ function renderNotices() {
         <div class="notice-magazine" style="position: relative; padding: 40px 30px; overflow: hidden; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 160px;">
             
             <!-- Giant Transparent Background Icon (Magazine Style) -->
-            <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-10deg); opacity: 0.08; color: var(--primary-color); pointer-events: none; z-index: 0;">
+            <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-10deg); opacity: 0.15; color: var(--primary-color); pointer-events: none; z-index: 0;">
                 <svg width="220" height="220" viewBox="0 0 24 24" fill="currentColor">
                     <path d="M12 20.25c4.97 0 9-3.69 9-8.25s-4.03-8.25-9-8.25S3 7.44 3 12c0 2.12.87 4.07 2.3 5.54l-1.04 2.5a.75.75 0 0 0 .96.96l2.5-1.04A9.04 9.04 0 0 0 12 20.25z"/>
                 </svg>
