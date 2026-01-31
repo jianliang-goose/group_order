@@ -344,6 +344,13 @@
                     });
 
                     console.log("CSV Load Success");
+
+                    // Smart CSV Validation: Check if new field exists
+                    // If not, it means CSV is stale, so we should throw to trigger API fallback
+                    if (!data.settings['schedule_desc']) {
+                        throw new Error("CSV is stale (missing schedule_desc)");
+                    }
+
                     applySettings(data);
                     document.getElementById('pageLoader').style.display = 'none';
                     return; // Exit if successful
@@ -617,17 +624,6 @@
                     body: JSON.stringify(payload)
                 });
                 alert("設定已儲存！");
-
-                // Cache locally for immediate preview (bypass CSV delay)
-                try {
-                    localStorage.setItem('admin_cached_settings', JSON.stringify({
-                        timestamp: Date.now(),
-                        data: settings
-                    }));
-                } catch (lsErr) {
-                    console.warn("LocalStorage failed", lsErr);
-                }
-
                 // Don't reload, just restore
             } catch (e) {
                 console.error(e);
