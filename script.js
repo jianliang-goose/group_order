@@ -300,51 +300,34 @@ function renderNotices() {
     // The HTML has <ul class="notice-list" id="noticeList"> inside <section class="notice-board">.
     // Let's replace the whole innerHTML of notice-board to give us full freedom.
 
-    const board = document.querySelector('.notice-board');
-    if (!board) return;
-
     board.innerHTML = `
-        <div class="notice-magazine" style="position: relative; padding: 30px 20px; overflow: hidden; display: flex; flex-direction: column; align-items: center;">
+        <div class="notice-magazine" style="position: relative; padding: 40px 30px; overflow: hidden; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 160px;">
             
-            <!-- Decorative Background (Faded) -->
-            <div style="position: absolute; top: -10px; right: 10px; opacity: 0.05; transform: rotate(10deg); pointer-events: none; color: var(--primary-color);">
-                <svg width="120" height="120" viewBox="0 0 24 24" fill="currentColor">
+            <!-- Giant Transparent Background Icon (Magazine Style) -->
+            <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-10deg); opacity: 0.08; color: var(--primary-color); pointer-events: none; z-index: 0;">
+                <svg width="220" height="220" viewBox="0 0 24 24" fill="currentColor">
                     <path d="M12 20.25c4.97 0 9-3.69 9-8.25s-4.03-8.25-9-8.25S3 7.44 3 12c0 2.12.87 4.07 2.3 5.54l-1.04 2.5a.75.75 0 0 0 .96.96l2.5-1.04A9.04 9.04 0 0 0 12 20.25z"/>
                 </svg>
-            </div>
-
-            <!-- Styled Main Icon -->
-            <div style="margin-bottom: 20px; position: relative;">
-                <div style="
-                    width: 60px; height: 60px; 
-                    background: #FFF8E1; 
-                    border-radius: 50%; 
-                    display: flex; align-items: center; justify-content: center; 
-                    box-shadow: 0 4px 15px rgba(185, 78, 0, 0.15);
-                    border: 1px solid rgba(185, 78, 0, 0.1);
-                ">
-                    <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="color: var(--primary-color);">
-                        <path d="M12 20.25c4.97 0 9-3.69 9-8.25s-4.03-8.25-9-8.25S3 7.44 3 12c0 2.12.87 4.07 2.3 5.54l-1.04 2.5a.75.75 0 0 0 .96.96l2.5-1.04A9.04 9.04 0 0 0 12 20.25z"/>
-                        <path d="M8 12h8"/>
-                        <path d="M8 9h5"/>
-                        <path d="M8 15h3"/>
-                    </svg>
-                </div>
             </div>
 
             <!-- Text Content -->
             <div class="notice-text" style="
                 text-align: center; 
                 white-space: pre-wrap; 
-                line-height: 1.8; 
-                color: #555; 
+                line-height: 2.0; 
+                color: #2c1810; 
                 font-weight: 500; 
-                font-size: 1.0rem; 
+                font-size: 1.05rem; 
                 width: 100%;
                 max-width: 500px;
                 position: relative; 
                 z-index: 1;
+                /* Add a subtle text shadow for better readability over the icon */
+                text-shadow: 0 1px 0 rgba(255,255,255,0.8);
+                font-family: 'Times New Roman', serif; /* Use Serif for magazine feel, or fallback to default */
+                letter-spacing: 0.5px;
             ">
+                <span style="display:block; font-family: var(--font-main); font-weight: bold; color: var(--primary-color); font-size: 1.2rem; margin-bottom: 12px; letter-spacing: 1px;">NEWS & NOTICE</span>
                 ${settings.schedule_desc || '最後寄貨(冷凍)：2026/02/09\n最後接單：2026/02/10\n最後自取：2026/02/15 (19:00 前)'}
             </div>
         </div>
