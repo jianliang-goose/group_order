@@ -73,24 +73,70 @@
         .detail-row {
             display: flex;
             justify-content: space-between;
-            margin-bottom: 10px;
+            align-items: flex-start;
+            /* Align top for multi-line */
+            margin-bottom: 12px;
+            /* Slightly more space between rows */
             border-bottom: 1px solid #eee;
-            padding-bottom: 5px;
+            padding-bottom: 8px;
         }
 
         .detail-row:last-child {
             border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
         }
 
         .detail-label {
             font-weight: bold;
             color: #555;
-            flex: 0 0 100px;
+            flex: 0 0 90px;
+            /* Slightly reduced from 100px */
+            min-width: 70px;
         }
 
         .detail-value {
             color: #333;
             flex: 1;
+            text-align: right;
+            /* Right align values looks cleaner in table */
+            word-break: break-word;
+            /* Prevent overflow */
+            line-height: 1.4;
+        }
+
+        /* Mobile Optimization for Success Card */
+        @media (max-width: 600px) {
+            .success-card {
+                padding: 25px 20px;
+                /* Wider padding on mobile */
+                margin: 20px auto;
+            }
+
+            .order-details-box {
+                padding: 15px;
+                /* Compact padding */
+            }
+
+            .detail-label {
+                font-size: 0.9rem;
+                flex: 0 0 70px;
+                /* Smaller label width */
+            }
+
+            .detail-value {
+                font-size: 0.9rem;
+            }
+
+            .success-title {
+                font-size: 1.6rem;
+            }
+
+            .success-icon {
+                width: 60px;
+                height: 60px;
+                font-size: 30px;
+            }
         }
 
         .screenshot-hint {
