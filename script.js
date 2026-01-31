@@ -368,7 +368,7 @@ function renderNotices() {
     if (!board) return;
 
     board.innerHTML = `
-        <div class="notice-magazine" style="position: relative; padding: 40px 30px; overflow: hidden; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 160px;">
+        <div class="notice-magazine" style="position: relative; padding: 25px 30px; overflow: hidden; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 150px;">
             
             <!-- Giant Transparent Background Icon (Magazine Style) -->
             <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-10deg); opacity: 0.15; color: var(--primary-color); pointer-events: none; z-index: 0;">
