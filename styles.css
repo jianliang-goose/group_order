@@ -834,12 +834,21 @@ p.brand-tagline {
 .form-input,
 .form-select {
   width: 100%;
+  max-width: 100%;
+  /* Prevent overflow on iOS */
+  box-sizing: border-box;
   padding: 12px 16px;
   border: 1px solid #E0E0E0;
   border-radius: var(--radius-sm);
   font-size: 1rem;
   font-family: inherit;
   transition: border-color 0.2s;
+  background-color: #fff;
+  /* Ensure white background */
+  appearance: none;
+  /* Remove default styling */
+  -webkit-appearance: none;
+  /* Fix iOS styling */
 }
 
 .form-input:focus,
