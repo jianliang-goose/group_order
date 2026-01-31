@@ -364,6 +364,8 @@ function renderNotices() {
     // Let's target the parent section instead for full control or just swap the UL to DIVs in JS?
     // The HTML has <ul class="notice-list" id="noticeList"> inside <section class="notice-board">.
     // Let's replace the whole innerHTML of notice-board to give us full freedom.
+    const board = document.querySelector('.notice-board');
+    if (!board) return;
 
     board.innerHTML = `
         <div class="notice-magazine" style="position: relative; padding: 40px 30px; overflow: hidden; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 160px;">
