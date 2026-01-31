@@ -352,7 +352,7 @@ function renderNotices() {
                 letter-spacing: 0.5px;
             ">
                 <span style="display:block; font-family: var(--font-main); font-weight: bold; color: var(--primary-color); font-size: 1.2rem; margin-bottom: 12px; letter-spacing: 1px;">NEWS & NOTICE</span>
-                ${settings.schedule_desc || '最後寄貨(冷凍)：2026/02/09\n最後接單：2026/02/10\n最後自取：2026/02/15 (19:00 前)'}
+                ${(settings.schedule_desc || '最後寄貨(冷凍)：2026/02/09\n最後接單：2026/02/10\n最後自取：2026/02/15 (19:00 前)').trim()}
             </div>
         </div>
 
