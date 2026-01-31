@@ -255,16 +255,11 @@
                     </div>
 
                     <div class="form-group">
-                        <label class="form-label">最後接單日</label>
-                        <input type="text" class="form-input" name="close_date" placeholder="YYYY/MM/DD">
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">最後寄貨日</label>
-                        <input type="text" class="form-input" name="shipping_date" placeholder="YYYY/MM/DD">
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">最後自取日</label>
-                        <input type="text" class="form-input" name="pickup_date" placeholder="YYYY/MM/DD (時間)">
+                        <label class="form-label">訂購重要時程 (顯示於首頁)</label>
+                        <textarea class="form-textarea" name="schedule_desc" rows="5" placeholder="例如：
+最後寄貨：2026/02/09
+最後接單：2026/02/10
+最後自取：2026/02/15"></textarea>
                     </div>
                     <div class="form-group">
                         <label class="form-label">免運門檻 ($)</label>
@@ -596,9 +591,7 @@
             const form = document.getElementById('settingsForm');
             const settings = {
                 is_open: form.elements['is_open'].value,
-                close_date: form.elements['close_date'].value,
-                shipping_date: form.elements['shipping_date'].value,
-                pickup_date: form.elements['pickup_date'].value,
+                schedule_desc: form.elements['schedule_desc'].value,
                 shipping_threshold: form.elements['shipping_threshold'].value,
                 shipping_fee: form.elements['shipping_fee'].value,
                 group_leaders: form.elements['group_leaders'].value

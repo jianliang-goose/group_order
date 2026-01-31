@@ -18,9 +18,7 @@ const fallbackProducts = [
 const fallbackSettings = {
     shipping_threshold: 3000,
     shipping_fee: 120,
-    close_date: "2026/02/10",
-    shipping_date: "2026/02/09",
-    pickup_date: "2026/02/15 (19:00 前)",
+    schedule_desc: "最後寄貨(冷凍)：2026/02/09\n最後接單：2026/02/10\n最後自取：2026/02/15 (19:00 前)",
     group_leaders: "無(個人訂購),宛儒,Evelyn"
 };
 
@@ -312,22 +310,7 @@ function renderNotices() {
             </h3>
         </div>
         
-        <div class="notice-timeline">
-            <div class="timeline-item">
-                <span class="timeline-label">最後寄貨(冷凍)</span>
-                <span class="timeline-date">${settings.shipping_date || '-'}</span>
-            </div>
-            <div class="timeline-divider"></div>
-            <div class="timeline-item">
-                <span class="timeline-label">最後接單</span>
-                <span class="timeline-date">${settings.close_date || '-'}</span>
-            </div>
-             <div class="timeline-divider"></div>
-            <div class="timeline-item">
-                <span class="timeline-label">最後自取</span>
-                <span class="timeline-date">${settings.pickup_date || '-'}</span>
-            </div>
-        </div>
+        <div class="notice-timeline" style="display:block; text-align:center; white-space: pre-wrap; line-height: 1.8; color: #444; font-weight: 500; padding: 20px 40px;">${settings.schedule_desc || '最後寄貨(冷凍)：2026/02/09\n最後接單：2026/02/10\n最後自取：2026/02/15 (19:00 前)'}</div>
 
         <div class="notice-shipping-banner">
             <div class="shipping-icon-box">

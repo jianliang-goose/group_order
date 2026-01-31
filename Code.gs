@@ -42,9 +42,7 @@ function getConfig(doc) {
     settingSheet = doc.insertSheet('Settings');
     settingSheet.appendRow(['Key', 'Value']);
     var defaultSettings = [
-      ['close_date', '2026/02/10'],
-      ['shipping_date', '2026/02/09'],
-      ['pickup_date', '2026/02/15 (19:00 前)'],
+      ['schedule_desc', '最後寄貨(冷凍)：2026/02/09\n最後接單：2026/02/10\n最後自取：2026/02/15 (19:00 前)'],
       ['shipping_threshold', '3000'],
       ['shipping_fee', '120'],
       ['group_leaders', '無,宛儒'],
