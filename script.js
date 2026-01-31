@@ -111,8 +111,9 @@ async function fetchConfig(ignorePreload = false) {
         console.log("CSV Data Loaded Successfully");
 
         // Smart Check: If CSV is stale (missing new 'schedule_desc' field), force fetch from API
-        if (!settingsObj.schedule_desc) {
-            console.warn("CSV is stale (missing schedule_desc), fetching fresh data from API...");
+        // Relaxed check: Also trigger if content is suspiciously empty
+        if (!settingsObj.schedule_desc || settingsObj.schedule_desc.length < 2) {
+            console.warn("CSV is stale (missing or empty schedule_desc), fetching fresh data from API...");
             try {
                 const apiRes = await fetch(GAS_API_URL + '?type=config');
                 const apiData = await apiRes.json();
@@ -120,7 +121,6 @@ async function fetchConfig(ignorePreload = false) {
                 if (apiData.settings) {
                     // Merge API settings (live) into CSV settings
                     Object.assign(settingsObj, apiData.settings);
-                    // Also handle products if needed, but usually settings are the critical dynamic part
                     console.log("Fresh data loaded from API");
 
                     // Decode newline from API data if present
@@ -134,7 +134,30 @@ async function fetchConfig(ignorePreload = false) {
         }
 
         // Merge with fallback settings to ensure important keys exist (like group_leaders if missing in CSV)
-        const finalSettings = { ...fallbackSettings, ...settingsObj };
+        let finalSettings = { ...fallbackSettings, ...settingsObj };
+
+        // SUPER HOTFIX: Check LocalStorage for Admin Cached Settings (Immediate Update)
+        try {
+            const adminCache = localStorage.getItem('admin_cached_settings');
+            if (adminCache) {
+                const cacheData = JSON.parse(adminCache);
+                const TEN_MINS = 10 * 60 * 1000;
+                if (Date.now() - cacheData.timestamp < TEN_MINS) {
+                    console.log("Using Admin LocalStorage Cache for immediate update");
+                    const cachedSettings = cacheData.data;
+
+                    // Decode cached settings (they are stored encoded)
+                    if (cachedSettings.schedule_desc) {
+                        cachedSettings.schedule_desc = cachedSettings.schedule_desc.replace(/\\n/g, '\n');
+                    }
+
+                    // Merge CACHE on top of everything
+                    finalSettings = { ...finalSettings, ...cachedSettings };
+                }
+            }
+        } catch (e) {
+            console.warn("Admin cache check failed", e);
+        }
 
         console.log("Settings Loaded:", finalSettings);
 
