@@ -381,6 +381,11 @@
                     value = `${year}/${month}/${day}`;
                 }
 
+                // Decode newlines for Textarea
+                if (key === 'schedule_desc' && value) {
+                    value = value.replace(/\\n/g, '\n');
+                }
+
                 // Skip is_open in the loose loop, we handle it explicitly below for safety
                 if (key === 'is_open') continue;
 
@@ -591,7 +596,8 @@
             const form = document.getElementById('settingsForm');
             const settings = {
                 is_open: form.elements['is_open'].value,
-                schedule_desc: form.elements['schedule_desc'].value,
+                // Encode newlines for CSV safety
+                schedule_desc: form.elements['schedule_desc'].value.replace(/\n/g, '\\n'),
                 shipping_threshold: form.elements['shipping_threshold'].value,
                 shipping_fee: form.elements['shipping_fee'].value,
                 group_leaders: form.elements['group_leaders'].value

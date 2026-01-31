@@ -88,7 +88,13 @@ async function fetchConfig(ignorePreload = false) {
 
             if (keyCol && row[keyCol]) {
                 const keyName = String(row[keyCol]).trim();
-                const valData = valCol && row[valCol] ? String(row[valCol]).trim() : '';
+                let valData = valCol && row[valCol] ? String(row[valCol]).trim() : '';
+
+                // Decode newlines for specific keys or globally
+                if (keyName === 'schedule_desc') {
+                    valData = valData.replace(/\\n/g, '\n');
+                }
+
                 settingsObj[keyName] = valData;
             }
         });
