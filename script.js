@@ -456,9 +456,14 @@ function calculateTotal() {
         // Check if this product has a "PromoDesc" which holds the Target ID (e.g. "p1")
         // And if it has a discount price.
         if (product.promoDesc && product.discountPrice) {
-            const targetId = product.promoDesc.trim();
-            // Check target count
-            const targetCount = getCount(targetId);
+            // Support multiple targets: "p1, p2" or "p1 OR p2"
+            // Split by comma (half/full width) or "OR" (case-insensitive)
+            const targets = product.promoDesc.split(/[,，]|\s+OR\s+/i)
+                .map(s => s.trim())
+                .filter(s => s);
+
+            // Sum count of all target items
+            const targetCount = targets.reduce((sum, tid) => sum + getCount(tid), 0);
 
             // Rule: N Targets -> 1 Discount
             // Default 2 if undefined (safety)
