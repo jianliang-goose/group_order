@@ -320,6 +320,7 @@ function updateOrderFull(doc, data) {
   setCell('Grand_Total', data.grandTotal);
   setCell('Delivery_Method', data.deliveryMethod);
   setCell('Store_Info', data.storeInfo);
+  setCell('Pickup_Time', data.pickupTime);
   setCell('Payment_Method', data.paymentMethod);
   setCell('Payment_Info', data.paymentInfo);
   setCell('Status', data.status);
@@ -377,7 +378,7 @@ function createOrder(doc, data) {
      sheet.appendRow([
        'Timestamp', 'Order_ID', 'Group_Leader', 'Name', 'Phone', 'Items', 
        'Total_Amount', 'Shipping_Fee', 'Grand_Total', 
-       'Payment_Method', 'Payment_Info', 'Delivery_Method', 'Store_Info', 'Status', 'Payment_Verified', 'Note'
+       'Payment_Method', 'Payment_Info', 'Delivery_Method', 'Store_Info', 'Pickup_Time', 'Status', 'Payment_Verified', 'Note'
      ]);
   } else {
      // Check headers and force add missing columns if needed
@@ -428,6 +429,7 @@ function createOrder(doc, data) {
   newRow.push(data.paymentInfo || '');
   newRow.push(data.deliveryMethod || '');
   newRow.push(data.storeInfo || '');
+  newRow.push(data.pickupTime || '');
   newRow.push('未處理'); 
   newRow.push(''); // Payment_Verified default empty
   newRow.push(''); // Note initially empty
@@ -499,6 +501,7 @@ function searchOrder(doc, data) {
              paymentStatus: getValue('Payment_Verified') || getValue('Payment Verified') || getValue('PaymentVerified') || getValue('對帳狀態') || getValue('對帳') || '未核對',
              deliveryMethod: getValue('Delivery_Method'),
              storeInfo: getValue('Store_Info'),
+             pickupTime: getValue('Pickup_Time'),
              paymentMethod: getValue('Payment_Method'),
              paymentInfo: getValue('Payment_Info'),
              shippingFee: getValue('Shipping_Fee'),

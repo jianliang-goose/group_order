@@ -932,6 +932,11 @@
                     </div>
                 </div>
 
+                <div class="form-group">
+                    <label>預計自取時間</label>
+                    <input type="text" id="edit-pickupTime" placeholder="例如：2/15 下午3點">
+                </div>
+
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
                     <div class="form-group">
                         <label>付款方式</label>
@@ -1302,7 +1307,7 @@
                     <td>${o.Group_Leader || '-'}</td>
                     <td>
                         ${o.Delivery_Method}<br>
-                        <span style="font-size:0.8rem; color:#888;">${o.Store_Info || ''}</span>
+                        <span style="font-size:0.8rem; color:#888;">${o.Store_Info || ''}${o.Pickup_Time ? `⏰ 自取：${o.Pickup_Time}` : ''}</span>
                     </td>
                     <td class="items-cell">${o.Items}</td>
                     <td style="font-weight:bold; color:var(--primary-color);">$${priceNum.toLocaleString()}</td>
@@ -1474,6 +1479,7 @@
             document.getElementById('edit-grandTotal').value = parseInt(String(order.Grand_Total || 0).replace(/[$,]/g, '')) || 0;
             document.getElementById('edit-deliveryMethod').value = order.Delivery_Method || '現場自取';
             document.getElementById('edit-storeInfo').value = order.Store_Info || '';
+            document.getElementById('edit-pickupTime').value = order.Pickup_Time || '';
             document.getElementById('edit-paymentMethod').value = order.Payment_Method || 'ATM轉帳';
             document.getElementById('edit-paymentInfo').value = order.Payment_Info || '';
             document.getElementById('edit-status').value = order.Status || '未處理';
@@ -1515,6 +1521,7 @@
                 grandTotal: parseInt(document.getElementById('edit-grandTotal').value) || 0,
                 deliveryMethod: document.getElementById('edit-deliveryMethod').value,
                 storeInfo: document.getElementById('edit-storeInfo').value,
+                pickupTime: document.getElementById('edit-pickupTime').value,
                 paymentMethod: document.getElementById('edit-paymentMethod').value,
                 paymentInfo: document.getElementById('edit-paymentInfo').value,
                 status: document.getElementById('edit-status').value,
@@ -1547,6 +1554,7 @@
                             Grand_Total: payload.grandTotal,
                             Delivery_Method: payload.deliveryMethod,
                             Store_Info: payload.storeInfo,
+                            Pickup_Time: payload.pickupTime,
                             Payment_Method: payload.paymentMethod,
                             Payment_Info: payload.paymentInfo,
                             Status: payload.status,

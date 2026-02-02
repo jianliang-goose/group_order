@@ -656,11 +656,14 @@ function calculateTotal() {
 function toggleDeliveryOptions() {
     const method = document.querySelector('input[name="deliveryMethod"]:checked').value;
     const shippingOptions = document.getElementById('shippingOptions');
+    const selfPickupOptions = document.getElementById('selfPickupOptions');
 
     if (method === 'shipping') {
         shippingOptions.classList.add('active');
+        if (selfPickupOptions) selfPickupOptions.classList.remove('active');
     } else {
         shippingOptions.classList.remove('active');
+        if (selfPickupOptions) selfPickupOptions.classList.add('active');
     }
     calculateTotal();
 }
@@ -698,6 +701,13 @@ async function submitOrder(e) {
 
     if (deliveryMethod === 'shipping' && !storeInfo.trim()) {
         alert("請填寫收件門市資訊！");
+        return;
+    }
+
+    // Self-pickup time validation
+    const pickupTime = document.getElementById('pickupTime') ? document.getElementById('pickupTime').value.trim() : '';
+    if (deliveryMethod === 'self' && !pickupTime) {
+        alert("請填寫預計自取時間！");
         return;
     }
 
@@ -778,6 +788,7 @@ async function submitOrder(e) {
         deliveryMethod: deliveryMethod === 'self' ? '現場自取' : '冷凍店到店',
         storeInfo: deliveryMethod === 'shipping' ?
             `${document.querySelector('input[name="storeType"]:checked').nextSibling.textContent.trim()} - ${storeInfo}` : '',
+        pickupTime: deliveryMethod === 'self' ? pickupTime : '',
     };
 
     try {
@@ -808,7 +819,15 @@ async function submitOrder(e) {
         document.getElementById('successName').innerText = payload.name;
         document.getElementById('successTotal').innerText = `$${total.toLocaleString()}`;
         document.getElementById('successPayment').innerText = `${payload.paymentMethod}\n(${paymentInfo})`;
-        document.getElementById('successDelivery').innerText = `${payload.deliveryMethod}\n${payload.storeInfo}`;
+        // Display delivery info with pickup time if self-pickup
+        let deliveryDisplay = payload.deliveryMethod;
+        if (payload.storeInfo) {
+            deliveryDisplay += `\n${payload.storeInfo}`;
+        }
+        if (payload.pickupTime) {
+            deliveryDisplay += `\n預計自取：${payload.pickupTime}`;
+        }
+        document.getElementById('successDelivery').innerText = deliveryDisplay;
 
         // Format Items for better readability
         const itemsList = itemsStr.map(item => `• ${item}`).join('<br>'); // Add bullet points
@@ -830,7 +849,7 @@ async function submitOrder(e) {
 ${payload.groupLeader !== '無' ? `🏠 團購主：${payload.groupLeader}\n` : ''}🛒 訂購內容：${itemsStr.join(', ')}
 💰 總金額：$${total.toLocaleString()}
 💳 付款：${payload.paymentMethod} (${paymentInfo})
-🚚 取貨：${payload.deliveryMethod}${payload.storeInfo ? ` - ${payload.storeInfo}` : ''}`;
+🚚 取貨：${payload.deliveryMethod}${payload.storeInfo ? ` - ${payload.storeInfo}` : ''}${payload.pickupTime ? `\n⏰ 預計自取：${payload.pickupTime}` : ''}`;
 
             const encodedMessage = encodeURIComponent(lineMessage);
             lineShareBtn.href = `https://line.me/R/oaMessage/${LINE_OA_ID}/?${encodedMessage}`;
@@ -998,7 +1017,14 @@ function initTrackingPage() {
             payStatusDiv.innerHTML = paymentDisplay;
 
             // Delivery
-            card.querySelector('.res-delivery').innerText = order.deliveryMethod + (order.storeInfo ? ` (${order.storeInfo})` : '');
+            let deliveryText = order.deliveryMethod;
+            if (order.storeInfo) {
+                deliveryText += ` (${order.storeInfo})`;
+            }
+            if (order.pickupTime) {
+                deliveryText += ` ⏰ 自取時間：${order.pickupTime}`;
+            }
+            card.querySelector('.res-delivery').innerText = deliveryText;
 
             // Items
             if (order.items) {
