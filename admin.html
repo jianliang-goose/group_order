@@ -441,14 +441,6 @@
             display: none;
         }
 
-        .status-btn.pending:hover .btn-text-normal {
-            display: none;
-        }
-
-        .status-btn.pending:hover .btn-text-hover {
-            display: inline;
-        }
-
         /* Verified State (Payment received) */
         .status-btn.verified {
             background-color: #d4edda;
@@ -466,12 +458,23 @@
             display: none;
         }
 
-        .status-btn.verified:hover .btn-text-normal {
-            display: none;
-        }
+        /* Only show hover text swap on devices with true hover capability (not touch) */
+        @media (hover: hover) and (pointer: fine) {
+            .status-btn.pending:hover .btn-text-normal {
+                display: none;
+            }
 
-        .status-btn.verified:hover .btn-text-hover {
-            display: inline;
+            .status-btn.pending:hover .btn-text-hover {
+                display: inline;
+            }
+
+            .status-btn.verified:hover .btn-text-normal {
+                display: none;
+            }
+
+            .status-btn.verified:hover .btn-text-hover {
+                display: inline;
+            }
         }
 
         .header-actions {
