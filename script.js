@@ -8,11 +8,11 @@ let cart = {};
 
 // Default Fallback Data (used if API fails or not set)
 const fallbackProducts = [
-    { ID: 'p1', Name: "茶香鵝肉 (1/4 隻)", Price: 420, Description: "嚴選優質鵝肉，獨家茶燻工法...", Image: "images/goose-quarter.png" },
+    { ID: 'p1', Name: "茶香鵝肉 (1/4 隻)", Price: 420, Description: "嚴選優質鵝肉，獨家茶燻工法...", Image: "images/goose-quarter.jpg" },
     { ID: 'p2', Name: "肥仔鵝肉燥包", Price: 300, DiscountPrice: 250, PromoTag: "加購優惠", Description: "每買 2 盒「1/4 茶香鵝肉」，即可以 $250 加購 1 包！", Image: "images/goose-sauce.jpg" },
-    { ID: 'p3', Name: "拜拜整隻茶鵝", Price: 1500, Description: "整隻全鵝，祭祀拜拜首選。", Image: "images/goose-whole.png" },
-    { ID: 'p4', Name: "煙燻鵝腳 (1 包)", Price: 150, Description: "富含膠質，Q彈有嚼勁。", Image: "images/goose-feet.png" },
-    { ID: 'p5', Name: "煙燻鵝舌 (17 隻)", Price: 300, Description: "精選鵝舌，滷製入味。", Image: "images/goose-tongue.png" }
+    { ID: 'p3', Name: "拜拜整隻茶鵝", Price: 1500, Description: "整隻全鵝，祭祀拜拜首選。", Image: "images/goose-whole.jpg" },
+    { ID: 'p4', Name: "煙燻鵝腳 (1 包)", Price: 150, Description: "富含膠質，Q彈有嚼勁。", Image: "images/goose-feet.jpg" },
+    { ID: 'p5', Name: "煙燻鵝舌 (17 隻)", Price: 300, Description: "精選鵝舌，滷製入味。", Image: "images/goose-tongue.jpg" }
 ];
 
 const fallbackSettings = {

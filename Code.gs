@@ -27,11 +27,11 @@ function getConfig(doc) {
     productSheet.appendRow(['ID', 'Name', 'Price', 'Description', 'Image', 'Category', 'DiscountPrice', 'PromoTag', 'PromoDesc', 'PromoTargetQty', 'Stock']);
     // Seed default data
     var defaultProducts = [
-      ['p1', '茶香鵝肉 (1/4 隻)', 420, '嚴選優質鵝肉，獨家茶燻工法，皮薄肉嫩多汁。兩盒以上可享肉燥包加購優惠！', 'images/goose-quarter.png', 'main', '', '', ''],
-      ['p2', '肥仔鵝肉燥包', 300, '每買 2 盒「1/4 茶香鵝肉」，即可以 $250 加購 1 包！(原價 $300)', 'images/goose-sauce.png', 'addon', 250, '加購優惠', ''],
-      ['p3', '拜拜整隻茶鵝', 1500, '整隻全鵝，祭祀拜拜首選。大氣美觀，香氣四溢。', 'images/goose-whole.png', 'main', '', '', ''],
-      ['p4', '煙燻鵝腳 (1 包)', 150, '富含膠質，Q彈有嚼勁，下酒追劇良伴。', 'images/goose-feet.png', 'snack', '', '', ''],
-      ['p5', '煙燻鵝舌 (17 隻)', 300, '精選鵝舌，滷製入味，口感獨特。', 'images/goose-tongue.png', 'snack', '', '', '']
+      ['p1', '茶香鵝肉 (1/4 隻)', 420, '嚴選優質鵝肉，獨家茶燻工法，皮薄肉嫩多汁。兩盒以上可享肉燥包加購優惠！', 'images/goose-quarter.jpg', 'main', '', '', ''],
+      ['p2', '肥仔鵝肉燥包', 300, '每買 2 盒「1/4 茶香鵝肉」，即可以 $250 加購 1 包！(原價 $300)', 'images/goose-sauce.jpg', 'addon', 250, '加購優惠', ''],
+      ['p3', '拜拜整隻茶鵝', 1500, '整隻全鵝，祭祀拜拜首選。大氣美觀，香氣四溢。', 'images/goose-whole.jpg', 'main', '', '', ''],
+      ['p4', '煙燻鵝腳 (1 包)', 150, '富含膠質，Q彈有嚼勁，下酒追劇良伴。', 'images/goose-feet.jpg', 'snack', '', '', ''],
+      ['p5', '煙燻鵝舌 (17 隻)', 300, '精選鵝舌，滷製入味，口感獨特。', 'images/goose-tongue.jpg', 'snack', '', '', '']
     ];
     defaultProducts.forEach(row => productSheet.appendRow(row));
   }
