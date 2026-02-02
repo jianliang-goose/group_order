@@ -1,4 +1,4 @@
-function doGet(e) {
+﻿function doGet(e) {
   // Optimization: No lock needed for simple reads (Config/Orders)
   // This drastically improves concurrent load times.
   
@@ -430,7 +430,7 @@ function createOrder(doc, data) {
   newRow.push(data.deliveryMethod || '');
   newRow.push(data.storeInfo || '');
   newRow.push(data.pickupTime || '');
-  newRow.push('未處理'); 
+  newRow.push('待處理'); 
   newRow.push(''); // Payment_Verified default empty
   newRow.push(''); // Note initially empty
 
@@ -495,7 +495,7 @@ function searchOrder(doc, data) {
          foundOrders.push({
              orderId: String(row[idIndex] || '').trim(),
              createdDate: getValue('Timestamp'), 
-             status: getValue('Status') || '未處理',
+             status: getValue('Status') || '待處理',
              items: getValue('Items'),
              totalAmount: getValue('Total_Amount'),
              paymentStatus: getValue('Payment_Verified') || getValue('Payment Verified') || getValue('PaymentVerified') || getValue('對帳狀態') || getValue('對帳') || '未核對',

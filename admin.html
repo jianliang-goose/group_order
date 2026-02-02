@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="zh-TW">
 
 <head>
@@ -230,7 +230,7 @@
         }
 
         /* Status Colors */
-        .status-badge[data-status='未處理'] {
+        .status-badge[data-status='待處理'] {
             background: #e9ecef;
             color: #495057;
         }
@@ -345,7 +345,7 @@
             margin-right: 12px;
         }
 
-        .sheet-option-btn[data-value='未處理'] .dot {
+        .sheet-option-btn[data-value='待處理'] .dot {
             background: #6c757d;
         }
 
@@ -836,7 +836,7 @@
             </div>
             <div class="stat-card">
                 <div class="stat-value" id="pendingOrders">0</div>
-                <div class="stat-label">未處理訂單</div>
+                <div class="stat-label">待處理訂單</div>
             </div>
         </section>
 
@@ -955,7 +955,7 @@
                     <div class="form-group">
                         <label>訂單狀態</label>
                         <select id="edit-status">
-                            <option value="未處理">未處理</option>
+                            <option value="待處理">待處理</option>
                             <option value="完成待取">完成待取</option>
                             <option value="已出貨">已出貨</option>
                             <option value="已取消">已取消</option>
@@ -989,8 +989,8 @@
         <div class="status-action-sheet">
             <div class="sheet-title">選擇訂單狀態</div>
             <div class="sheet-options">
-                <div class="sheet-option-btn" onclick="selectStatus('未處理')" data-value="未處理">
-                    <div class="dot"></div>未處理
+                <div class="sheet-option-btn" onclick="selectStatus('待處理')" data-value="待處理">
+                    <div class="dot"></div>待處理
                 </div>
                 <div class="sheet-option-btn" onclick="selectStatus('完成待取')" data-value="完成待取">
                     <div class="dot"></div>完成待取
@@ -1028,7 +1028,7 @@
 
         // Global filter state object
         window.activeFilterState = {
-            statuses: ['未處理', '完成待取', '已出貨'],
+            statuses: ['待處理', '完成待取', '已出貨'],
             payment: 'all' // 'all', 'paid', 'unpaid'
         };
 
@@ -1043,7 +1043,7 @@
             if (!filterContainer) return;
 
             filterContainer.innerHTML = '';
-            const statuses = ['未處理', '完成待取', '已出貨', '已取消'];
+            const statuses = ['待處理', '完成待取', '已出貨', '已取消'];
 
             // Count orders per status (raw count regardless of payment)
             const statusCounts = {};
@@ -1137,7 +1137,7 @@
             document.getElementById('totalRevenue').innerText = `$${Math.round(revenue).toLocaleString()}`;
 
             // Pending (from the visible set)
-            const pending = orders.filter(o => o.Status === '未處理').length;
+            const pending = orders.filter(o => o.Status === '待處理').length;
             document.getElementById('pendingOrders').innerText = pending;
         }
 
@@ -1482,7 +1482,7 @@
             document.getElementById('edit-pickupTime').value = order.Pickup_Time || '';
             document.getElementById('edit-paymentMethod').value = order.Payment_Method || 'ATM轉帳';
             document.getElementById('edit-paymentInfo').value = order.Payment_Info || '';
-            document.getElementById('edit-status').value = order.Status || '未處理';
+            document.getElementById('edit-status').value = order.Status || '待處理';
             document.getElementById('edit-paymentVerified').value = order.Payment_Verified || '';
             document.getElementById('edit-note').value = order.Note || '';
 

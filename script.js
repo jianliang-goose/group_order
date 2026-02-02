@@ -981,7 +981,7 @@ function initTrackingPage() {
             // Status Badge
             const statusBadge = card.querySelector('.res-status-badge');
             statusBadge.className = 'status-badge res-status-badge'; // Reset classes
-            let statusText = order.status || '未處理';
+            let statusText = order.status || '待處理';
 
             if (statusText === '已確認' || statusText === '已付款' || statusText.includes('完成')) {
                 statusBadge.classList.add('confirmed');
