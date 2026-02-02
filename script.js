@@ -814,6 +814,25 @@ async function submitOrder(e) {
         const itemsList = itemsStr.map(item => `• ${item}`).join('<br>'); // Add bullet points
         document.getElementById('successItems').innerHTML = itemsList;
 
+        // Generate LINE Share Link (Direct to Official Account)
+        const lineShareBtn = document.getElementById('lineShareBtn');
+        if (lineShareBtn) {
+            // Use oaMessage to send directly to the shop's LINE Official Account
+            // This works on both mobile and desktop, and prompts to add friend if not added yet
+            const LINE_OA_ID = '@063ifost'; // 建良鵝肉官方 LINE ID
+
+            const lineMessage = `📋 訂單編號：${orderId}
+👤 訂購人：${payload.name}
+📱 電話：${payload.phone}
+${payload.groupLeader !== '無' ? `🏠 團購主：${payload.groupLeader}\n` : ''}🛒 訂購內容：${itemsStr.join(', ')}
+💰 總金額：$${total.toLocaleString()}
+💳 付款：${payload.paymentMethod} (${paymentInfo})
+🚚 取貨：${payload.deliveryMethod}${payload.storeInfo ? ` - ${payload.storeInfo}` : ''}`;
+
+            const encodedMessage = encodeURIComponent(lineMessage);
+            lineShareBtn.href = `https://line.me/R/oaMessage/${LINE_OA_ID}/?${encodedMessage}`;
+        }
+
         window.scrollTo(0, 0); // Scroll to top to see msg
 
         // Do NOT reload
