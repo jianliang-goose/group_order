@@ -454,36 +454,36 @@
             border-color: #dc3545;
         }
 
-        .status-btn.verified .btn-text-hover {
+        /*
+         * HOVER LOGIC REFACTOR
+         * We will add a 'can-hover' class to the body via JS only if the device supports true hover.
+         * This prevents any sticky hover issues on touch devices completely.
+         */
+
+        /* Default: Hide hover text */
+        .btn-text-hover {
             display: none;
         }
 
-        /* 
-         * Hover text is ALWAYS hidden by default.
-         * Only on devices with mouse (hover: hover + pointer: fine),
-         * AND only when actually hovering, will the text swap.
-         */
-        @media (hover: hover) and (pointer: fine) {
-            .status-btn.pending:hover .btn-text-normal {
-                display: none;
-            }
-
-            .status-btn.pending:hover .btn-text-hover {
-                display: inline;
-            }
-
-            .status-btn.verified:hover .btn-text-normal {
-                display: none;
-            }
-
-            .status-btn.verified:hover .btn-text-hover {
-                display: inline;
-            }
+        /* Only enable hover swap if body has 'can-hover' class AND element is hovered */
+        .can-hover .status-btn.pending:hover .btn-text-normal {
+            display: none;
         }
 
-        /* Touch devices: NEVER show hover text, even with sticky hover states */
-        @media (hover: none),
-        (pointer: coarse) {
+        .can-hover .status-btn.pending:hover .btn-text-hover {
+            display: inline;
+        }
+
+        .can-hover .status-btn.verified:hover .btn-text-normal {
+            display: none;
+        }
+
+        .can-hover .status-btn.verified:hover .btn-text-hover {
+            display: inline;
+        }
+
+        /* Explicitly force hide on touch just in case */
+        @media (hover: none) {
             .btn-text-hover {
                 display: none !important;
             }
@@ -1022,6 +1022,11 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', async () => {
+            // Feature detect hover support (desktop mouse)
+            if (window.matchMedia('(hover: hover)').matches) {
+                document.body.classList.add('can-hover');
+            }
+
             if (typeof GAS_API_URL === 'undefined' || GAS_API_URL.includes("YOUR_GAS_WEB_APP_URL")) {
                 alert("請先設定 GAS URL (請檢查 script.js)");
                 return;
