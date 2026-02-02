@@ -221,8 +221,15 @@
             text-decoration: none;
             font-weight: bold;
             font-size: 1.05rem;
-            margin-top: 10px;
             transition: all 0.2s;
+            margin-top: 20px;
+        }
+
+        /* Home button container with separator */
+        .home-action-area {
+            margin-top: 25px;
+            padding-top: 20px;
+            border-top: 1px dashed #eee;
         }
 
         @media (max-width: 400px) {
@@ -557,7 +564,9 @@
                         </a>
                     </div>
 
-                    <a href="javascript:location.reload()" class="back-home-btn full-width">回到首頁</a>
+                    <div class="home-action-area">
+                        <a href="javascript:location.reload()" class="back-home-btn full-width">回到首頁</a>
+                    </div>
                 </div>
             </div>
         </section>
