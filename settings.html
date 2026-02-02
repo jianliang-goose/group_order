@@ -510,6 +510,10 @@
                             <label class="form-label">原價</label>
                             <input type="number" class="form-input p-price" value="${p.Price || 0}">
                         </div>
+                        <div class="form-group">
+                            <label class="form-label">庫存量 <small style="color:#888; font-weight:normal;">(空白=無限/不限制)</small></label>
+                            <input type="number" class="form-input p-stock" value="${p.Stock || ''}" placeholder="例如: 50" min="0">
+                        </div>
                     </div>
 
                     <div class="form-group">
@@ -589,6 +593,7 @@
                     // Category removed
                     Name: div.querySelector('.p-name').value,
                     Price: div.querySelector('.p-price').value,
+                    Stock: div.querySelector('.p-stock').value,
                     DiscountPrice: div.querySelector('.p-discount').value,
                     Description: div.querySelector('.p-desc').value,
                     PromoTag: div.querySelector('.p-tag').value,
@@ -606,6 +611,7 @@
                 ID: 'p' + Date.now().toString().slice(-4),
                 Name: '',
                 Price: 0,
+                Stock: '',
                 // Category removed
                 Description: '',
                 Image: 'images/new_product.JPG',

@@ -749,6 +749,31 @@ p.brand-tagline {
   flex-grow: 1;
 }
 
+/* Stock Warning - Low Inventory Alert */
+.stock-warning {
+  display: inline-block;
+  font-size: 0.8rem;
+  color: #E65100;
+  background: linear-gradient(135deg, #FFF3E0 0%, #FFE0B2 100%);
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-weight: 600;
+  margin-bottom: 12px;
+  border: 1px solid #FFCC80;
+  animation: pulse-stock 2s ease-in-out infinite;
+}
+
+@keyframes pulse-stock {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.85;
+    transform: scale(1.02);
+  }
+}
+
 .promo-tag {
   display: inline-block;
   background-color: #FFF3E0;

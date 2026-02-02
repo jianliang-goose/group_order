@@ -24,7 +24,7 @@ function getConfig(doc) {
   var productSheet = doc.getSheetByName('Products');
   if (!productSheet) {
     productSheet = doc.insertSheet('Products');
-    productSheet.appendRow(['ID', 'Name', 'Price', 'Description', 'Image', 'Category', 'DiscountPrice', 'PromoTag', 'PromoDesc']);
+    productSheet.appendRow(['ID', 'Name', 'Price', 'Description', 'Image', 'Category', 'DiscountPrice', 'PromoTag', 'PromoDesc', 'PromoTargetQty', 'Stock']);
     // Seed default data
     var defaultProducts = [
       ['p1', '茶香鵝肉 (1/4 隻)', 420, '嚴選優質鵝肉，獨家茶燻工法，皮薄肉嫩多汁。兩盒以上可享肉燥包加購優惠！', 'images/goose-quarter.png', 'main', '', '', ''],
@@ -259,7 +259,7 @@ function saveSettings(doc, data) {
   if (data.products && Array.isArray(data.products)) {
     var productSheet = doc.getSheetByName('Products');
     productSheet.clearContents();
-    productSheet.appendRow(['ID', 'Name', 'Price', 'Description', 'Image', 'Category', 'DiscountPrice', 'PromoTag', 'PromoDesc', 'PromoTargetQty']);
+    productSheet.appendRow(['ID', 'Name', 'Price', 'Description', 'Image', 'Category', 'DiscountPrice', 'PromoTag', 'PromoDesc', 'PromoTargetQty', 'Stock']);
     
     data.products.forEach(function(p) {
       productSheet.appendRow([
@@ -272,7 +272,8 @@ function saveSettings(doc, data) {
         p.DiscountPrice || '',
         p.PromoTag || '',
         p.PromoDesc || '',
-        p.PromoTargetQty || ''
+        p.PromoTargetQty || '',
+        p.Stock || ''
       ]);
     });
   }

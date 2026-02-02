@@ -319,13 +319,42 @@ function renderApp(productsArray, settingsMsg) {
             image: p.Image || 'images/new_product.JPG',
             promoTag: p.PromoTag || '',
             promoDesc: p.PromoDesc || '',
-            promoTargetQty: parseInt(p.PromoTargetQty) || 2
+            promoTargetQty: parseInt(p.PromoTargetQty) || 2,
+            stock: p.Stock !== undefined && p.Stock !== '' ? parseInt(p.Stock) : null
         };
         cart[id] = 0;
 
         // Render Card
         const card = document.createElement('article');
         card.className = 'product-card';
+
+        // Stock logic
+        const stockInfo = products[id].stock;
+        const isSoldOut = stockInfo !== null && stockInfo <= 0;
+        const isLowStock = stockInfo !== null && stockInfo > 0 && stockInfo < 20;
+
+        // Stock warning display
+        let stockWarningHtml = '';
+        if (isSoldOut) {
+            stockWarningHtml = `<span class="stock-soldout">已售完</span>`;
+            card.classList.add('sold-out');
+        } else if (isLowStock) {
+            stockWarningHtml = `<span class="stock-warning">剩餘 ${stockInfo} 份</span>`;
+        }
+
+        // Quantity control - disabled if sold out
+        const qtyControlHtml = isSoldOut ? `
+            <div class="quantity-control sold-out-control">
+                <span class="sold-out-text">商品已售完</span>
+            </div>
+        ` : `
+            <div class="quantity-control">
+                <button class="qty-btn minus" onclick="updateQty('${id}', -1)">-</button>
+                <input type="number" class="qty-input" id="qty-${id}" value="0" readonly>
+                <button class="qty-btn plus" onclick="updateQty('${id}', 1)">+</button>
+            </div>
+        `;
+
         card.innerHTML = `
             <img src="${products[id].image}" alt="${p.Name}" class="product-image">
             <div class="product-info">
@@ -336,11 +365,8 @@ function renderApp(productsArray, settingsMsg) {
                 </div>
                 ${p.DiscountPrice ? `<span class="price-original"></span>` : ''} 
                 <p class="product-desc">${p.Description || ''}</p>
-                <div class="quantity-control">
-                    <button class="qty-btn minus" onclick="updateQty('${id}', -1)">-</button>
-                    <input type="number" class="qty-input" id="qty-${id}" value="0" readonly>
-                    <button class="qty-btn plus" onclick="updateQty('${id}', 1)">+</button>
-                </div>
+                ${stockWarningHtml}
+                ${qtyControlHtml}
             </div>
         `;
         listEl.appendChild(card);
@@ -364,8 +390,8 @@ function renderNotices() {
         <div class="notice-magazine" style="position: relative; padding: 25px 30px; overflow: hidden; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 150px;">
             
             <!-- Giant Transparent Background Icon (Magazine Style) -->
-            <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-10deg); opacity: 0.15; color: var(--primary-color); pointer-events: none; z-index: 0;">
-                <svg width="220" height="220" viewBox="0 0 24 24" fill="currentColor">
+            <div style="position: absolute; top: 35%; left: 50%; transform: translate(-50%, -50%) rotate(-10deg); opacity: 0.15; color: var(--primary-color); pointer-events: none; z-index: 0;">
+                <svg width="140" height="140" viewBox="0 0 24 24" fill="currentColor">
                     <path d="M12 20.25c4.97 0 9-3.69 9-8.25s-4.03-8.25-9-8.25S3 7.44 3 12c0 2.12.87 4.07 2.3 5.54l-1.04 2.5a.75.75 0 0 0 .96.96l2.5-1.04A9.04 9.04 0 0 0 12 20.25z"/>
                 </svg>
             </div>
@@ -406,16 +432,55 @@ function renderNotices() {
     `;
 }
 
-// Update Quantity
+// Update Quantity with Stock Limit
 function updateQty(id, change) {
     const currentQty = cart[id];
     let newQty = currentQty + change;
     if (newQty < 0) newQty = 0;
 
+    // Stock limit check
+    const product = products[id];
+    if (product.stock !== null && newQty > product.stock) {
+        // Show friendly message
+        const remaining = product.stock - currentQty;
+        if (remaining <= 0) {
+            showStockAlert(`「${product.name}」已達庫存上限 (${product.stock} 份)`);
+        } else {
+            showStockAlert(`「${product.name}」庫存僅剩 ${product.stock} 份`);
+        }
+        newQty = product.stock; // Cap at stock limit
+    }
+
     cart[id] = newQty;
     document.getElementById(`qty-${id}`).value = newQty;
 
     calculateTotal();
+}
+
+// Stock Alert Toast
+function showStockAlert(message) {
+    // Remove existing alert if any
+    const existing = document.querySelector('.stock-alert-toast');
+    if (existing) existing.remove();
+
+    const toast = document.createElement('div');
+    toast.className = 'stock-alert-toast';
+    toast.innerHTML = `
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/>
+        </svg>
+        <span>${message}</span>
+    `;
+    document.body.appendChild(toast);
+
+    // Trigger animation
+    setTimeout(() => toast.classList.add('show'), 10);
+
+    // Auto remove
+    setTimeout(() => {
+        toast.classList.remove('show');
+        setTimeout(() => toast.remove(), 300);
+    }, 2500);
 }
 
 // Core Logic: Calculate Total with Discounts & Shipping
