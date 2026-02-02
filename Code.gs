@@ -99,6 +99,72 @@ function getDataFromSheet(sheet) {
   return results;
 }
 
+/**
+ * Update stock for products in an order
+ * @param {SpreadsheetApp.Spreadsheet} doc - The spreadsheet document
+ * @param {string} itemsStr - Items string like "茶香鵝肉 (1/4 隻)x2, 肥仔鵝肉燥包x1"
+ * @param {string} action - 'deduct' to subtract stock, 'restore' to add back
+ */
+function updateStock(doc, itemsStr, action) {
+  if (!itemsStr) return;
+  
+  var productSheet = doc.getSheetByName('Products');
+  if (!productSheet) return;
+  
+  var productData = productSheet.getDataRange().getValues();
+  var headers = productData[0];
+  var nameIndex = headers.indexOf('Name');
+  var stockIndex = headers.indexOf('Stock');
+  
+  if (nameIndex === -1 || stockIndex === -1) return;
+  
+  // Parse items string: "茶香鵝肉 (1/4 隻)x2, 肥仔鵝肉燥包x1"
+  // Support both full-width and half-width commas
+  var items = itemsStr.split(/[,，]/).map(function(s) { return s.trim(); });
+  
+  items.forEach(function(item) {
+    if (!item) return;
+    
+    // Match pattern: "Product Name x Quantity" or "Product NamexQuantity"
+    // The product name can contain special characters like (1/4 隻)
+    var match = item.match(/^(.+?)\s*[xX×]\s*(\d+)$/);
+    if (!match) return;
+    
+    var productName = match[1].trim();
+    var quantity = parseInt(match[2]) || 0;
+    
+    if (quantity === 0) return;
+    
+    // Find product row by name
+    for (var i = 1; i < productData.length; i++) {
+      var rowName = String(productData[i][nameIndex]).trim();
+      if (rowName === productName) {
+        var currentStock = productData[i][stockIndex];
+        
+        // Skip if stock is empty or not a number (unlimited stock)
+        if (currentStock === '' || currentStock === null || currentStock === undefined) {
+          continue;
+        }
+        
+        currentStock = parseInt(currentStock) || 0;
+        var newStock;
+        
+        if (action === 'deduct') {
+          newStock = Math.max(0, currentStock - quantity); // Don't go negative
+        } else if (action === 'restore') {
+          newStock = currentStock + quantity;
+        } else {
+          continue;
+        }
+        
+        // Update the cell (row is 1-indexed, +1 for header)
+        productSheet.getRange(i + 1, stockIndex + 1).setValue(newStock);
+        break;
+      }
+    }
+  });
+}
+
 function doPost(e) {
   var lock = LockService.getScriptLock();
   lock.tryLock(10000); 
@@ -147,6 +213,7 @@ function updateOrder(doc, data) {
   // Find Columns
   var idIndex = headers.indexOf('Order_ID');
   var statusIndex = headers.indexOf('Status');
+  var itemsIndex = headers.indexOf('Items');
   var noteIndex = headers.indexOf('Note');
   var paymentVerifiedIndex = headers.indexOf('Payment_Verified');
 
@@ -164,15 +231,35 @@ function updateOrder(doc, data) {
 
   // Find Row
   var rowIndex = -1;
+  var currentRow = null;
   for (var i = 1; i < rows.length; i++) {
     if (String(rows[i][idIndex]) === String(data.orderId)) {
       rowIndex = i + 1; // 1-based
+      currentRow = rows[i];
       break;
     }
   }
 
   if (rowIndex === -1) {
     throw new Error("Order not found: " + data.orderId);
+  }
+
+  // Check if status is changing to/from cancelled - handle stock
+  if (data.status && itemsIndex !== -1) {
+    var oldStatus = String(currentRow[statusIndex] || '');
+    var newStatus = String(data.status);
+    var itemsStr = String(currentRow[itemsIndex] || '');
+    
+    var wasCancelled = oldStatus.includes('取消');
+    var isCancelling = newStatus.includes('取消');
+    
+    if (!wasCancelled && isCancelling) {
+      // Order is being cancelled -> restore stock
+      updateStock(doc, itemsStr, 'restore');
+    } else if (wasCancelled && !isCancelling) {
+      // Order is being un-cancelled (restored) -> deduct stock again
+      updateStock(doc, itemsStr, 'deduct');
+    }
   }
 
   // Update
@@ -346,6 +433,9 @@ function createOrder(doc, data) {
   newRow.push(''); // Note initially empty
 
   sheet.appendRow(newRow);
+
+  // Deduct stock for ordered items
+  updateStock(doc, data.items, 'deduct');
 
   return ContentService
     .createTextOutput(JSON.stringify({ "result": "success", "orderId": orderId }))
