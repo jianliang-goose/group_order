@@ -1084,3 +1084,34 @@ function initTrackingPage() {
         });
     }
 }
+
+// Utility: Copy to Clipboard
+function copyToClipboard(text, btn) {
+    // navigator.clipboard works in modern browsers and secure contexts
+    navigator.clipboard.writeText(text).then(() => {
+        const originalContent = btn.innerHTML;
+        btn.innerHTML = '<span>✅</span> 已複製';
+        btn.style.backgroundColor = 'var(--primary-color)';
+        btn.style.color = 'white';
+
+        setTimeout(() => {
+            btn.innerHTML = originalContent;
+            btn.style.backgroundColor = 'white';
+            btn.style.color = 'var(--primary-color)';
+        }, 2000);
+    }).catch(err => {
+        console.error('Copy failed: ', err);
+        // Fallback for older browsers
+        const tempInput = document.createElement('input');
+        tempInput.value = text;
+        document.body.appendChild(tempInput);
+        tempInput.select();
+        try {
+            document.execCommand('copy');
+            alert('帳號已複製！');
+        } catch (e) {
+            alert('複製失敗，請手動複製。');
+        }
+        document.body.removeChild(tempInput);
+    });
+}

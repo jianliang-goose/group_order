@@ -455,8 +455,14 @@
                         <div style="font-size:1.1rem; color:#B94E00; line-height: 1.6;">
                             <div style="margin-bottom: 4px;"><strong>凱基銀行 (代碼 809)</strong></div>
                             <div style="margin-bottom: 4px;">帳號：</div>
-                            <div style="margin-bottom: 8px;"><strong
-                                    style="letter-spacing:1px; font-size: 1.2rem; background: #fff8e1; padding: 2px 6px; border-radius: 4px; display: inline-block; white-space: nowrap;">0005-95-3239840-6</strong>
+                            <div
+                                style="margin-bottom: 8px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+                                <strong id="bankAccountNumber"
+                                    style="letter-spacing:1px; font-size: 1.2rem; display: inline-block; white-space: nowrap; color: var(--primary-dark);">0005-95-3239840-6</strong>
+                                <button type="button" onclick="copyToClipboard('0005-95-3239840-6', this)"
+                                    style="padding: 4px 12px; font-size: 0.85rem; border-radius: 6px; border: 1px solid var(--primary-color); background: white; color: var(--primary-color); font-weight: bold; cursor: pointer; transition: all 0.2s; display: inline-flex; align-items: center; gap: 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
+                                    <span>📋</span> 複製
+                                </button>
                             </div>
                             <div>戶名：<strong>林宛儒</strong></div>
                         </div>
