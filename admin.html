@@ -460,12 +460,11 @@
         }
 
         /* 
-         * PURE CSS HOVER SOLUTION 
-         * Using @media (hover: hover) to strictly limit hover effects to 
-         * devices that support hovering (e.g., mouse pointers).
-         * Touch devices will NOT trigger these rules.
+         * DESKTOP ONLY HOVER EFFECTS
+         * We restrict this strictly to larger screens (presumed to be desktop with mouse)
+         * AND devices that report supporting hover. 
          */
-        @media (hover: hover) {
+        @media (min-width: 1024px) {
             .status-btn.pending:hover .btn-text-normal {
                 display: none;
             }
@@ -480,6 +479,21 @@
 
             .status-btn.verified:hover .btn-text-hover {
                 display: inline;
+            }
+        }
+
+        /* 
+         * MOBILE OVERRIDE - BRUTE FORCE 
+         * Force normal text to show and hover text to hide on smaller screens, 
+         * regardless of what the browser thinks about hover support.
+         */
+        @media (max-width: 1023px) {
+            .btn-text-normal {
+                display: inline !important;
+            }
+
+            .btn-text-hover {
+                display: none !important;
             }
         }
 
