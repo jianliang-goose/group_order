@@ -1646,6 +1646,17 @@
                 // Break sticky hover state on touch devices
                 btn.blur();
 
+                // Force clear hover state on touch devices by temporarily focusing elsewhere
+                if ('ontouchstart' in window || navigator.maxTouchPoints > 0) {
+                    const temp = document.createElement('button');
+                    temp.style.cssText = 'position:fixed;top:-9999px;left:-9999px;opacity:0;pointer-events:none;';
+                    document.body.appendChild(temp);
+                    temp.focus();
+                    requestAnimationFrame(() => {
+                        document.body.removeChild(temp);
+                    });
+                }
+
                 // CRITICAL: Update the data attribute so the next click works correctly
                 btn.dataset.verified = newVerifiedState;
 
