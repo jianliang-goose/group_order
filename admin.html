@@ -458,7 +458,11 @@
             display: none;
         }
 
-        /* Only show hover text swap on devices with true hover capability (not touch) */
+        /* 
+         * Hover text is ALWAYS hidden by default.
+         * Only on devices with mouse (hover: hover + pointer: fine),
+         * AND only when actually hovering, will the text swap.
+         */
         @media (hover: hover) and (pointer: fine) {
             .status-btn.pending:hover .btn-text-normal {
                 display: none;
@@ -474,6 +478,14 @@
 
             .status-btn.verified:hover .btn-text-hover {
                 display: inline;
+            }
+        }
+
+        /* Touch devices: NEVER show hover text, even with sticky hover states */
+        @media (hover: none),
+        (pointer: coarse) {
+            .btn-text-hover {
+                display: none !important;
             }
         }
 
