@@ -1631,6 +1631,9 @@
                     btn.innerHTML = '<span class="btn-text-normal">待收款</span><span class="btn-text-hover">確認收款</span>';
                 }
 
+                // Break sticky hover state on touch devices
+                btn.blur();
+
                 // CRITICAL: Update the data attribute so the next click works correctly
                 btn.dataset.verified = newVerifiedState;
 
