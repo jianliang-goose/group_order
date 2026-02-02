@@ -821,7 +821,10 @@ async function submitOrder(e) {
             // This works on both mobile and desktop, and prompts to add friend if not added yet
             const LINE_OA_ID = '@063ifost'; // 建良鵝肉官方 LINE ID
 
-            const lineMessage = `📋 訂單編號：${orderId}
+            // 【我已下單】 at the start serves as keyword trigger for LINE auto-reply
+            const lineMessage = `【我已下單】
+
+📋 訂單編號：${orderId}
 👤 訂購人：${payload.name}
 📱 電話：${payload.phone}
 ${payload.groupLeader !== '無' ? `🏠 團購主：${payload.groupLeader}\n` : ''}🛒 訂購內容：${itemsStr.join(', ')}
