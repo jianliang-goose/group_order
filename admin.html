@@ -460,15 +460,27 @@
         }
 
         /* 
-         * JS-DRIVEN HOVER CLASS 
-         * We will toggle this class via JS 'mouseenter'/'mouseleave' events ONLY on non-touch interactions.
+         * PURE CSS HOVER SOLUTION 
+         * Using @media (hover: hover) to strictly limit hover effects to 
+         * devices that support hovering (e.g., mouse pointers).
+         * Touch devices will NOT trigger these rules.
          */
-        .status-btn.is-hovering .btn-text-normal {
-            display: none;
-        }
+        @media (hover: hover) {
+            .status-btn.pending:hover .btn-text-normal {
+                display: none;
+            }
 
-        .status-btn.is-hovering .btn-text-hover {
-            display: inline;
+            .status-btn.pending:hover .btn-text-hover {
+                display: inline;
+            }
+
+            .status-btn.verified:hover .btn-text-normal {
+                display: none;
+            }
+
+            .status-btn.verified:hover .btn-text-hover {
+                display: inline;
+            }
         }
 
         .header-actions {
@@ -1004,19 +1016,7 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', async () => {
-            // JS-DRIVER HOVER LOGIC for Payment Buttons
-            // Only toggle hover state if input device is a mouse
-            document.body.addEventListener('pointerenter', (e) => {
-                if (e.target.classList && e.target.classList.contains('status-btn') && e.pointerType === 'mouse') {
-                    e.target.classList.add('is-hovering');
-                }
-            }, true); // Use capture to ensure we catch it
 
-            document.body.addEventListener('pointerleave', (e) => {
-                if (e.target.classList && e.target.classList.contains('status-btn')) {
-                    e.target.classList.remove('is-hovering');
-                }
-            }, true);
 
             if (typeof GAS_API_URL === 'undefined' || GAS_API_URL.includes("YOUR_GAS_WEB_APP_URL")) {
                 alert("請先設定 GAS URL (請檢查 script.js)");
