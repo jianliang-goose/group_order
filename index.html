@@ -164,52 +164,71 @@
             transform: scale(1.05);
         }
 
-        /* Success Page Actions */
         .success-actions {
-            margin-top: 25px;
+            margin-top: 30px;
+            padding-top: 25px;
             border-top: 1px dashed #eee;
-            padding-top: 20px;
         }
 
         .actions-grid {
-            display: flex;
-            justify-content: center;
-            gap: 15px;
-            flex-wrap: wrap;
-            margin-bottom: 20px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 12px;
         }
 
-        .action-btn-lookup {
-            display: inline-flex;
+        /* Unified secondary action buttons */
+        .secondary-btn {
+            display: flex;
             align-items: center;
+            justify-content: center;
             gap: 8px;
-            background: white;
-            color: #555;
-            border: 1px solid #ddd;
-            padding: 8px 20px;
-            border-radius: 8px;
+            height: 46px;
+            border-radius: 12px;
+            font-size: 0.95rem;
+            font-weight: 600;
             text-decoration: none;
-            font-weight: bold;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
             transition: all 0.2s;
-            height: 42px;
-            /* Match Line Button Height */
             box-sizing: border-box;
         }
 
-        .action-btn-lookup:hover {
-            background-color: #f8f9fa;
-            border-color: #ccc;
+        .btn-tracking {
+            background: #f8f9fa;
+            color: #555;
+            border: 1px solid #ddd;
+        }
+
+        .btn-line-add {
+            background: #06c755;
+            color: white;
+            border: none;
+        }
+
+        .secondary-btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            color: #333;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
         }
 
         .back-home-btn.full-width {
             width: 100%;
-            display: block;
-            text-align: center;
-            box-sizing: border-box;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--primary-color, #c45a00);
+            color: white;
+            border-radius: 12px;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 1.05rem;
+            margin-top: 10px;
+            transition: all 0.2s;
+        }
+
+        @media (max-width: 400px) {
+            .actions-grid {
+                grid-template-columns: 1fr;
+            }
         }
 
         /* LINE Share Button */
@@ -513,13 +532,13 @@
                 </div>
 
                 <div class="success-actions">
-                    <p style="text-align:center; color:#555; margin-bottom:15px; font-weight:500;">
-                        其他方式查詢訂單進度：
+                    <p style="text-align:center; color:#777; margin-bottom:15px; font-size: 0.9rem;">
+                        您可以透過以下方式查詢進度或聯絡店家：
                     </p>
 
                     <div class="actions-grid">
                         <!-- Order Lookup Button -->
-                        <a href="tracking.html" class="action-btn-lookup">
+                        <a href="tracking.html" class="secondary-btn btn-tracking">
                             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                                 stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                 <circle cx="11" cy="11" r="8"></circle>
@@ -528,10 +547,13 @@
                             網站訂單查詢
                         </a>
 
-                        <!-- Line Button -->
-                        <a href="https://lin.ee/uLbdSkD" target="_blank" style="display:inline-block; height: 42px;">
-                            <img src="https://scdn.line-apps.com/n/line_add_friends/btn/zh-Hant.png" alt="加入好友"
-                                height="42" border="0">
+                        <!-- Custom Line Add Friend Button -->
+                        <a href="https://lin.ee/uLbdSkD" target="_blank" class="secondary-btn btn-line-add">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                                <path
+                                    d="M19.365 9.863c.349 0 .63.285.63.631 0 .345-.281.63-.63.63H17.61v1.125h1.755c.349 0 .63.283.63.63 0 .344-.281.629-.63.629h-2.386c-.345 0-.627-.285-.627-.629V8.108c0-.345.282-.63.63-.63h2.386c.346 0 .627.285.627.63 0 .349-.281.63-.63.63H17.61v1.125h1.755zm-3.855 3.016c0 .27-.174.51-.432.596-.064.021-.133.031-.199.031-.211 0-.391-.09-.51-.25l-2.443-3.317v2.94c0 .344-.279.629-.631.629-.346 0-.626-.285-.626-.629V8.108c0-.27.173-.51.43-.595.06-.023.136-.033.194-.033.195 0 .375.105.495.254l2.462 3.33V8.108c0-.345.282-.63.63-.63.345 0 .63.285.63.63v4.771zm-5.741 0c0 .344-.282.629-.631.629-.345 0-.627-.285-.627-.629V8.108c0-.345.282-.63.63-.63.346 0 .628.285.628.63v4.771zm-2.466.629H4.917c-.345 0-.63-.285-.63-.629V8.108c0-.345.285-.63.63-.63.348 0 .63.285.63.63v4.141h1.756c.348 0 .629.283.629.63 0 .344-.282.629-.629.629M24 10.314C24 4.943 18.615.572 12 .572S0 4.943 0 10.314c0 4.811 4.27 8.842 10.035 9.608.391.082.923.258 1.058.59.12.301.079.766.038 1.08l-.164 1.02c-.045.301-.24 1.186 1.049.645 1.291-.539 6.916-4.078 9.436-6.975C23.176 14.393 24 12.458 24 10.314" />
+                            </svg>
+                            加入官方 LINE
                         </a>
                     </div>
 
