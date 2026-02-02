@@ -454,39 +454,21 @@
             border-color: #dc3545;
         }
 
-        /*
-         * HOVER LOGIC REFACTOR
-         * We will add a 'can-hover' class to the body via JS only if the device supports true hover.
-         * This prevents any sticky hover issues on touch devices completely.
-         */
-
         /* Default: Hide hover text */
         .btn-text-hover {
             display: none;
         }
 
-        /* Only enable hover swap if body has 'can-hover' class AND element is hovered */
-        .can-hover .status-btn.pending:hover .btn-text-normal {
+        /* 
+         * JS-DRIVEN HOVER CLASS 
+         * We will toggle this class via JS 'mouseenter'/'mouseleave' events ONLY on non-touch interactions.
+         */
+        .status-btn.is-hovering .btn-text-normal {
             display: none;
         }
 
-        .can-hover .status-btn.pending:hover .btn-text-hover {
+        .status-btn.is-hovering .btn-text-hover {
             display: inline;
-        }
-
-        .can-hover .status-btn.verified:hover .btn-text-normal {
-            display: none;
-        }
-
-        .can-hover .status-btn.verified:hover .btn-text-hover {
-            display: inline;
-        }
-
-        /* Explicitly force hide on touch just in case */
-        @media (hover: none) {
-            .btn-text-hover {
-                display: none !important;
-            }
         }
 
         .header-actions {
@@ -1022,10 +1004,19 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', async () => {
-            // Feature detect hover support (desktop mouse)
-            if (window.matchMedia('(hover: hover)').matches) {
-                document.body.classList.add('can-hover');
-            }
+            // JS-DRIVER HOVER LOGIC for Payment Buttons
+            // Only toggle hover state if input device is a mouse
+            document.body.addEventListener('pointerenter', (e) => {
+                if (e.target.classList && e.target.classList.contains('status-btn') && e.pointerType === 'mouse') {
+                    e.target.classList.add('is-hovering');
+                }
+            }, true); // Use capture to ensure we catch it
+
+            document.body.addEventListener('pointerleave', (e) => {
+                if (e.target.classList && e.target.classList.contains('status-btn')) {
+                    e.target.classList.remove('is-hovering');
+                }
+            }, true);
 
             if (typeof GAS_API_URL === 'undefined' || GAS_API_URL.includes("YOUR_GAS_WEB_APP_URL")) {
                 alert("請先設定 GAS URL (請檢查 script.js)");
