@@ -9,7 +9,7 @@
 const SITE = {
   brandZh: '建良鵝肉',
   brandEn: 'JianLiang Goose',
-  logo: '../brand_logo.png',
+  logo: 'brand_logo.png',
   address: '300 新竹市東區光復路一段230號',
   mapUrl: 'https://maps.google.com/?q=新竹市東區光復路一段230號',
   phone: '03 666 9219',
@@ -147,7 +147,7 @@ function renderFooter() {
         </div>
         <div class="footer-bottom">
           &copy; ${year} ${SITE.brandZh} JianLiang Goose. All Rights Reserved.
-          ・想看限時團購？<a href="../index.html">前往團購頁面</a>
+          ・想看限時團購？<a href="https://jianliang-goose.github.io/group_order/" target="_blank">前往團購頁面</a>
         </div>
       </div>
     </footer>

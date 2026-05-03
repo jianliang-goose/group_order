@@ -5,7 +5,7 @@
 
 @font-face {
   font-family: 'Ningshu';
-  src: url('../../fonts/ningshu-subset.woff2') format('woff2');
+  src: url('../fonts/ningshu-subset.woff2') format('woff2');
   font-weight: normal;
   font-style: normal;
   font-display: swap;
@@ -236,7 +236,7 @@ input, select, textarea { font-family: inherit; font-size: 1rem; }
   align-items: center;
   background:
     linear-gradient(180deg, rgba(31, 22, 18, .25) 0%, rgba(31, 22, 18, .55) 100%),
-    url('../../hero_table.jpg') center/cover no-repeat;
+    url('../hero_table.jpg') center/cover no-repeat;
   color: white;
   text-align: center;
   padding: 80px 0;
@@ -286,7 +286,7 @@ input, select, textarea { font-family: inherit; font-size: 1rem; }
 .page-header {
   background:
     linear-gradient(180deg, rgba(31,22,18,.55) 0%, rgba(31,22,18,.7) 100%),
-    url('../../hero_table.jpg') center/cover no-repeat;
+    url('../hero_table.jpg') center/cover no-repeat;
   color: white;
   text-align: center;
   padding: 80px 24px 60px;

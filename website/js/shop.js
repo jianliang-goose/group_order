@@ -127,8 +127,8 @@ async function fetchShop({ force = false } = {}) {
 function imagePath(rel) {
   if (!rel) return '';
   if (/^https?:\/\//i.test(rel)) return rel;
-  // Images are at parent ../images/...
-  return '../' + rel.replace(/^\.?\//, '');
+  // Site is self-contained: images live at ./images/
+  return rel.replace(/^\.?\//, '');
 }
 
 function effectivePrice(p) {
