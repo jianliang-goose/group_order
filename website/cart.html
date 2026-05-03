@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>購物車｜建良鵝肉</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=Noto+Serif+TC:wght@500;700&family=Outfit:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css?v=1">
+</head>
+<body>
+  <div id="siteHeader"></div>
+
+  <section class="page-header">
+    <div class="eyebrow">Cart</div>
+    <h1>購物車</h1>
+    <p>確認商品與數量，前往結帳</p>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <div id="cartContent">
+        <div style="text-align:center; padding: 60px; color: var(--ink-mute);">
+          <span class="spinner" style="border-color: rgba(0,0,0,.15); border-top-color: var(--primary);"></span>
+          <p style="margin-top: 12px;">載入中...</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div id="siteFooter"></div>
+
+  <script src="../data.js"></script>
+  <script src="js/main.js?v=1"></script>
+  <script src="js/shop.js?v=1"></script>
+  <script>
+    let allProducts = [];
+    let shopSettings = {};
+
+    function buildCartLines() {
+      const cart = getCart();
+      const lines = [];
+      Object.entries(cart).forEach(([id, qty]) => {
+        const p = findProduct(allProducts, id);
+        if (!p) return;
+        const unit = effectivePrice(p);
+        lines.push({ p, qty: parseInt(qty) || 0, unit, lineTotal: unit * (parseInt(qty) || 0) });
+      });
+      return lines;
+    }
+
+    function calcTotals(lines) {
+      const subTotal = lines.reduce((s, l) => s + l.lineTotal, 0);
+      const threshold = parseFloat(shopSettings.shipping_threshold) || 3000;
+      const shippingFee = parseFloat(shopSettings.shipping_fee) || 120;
+      // Cart page assumes shipping; actual fee determined at checkout based on delivery method
+      const ship = subTotal >= threshold ? 0 : shippingFee;
+      return { subTotal, threshold, shippingFee, estShipping: ship, grandTotal: subTotal + ship };
+    }
+
+    function render() {
+      const lines = buildCartLines();
+      const root = document.getElementById('cartContent');
+
+      if (!lines.length) {
+        root.innerHTML = `
+          <div class="empty-state">
+            <div class="icon">🛒</div>
+            <h3>購物車是空的</h3>
+            <p>看看我們的招牌茶香鵝肉，挑一份回家慰勞自己吧。</p>
+            <a href="products.html" class="btn btn-primary">前往選購</a>
+          </div>`;
+        return;
+      }
+
+      const t = calcTotals(lines);
+      const remain = Math.max(0, t.threshold - t.subTotal);
+      const note = remain > 0
+        ? `再買 ${fmtPrice(remain)} 即享免運費（超商冷凍配送，現場自取永遠免運）`
+        : `已享免運費！結帳時可選擇配送方式`;
+
+      root.innerHTML = `
+        <div class="cart-layout">
+          <div class="cart-items" id="cartItems">
+            ${lines.map(l => `
+              <div class="cart-row" data-id="${l.p.ID}">
+                <img class="thumb" src="${imagePath(l.p.Image)}" alt="${l.p.Name}" onerror="this.style.opacity=0.3">
+                <div class="meta">
+                  <h4><a href="product.html?id=${encodeURIComponent(l.p.ID)}" style="color:inherit;">${l.p.Name}</a></h4>
+                  <div class="unit-price">單價 ${fmtPrice(l.unit)}</div>
+                </div>
+                <div class="qty-control">
+                  <button type="button" data-act="dec">−</button>
+                  <input type="number" value="${l.qty}" min="1" max="99" data-input>
+                  <button type="button" data-act="inc">+</button>
+                </div>
+                <div class="line-total">${fmtPrice(l.lineTotal)}</div>
+                <button class="remove-btn" data-act="remove" aria-label="移除">×</button>
+              </div>
+            `).join('')}
+          </div>
+
+          <aside class="cart-summary">
+            <h3>訂單摘要</h3>
+            <div class="summary-row"><span>商品小計</span><span>${fmtPrice(t.subTotal)}</span></div>
+            <div class="summary-row"><span>預估運費</span><span>${t.estShipping === 0 ? '免運' : fmtPrice(t.estShipping)}</span></div>
+            <div class="summary-row total"><span>預估總計</span><span>${fmtPrice(t.grandTotal)}</span></div>
+            <div class="summary-note">${note}</div>
+            <div style="margin-top: 18px; display: flex; flex-direction: column; gap: 10px;">
+              <a href="checkout.html" class="btn btn-primary btn-block">前往結帳</a>
+              <a href="products.html" class="btn btn-ghost btn-block">繼續選購</a>
+            </div>
+            <button onclick="if(confirm('清空購物車？')){clearCart();render();}" style="display:block; margin: 14px auto 0; color: var(--ink-mute); font-size: 0.85rem; background:none;">清空購物車</button>
+          </aside>
+        </div>
+      `;
+
+      // wire qty buttons
+      root.querySelectorAll('.cart-row').forEach(row => {
+        const id = row.dataset.id;
+        const input = row.querySelector('[data-input]');
+        row.querySelector('[data-act="dec"]').onclick = () => {
+          let v = (parseInt(input.value) || 1) - 1;
+          if (v <= 0) { removeFromCart(id); render(); return; }
+          setCartItem(id, v); render();
+        };
+        row.querySelector('[data-act="inc"]').onclick = () => {
+          let v = Math.min(99, (parseInt(input.value) || 1) + 1);
+          setCartItem(id, v); render();
+        };
+        input.addEventListener('change', () => {
+          let v = Math.min(99, Math.max(1, parseInt(input.value) || 1));
+          setCartItem(id, v); render();
+        });
+        row.querySelector('[data-act="remove"]').onclick = () => {
+          removeFromCart(id); render();
+        };
+      });
+    }
+
+    (async function () {
+      const data = await fetchShop();
+      allProducts = data.products;
+      shopSettings = data.settings;
+      render();
+    })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>訂單查詢｜建良鵝肉</title>
+  <meta name="description" content="輸入手機號碼查詢您的訂單狀態與付款狀態。">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=Noto+Serif+TC:wght@500;700&family=Outfit:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css?v=1">
+</head>
+<body>
+  <div id="siteHeader"></div>
+
+  <section class="page-header">
+    <div class="eyebrow">Order Tracking</div>
+    <h1>訂單查詢</h1>
+    <p>輸入您下單時的手機號碼，查詢訂單狀態</p>
+  </section>
+
+  <section class="section">
+    <div class="container-narrow">
+      <div class="form-card">
+        <form id="trackForm" onsubmit="return doSearch(event)">
+          <div class="form-group">
+            <label class="form-label">手機號碼 <span class="required">*</span></label>
+            <input type="tel" class="form-input" id="trackPhone" required placeholder="0912-345-678 或 0912345678">
+            <div class="form-help">系統會找出與此號碼相關的所有訂單（含團購頁訂單）</div>
+          </div>
+          <button type="submit" class="btn btn-primary btn-block btn-lg" id="trackBtn">查詢訂單</button>
+        </form>
+      </div>
+
+      <div id="trackError" style="display:none; background: #f8d7da; color: #721c24; padding: 14px 18px; border-radius: var(--r-sm); margin-top: 16px; text-align: center;"></div>
+
+      <div id="trackResults" style="margin-top: 30px;"></div>
+    </div>
+  </section>
+
+  <div id="siteFooter"></div>
+
+  <script src="js/main.js?v=1"></script>
+  <script src="js/shop.js?v=1"></script>
+  <script>
+    function statusClass(status) {
+      const s = String(status || '').trim();
+      if (s.includes('取消')) return 'cancelled';
+      if (s.includes('完成')) return 'completed';
+      if (s.includes('出貨') || s.includes('寄出') || s.includes('取貨')) return 'shipped';
+      if (s.includes('確認') || s.includes('處理')) return 'processing';
+      return 'pending';
+    }
+
+    function fmtDate(d) {
+      if (!d) return '';
+      const dt = new Date(d);
+      if (isNaN(dt)) return d;
+      return dt.toLocaleString('zh-TW', { hour12: false });
+    }
+
+    function renderResults(orders) {
+      const root = document.getElementById('trackResults');
+      if (!orders.length) {
+        root.innerHTML = '';
+        return;
+      }
+      root.innerHTML = `<h3 style="font-family: var(--font-brand); letter-spacing: 2px; margin-bottom: 16px;">找到 ${orders.length} 筆訂單</h3>` +
+        orders.map(o => `
+          <div class="tracking-card">
+            <div class="order-head">
+              <div>
+                <div class="order-id">${o.orderId || '???'}</div>
+                <div style="font-size: 0.82rem; color: var(--ink-mute); margin-top: 4px;">${fmtDate(o.createdDate)}</div>
+              </div>
+              <span class="status-badge ${statusClass(o.status)}">${o.status || '待處理'}</span>
+            </div>
+            <div class="field-row"><div class="lbl">訂購內容</div><div class="val">${o.items || '-'}</div></div>
+            <div class="field-row"><div class="lbl">總金額</div><div class="val" style="color: var(--primary); font-weight: 700;">${fmtPrice(o.grandTotal || o.totalAmount)}</div></div>
+            <div class="field-row"><div class="lbl">付款方式</div><div class="val">${o.paymentMethod || '-'}${o.paymentInfo ? '<br><span style="color:var(--ink-mute); font-size: 0.85rem;">' + o.paymentInfo + '</span>' : ''}</div></div>
+            <div class="field-row"><div class="lbl">對帳狀態</div><div class="val">${o.paymentStatus || '未核對'}</div></div>
+            <div class="field-row"><div class="lbl">取貨方式</div><div class="val">${o.deliveryMethod || '-'}${o.storeInfo ? '<br>' + o.storeInfo : ''}${o.pickupTime ? '<br>預計自取：' + o.pickupTime : ''}</div></div>
+          </div>
+        `).join('');
+    }
+
+    async function doSearch(e) {
+      e.preventDefault();
+      const phone = document.getElementById('trackPhone').value.trim();
+      if (!phone) { showToast('請輸入手機號碼', 'error'); return false; }
+
+      const btn = document.getElementById('trackBtn');
+      const errorEl = document.getElementById('trackError');
+      errorEl.style.display = 'none';
+      document.getElementById('trackResults').innerHTML = '';
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner"></span> 查詢中...';
+
+      try {
+        // GAS searchOrder needs to read response, so we use regular fetch (text/plain to bypass preflight).
+        const res = await fetch(GAS_API_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain' },
+          body: JSON.stringify({ action: 'searchOrder', phone }),
+        });
+        const data = await res.json();
+        if (data.result === 'success' && data.orders && data.orders.length) {
+          renderResults(data.orders);
+        } else {
+          errorEl.textContent = '查無此號碼的訂單，請確認輸入是否正確。';
+          errorEl.style.display = 'block';
+        }
+      } catch (err) {
+        console.error(err);
+        errorEl.textContent = '系統連線錯誤，請稍後再試。';
+        errorEl.style.display = 'block';
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = '查詢訂單';
+      }
+      return false;
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>商品列表｜建良鵝肉</title>
+  <meta name="description" content="建良鵝肉線上商城——茶香鵝肉、煙燻鵝腳、鵝舌、肉燥包。冷凍宅配，新鮮到家。">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=Noto+Serif+TC:wght@500;700&family=Outfit:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css?v=1">
+</head>
+<body>
+  <div id="siteHeader"></div>
+
+  <section class="page-header">
+    <div class="eyebrow">Products</div>
+    <h1>商品列表</h1>
+    <p>選一份茶香鵝肉，慰勞自己一週的辛勞</p>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <div class="filter-chips" id="filterChips"></div>
+      <div class="product-grid" id="productGrid">
+        <div style="grid-column: 1/-1; text-align:center; padding: 60px; color: var(--ink-mute);">
+          <span class="spinner" style="border-color: rgba(0,0,0,.15); border-top-color: var(--primary);"></span>
+          <p style="margin-top: 12px;">載入商品中...</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div id="siteFooter"></div>
+
+  <script src="../data.js"></script>
+  <script src="js/main.js?v=1"></script>
+  <script src="js/shop.js?v=1"></script>
+  <script>
+    let allProducts = [];
+    let currentCategory = 'all';
+
+    function renderGrid() {
+      const grid = document.getElementById('productGrid');
+      const list = currentCategory === 'all'
+        ? allProducts
+        : allProducts.filter(p => (p.Category || 'other') === currentCategory);
+
+      if (!list.length) {
+        grid.innerHTML = `<div style="grid-column:1/-1; text-align:center; padding: 60px; color: var(--ink-mute);">這個分類目前沒有商品</div>`;
+        return;
+      }
+      grid.innerHTML = list.map(renderProductCard).join('');
+    }
+
+    function renderChips() {
+      const chips = document.getElementById('filterChips');
+      const cats = Array.from(new Set(allProducts.map(p => p.Category || 'other')));
+      const order = ['main', 'snack', 'addon', 'sauce', 'other'];
+      cats.sort((a, b) => (order.indexOf(a) === -1 ? 99 : order.indexOf(a)) - (order.indexOf(b) === -1 ? 99 : order.indexOf(b)));
+
+      const html = [`<button class="chip ${currentCategory === 'all' ? 'active' : ''}" data-cat="all">全部商品</button>`]
+        .concat(cats.map(c => `<button class="chip ${currentCategory === c ? 'active' : ''}" data-cat="${c}">${CATEGORY_LABEL[c] || c}</button>`))
+        .join('');
+      chips.innerHTML = html;
+      chips.querySelectorAll('.chip').forEach(btn => {
+        btn.addEventListener('click', () => {
+          currentCategory = btn.dataset.cat;
+          chips.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+          btn.classList.add('active');
+          renderGrid();
+          window.scrollTo({ top: chips.offsetTop - 100, behavior: 'smooth' });
+        });
+      });
+    }
+
+    (async function () {
+      const data = await fetchShop();
+      allProducts = data.products;
+
+      // Allow ?cat=main via URL
+      const params = new URLSearchParams(location.search);
+      const initCat = params.get('cat');
+      if (initCat) currentCategory = initCat;
+
+      renderChips();
+      renderGrid();
+    })();
+  </script>
+</body>
+</html>

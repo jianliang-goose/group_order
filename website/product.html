@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>商品詳情｜建良鵝肉</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=Noto+Serif+TC:wght@500;700&family=Outfit:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css?v=1">
+</head>
+<body>
+  <div id="siteHeader"></div>
+
+  <main class="container" style="padding-top: 40px; padding-bottom: 80px;">
+    <nav style="font-size: 0.88rem; color: var(--ink-mute); margin-bottom: 24px;">
+      <a href="index.html" style="color: var(--ink-mute);">首頁</a>
+      <span style="margin: 0 6px;">/</span>
+      <a href="products.html" style="color: var(--ink-mute);">商品</a>
+      <span style="margin: 0 6px;">/</span>
+      <span id="crumbName">商品</span>
+    </nav>
+
+    <div id="productDetail">
+      <div style="text-align:center; padding: 80px; color: var(--ink-mute);">
+        <span class="spinner" style="border-color: rgba(0,0,0,.15); border-top-color: var(--primary);"></span>
+        <p style="margin-top: 12px;">載入商品中...</p>
+      </div>
+    </div>
+  </main>
+
+  <!-- Related products -->
+  <section class="section section-alt" id="relatedSection" style="display:none;">
+    <div class="container">
+      <div class="section-head">
+        <span class="eyebrow">More</span>
+        <h2>您可能也喜歡</h2>
+      </div>
+      <div class="product-grid" id="relatedGrid"></div>
+    </div>
+  </section>
+
+  <div id="siteFooter"></div>
+
+  <script src="../data.js"></script>
+  <script src="js/main.js?v=1"></script>
+  <script src="js/shop.js?v=1"></script>
+  <script>
+    function renderDetail(p, allProducts) {
+      document.title = `${p.Name}｜建良鵝肉`;
+      document.getElementById('crumbName').textContent = p.Name;
+
+      const eff = effectivePrice(p);
+      const orig = p.DiscountPrice && Number(p.DiscountPrice) > 0 ? p.Price : null;
+      const promoBox = p.PromoTag ? `
+        <div style="display:inline-block; background: rgba(185,78,0,.1); color: var(--primary); padding: 4px 12px; border-radius: 50px; font-size: 0.82rem; font-weight: 600; margin-bottom: 14px;">
+          ${p.PromoTag}${p.PromoDesc ? ' · ' + p.PromoDesc : ''}
+        </div>` : '';
+
+      const stock = String(p.Stock || '').trim();
+      const isOOS = stock !== '' && Number(stock) === 0;
+
+      document.getElementById('productDetail').innerHTML = `
+        <div class="product-detail">
+          <div class="product-gallery">
+            <img src="${imagePath(p.Image)}" alt="${p.Name}" onerror="this.style.opacity=0.3">
+          </div>
+          <div class="product-info">
+            <span class="eyebrow">${CATEGORY_LABEL[p.Category] || '商品'}</span>
+            <h1>${p.Name}</h1>
+            ${promoBox}
+            <div class="price-row">
+              <div class="price-now">NT$ ${Number(eff).toLocaleString()}</div>
+              ${orig ? `<div class="price-original">NT$ ${Number(orig).toLocaleString()}</div>` : ''}
+            </div>
+            <div class="description">${(p.Description || '').replace(/\n/g, '<br>')}</div>
+
+            <div>
+              <label class="form-label" style="margin-bottom: 12px;">數量</label>
+              <div class="qty-control">
+                <button type="button" id="qtyMinus">−</button>
+                <input type="number" id="qtyInput" value="1" min="1" max="99">
+                <button type="button" id="qtyPlus">+</button>
+              </div>
+            </div>
+
+            <div class="product-actions">
+              <button class="btn btn-ghost btn-lg" id="addCartBtn" ${isOOS ? 'disabled' : ''}>
+                ${isOOS ? '已售完' : '加入購物車'}
+              </button>
+              <button class="btn btn-primary btn-lg" id="buyNowBtn" ${isOOS ? 'disabled' : ''}>
+                直接購買
+              </button>
+            </div>
+
+            <div class="product-meta">
+              <div class="meta-row"><strong>商品編號</strong><span>${p.ID}</span></div>
+              <div class="meta-row"><strong>保存方式</strong><span>冷凍 -18°C 以下，解凍後請盡速食用</span></div>
+              <div class="meta-row"><strong>配送方式</strong><span>7-11 / 全家 超商冷凍店到店、現場自取</span></div>
+              <div class="meta-row"><strong>付款方式</strong><span>ATM 轉帳、貨到付款</span></div>
+            </div>
+          </div>
+        </div>
+      `;
+
+      const qtyInput = document.getElementById('qtyInput');
+      document.getElementById('qtyMinus').onclick = () => {
+        qtyInput.value = Math.max(1, (parseInt(qtyInput.value) || 1) - 1);
+      };
+      document.getElementById('qtyPlus').onclick = () => {
+        qtyInput.value = Math.min(99, (parseInt(qtyInput.value) || 1) + 1);
+      };
+      qtyInput.addEventListener('change', () => {
+        let v = parseInt(qtyInput.value) || 1;
+        v = Math.min(99, Math.max(1, v));
+        qtyInput.value = v;
+      });
+
+      document.getElementById('addCartBtn').onclick = () => {
+        addToCart(p.ID, parseInt(qtyInput.value) || 1);
+        showToast('已加入購物車');
+      };
+      document.getElementById('buyNowBtn').onclick = () => {
+        addToCart(p.ID, parseInt(qtyInput.value) || 1);
+        location.href = 'cart.html';
+      };
+
+      // Related: same category, exclude self
+      const related = allProducts.filter(x => x.ID !== p.ID && (x.Category === p.Category || x.Category === 'main')).slice(0, 3);
+      if (related.length) {
+        document.getElementById('relatedGrid').innerHTML = related.map(renderProductCard).join('');
+        document.getElementById('relatedSection').style.display = '';
+      }
+    }
+
+    (async function () {
+      const params = new URLSearchParams(location.search);
+      const id = params.get('id');
+      const data = await fetchShop();
+      const p = findProduct(data.products, id);
+
+      if (!p) {
+        document.getElementById('productDetail').innerHTML = `
+          <div class="empty-state">
+            <div class="icon">😕</div>
+            <h3>找不到商品</h3>
+            <p>商品可能已下架，或網址有誤。</p>
+            <a href="products.html" class="btn btn-primary">回商品列表</a>
+          </div>
+        `;
+        return;
+      }
+      renderDetail(p, data.products);
+    })();
+  </script>
+</body>
+</html>

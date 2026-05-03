@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>結帳｜建良鵝肉</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=Noto+Serif+TC:wght@500;700&family=Outfit:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css?v=1">
+</head>
+<body>
+  <div id="siteHeader"></div>
+
+  <section class="page-header">
+    <div class="eyebrow">Checkout</div>
+    <h1>結帳</h1>
+    <p>填寫收件與付款資訊，完成訂單</p>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <div id="checkoutContent">
+        <div style="text-align:center; padding: 60px; color: var(--ink-mute);">
+          <span class="spinner" style="border-color: rgba(0,0,0,.15); border-top-color: var(--primary);"></span>
+          <p style="margin-top: 12px;">載入中...</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div id="siteFooter"></div>
+
+  <script src="../data.js"></script>
+  <script src="js/main.js?v=1"></script>
+  <script src="js/shop.js?v=1"></script>
+  <script>
+    let allProducts = [];
+    let shopSettings = {};
+
+    function buildLines() {
+      const cart = getCart();
+      return Object.entries(cart).map(([id, qty]) => {
+        const p = findProduct(allProducts, id);
+        if (!p) return null;
+        const unit = effectivePrice(p);
+        return { p, qty: parseInt(qty) || 0, unit, lineTotal: unit * (parseInt(qty) || 0) };
+      }).filter(Boolean);
+    }
+
+    function calcTotals(lines, deliveryMethod) {
+      const subTotal = lines.reduce((s, l) => s + l.lineTotal, 0);
+      const threshold = parseFloat(shopSettings.shipping_threshold) || 3000;
+      const shippingFee = parseFloat(shopSettings.shipping_fee) || 120;
+      let ship = 0;
+      if (deliveryMethod === 'shipping') {
+        ship = subTotal >= threshold ? 0 : shippingFee;
+      }
+      return { subTotal, threshold, shippingFee, ship, grandTotal: subTotal + ship };
+    }
+
+    function renderEmpty() {
+      document.getElementById('checkoutContent').innerHTML = `
+        <div class="empty-state">
+          <div class="icon">🛒</div>
+          <h3>購物車是空的</h3>
+          <p>請先加入商品再結帳。</p>
+          <a href="products.html" class="btn btn-primary">前往選購</a>
+        </div>`;
+    }
+
+    function renderCheckout() {
+      const lines = buildLines();
+      if (!lines.length) { renderEmpty(); return; }
+
+      document.getElementById('checkoutContent').innerHTML = `
+        <form id="checkoutForm" class="cart-layout">
+          <div>
+            <!-- 訂購人資料 -->
+            <div class="form-card">
+              <h2>訂購人資料</h2>
+              <div class="card-desc">我們會用此資料聯繫對帳與配送通知。</div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label">姓名 <span class="required">*</span></label>
+                  <input type="text" class="form-input" id="customerName" required placeholder="王小明">
+                </div>
+                <div class="form-group">
+                  <label class="form-label">手機 <span class="required">*</span></label>
+                  <input type="tel" class="form-input" id="customerPhone" required placeholder="0912-345-678" pattern="[0-9\\-\\s]{8,}">
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Email（選填，將用於寄送收據）</label>
+                <input type="email" class="form-input" id="customerEmail" placeholder="example@mail.com">
+              </div>
+            </div>
+
+            <!-- 取貨方式 -->
+            <div class="form-card">
+              <h2>取貨方式</h2>
+              <div class="card-desc">超商冷凍店到店免低溫運費，現場自取免運。</div>
+              <div class="radio-group">
+                <label class="radio-tile selected" data-delivery="shipping">
+                  <input type="radio" name="deliveryMethod" value="shipping" checked>
+                  <div class="tile-text">
+                    <div class="tile-title">超商冷凍店到店</div>
+                    <div class="tile-sub">7-11 / 全家 ・ 滿 ${parseFloat(shopSettings.shipping_threshold || 3000).toLocaleString()} 免運</div>
+                  </div>
+                </label>
+                <label class="radio-tile" data-delivery="self">
+                  <input type="radio" name="deliveryMethod" value="self">
+                  <div class="tile-text">
+                    <div class="tile-title">現場自取</div>
+                    <div class="tile-sub">新竹光復路門市 ・ 永遠免運</div>
+                  </div>
+                </label>
+              </div>
+
+              <!-- 超商配送資訊 -->
+              <div id="shippingFields" style="margin-top: 18px;">
+                <div class="form-group">
+                  <label class="form-label">超商系統</label>
+                  <div class="radio-group">
+                    <label class="radio-tile selected" data-store="familymart" style="flex: 1;">
+                      <input type="radio" name="storeType" value="familymart" checked>
+                      <div class="tile-text">
+                        <div class="tile-title">全家 FamilyMart</div>
+                      </div>
+                    </label>
+                    <label class="radio-tile" data-store="711" style="flex: 1;">
+                      <input type="radio" name="storeType" value="711">
+                      <div class="tile-text">
+                        <div class="tile-title">7-11</div>
+                      </div>
+                    </label>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">收件門市（店名 / 店號） <span class="required">*</span></label>
+                  <input type="text" class="form-input" id="storeInfo" placeholder="例如：全家新竹東園店 / 020814">
+                  <div class="form-help">
+                    不知道店號？點此查詢：
+                    <a href="https://www.family.com.tw/marketing/inquiry.aspx" target="_blank" style="color: #00A84D; font-weight: 600; margin: 0 8px;">全家門市查詢</a>
+                    <a href="https://emap.pcsc.com.tw/" target="_blank" style="color: #E11F26; font-weight: 600;">7-11 門市查詢</a>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">收件人姓名（如同訂購人可留空）</label>
+                  <input type="text" class="form-input" id="receiverName" placeholder="同訂購人">
+                </div>
+              </div>
+
+              <!-- 自取資訊 -->
+              <div id="selfFields" style="margin-top: 18px; display: none;">
+                <div class="form-group">
+                  <label class="form-label">預計自取時間 <span class="required">*</span></label>
+                  <input type="text" class="form-input" id="pickupTime" placeholder="例如：3/15 下午3點、週六傍晚">
+                  <div class="form-help">📍 自取地點：300 新竹市東區光復路一段230號</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- 付款方式 -->
+            <div class="form-card">
+              <h2>付款方式</h2>
+              <div class="card-desc">您可以選擇匯款轉帳，或於收件時付款給超商人員。</div>
+              <div class="radio-group">
+                <label class="radio-tile selected" data-payment="atm">
+                  <input type="radio" name="paymentMethod" value="atm" checked>
+                  <div class="tile-text">
+                    <div class="tile-title">ATM 轉帳</div>
+                    <div class="tile-sub">凱基銀行 ・ 轉帳後填寫末 5 碼</div>
+                  </div>
+                </label>
+                <label class="radio-tile" data-payment="cod">
+                  <input type="radio" name="paymentMethod" value="cod">
+                  <div class="tile-text">
+                    <div class="tile-title">貨到付款</div>
+                    <div class="tile-sub">超商取貨時付款 ・ 不收手續費</div>
+                  </div>
+                </label>
+              </div>
+
+              <!-- ATM info -->
+              <div id="atmFields" style="margin-top: 18px;">
+                <div class="payment-info-box">
+                  <div><strong>🏦 凱基銀行（代碼 809）</strong></div>
+                  <div class="account-row">
+                    <span>帳號：</span>
+                    <span class="account-num" id="bankAcc">0005-95-3239840-6</span>
+                    <button type="button" class="copy-btn" onclick="copyToClipboard('0005-95-3239840-6', this)">📋 複製</button>
+                  </div>
+                  <div>戶名：<strong>林宛儒</strong></div>
+                </div>
+                <div class="form-row" style="margin-top: 14px;">
+                  <div class="form-group">
+                    <label class="form-label">轉帳帳號末 5 碼 <span class="required">*</span></label>
+                    <input type="text" class="form-input" id="atmLast5" placeholder="12345" maxlength="5" pattern="[0-9]{5}">
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">轉帳日期 <span class="required">*</span></label>
+                    <input type="date" class="form-input" id="atmDate">
+                  </div>
+                </div>
+              </div>
+
+              <!-- COD info -->
+              <div id="codFields" style="margin-top: 18px; display: none;">
+                <div class="payment-info-box">
+                  <div><strong>📦 貨到付款說明</strong></div>
+                  <div style="margin-top: 6px;">商品送達超商時，請至取貨櫃台支付訂單金額。</div>
+                  <div style="margin-top: 6px; color: var(--ink-mute);">提醒：未取貨將影響您未來的訂購權益，請務必於 7 日內取貨。</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- 訂單備註 -->
+            <div class="form-card">
+              <h2>訂單備註（選填）</h2>
+              <div class="form-group">
+                <textarea class="form-textarea" id="orderNote" placeholder="例如：收件人聯絡時段、特殊需求…"></textarea>
+              </div>
+            </div>
+          </div>
+
+          <!-- 訂單摘要 -->
+          <aside class="cart-summary">
+            <h3>訂單摘要</h3>
+            <div class="summary-items-list" id="summaryItems"></div>
+            <div class="checkout-summary-row"><span>商品小計</span><span id="sumSub">$0</span></div>
+            <div class="checkout-summary-row"><span>運費</span><span id="sumShip">$0</span></div>
+            <div class="checkout-summary-row total"><span>總計</span><span id="sumTotal">$0</span></div>
+            <div class="summary-note" id="shipNote"></div>
+
+            <div style="margin-top: 18px;">
+              <button type="submit" class="btn btn-primary btn-block btn-lg" id="submitOrderBtn">確認下單</button>
+              <a href="cart.html" style="display:block; text-align:center; margin-top: 12px; color: var(--ink-mute); font-size: 0.9rem;">← 回購物車</a>
+            </div>
+            <div style="font-size: 0.78rem; color: var(--ink-mute); text-align: center; margin-top: 14px; line-height: 1.6;">
+              送出訂單即代表您同意我們<br>使用您的資料進行訂單聯繫與核對。
+            </div>
+          </aside>
+        </form>
+      `;
+
+      // Wire up the form
+      wireForm(lines);
+    }
+
+    function wireForm(lines) {
+      // Radio tile selection
+      function bindRadios(name, onChange) {
+        document.querySelectorAll(`input[name="${name}"]`).forEach(r => {
+          r.addEventListener('change', () => {
+            document.querySelectorAll(`input[name="${name}"]`).forEach(rr => {
+              const tile = rr.closest('.radio-tile');
+              if (tile) tile.classList.toggle('selected', rr.checked);
+            });
+            if (onChange) onChange(r.value);
+          });
+        });
+      }
+
+      const shippingFields = document.getElementById('shippingFields');
+      const selfFields = document.getElementById('selfFields');
+      const atmFields = document.getElementById('atmFields');
+      const codFields = document.getElementById('codFields');
+
+      bindRadios('deliveryMethod', (v) => {
+        shippingFields.style.display = v === 'shipping' ? '' : 'none';
+        selfFields.style.display = v === 'self' ? '' : 'none';
+        updateSummary();
+      });
+      bindRadios('storeType');
+      bindRadios('paymentMethod', (v) => {
+        atmFields.style.display = v === 'atm' ? '' : 'none';
+        codFields.style.display = v === 'cod' ? '' : 'none';
+      });
+
+      // Render summary items
+      const itemsHtml = lines.map(l => `
+        <div class="summary-item"><span>${l.p.Name} × ${l.qty}</span><span>${fmtPrice(l.lineTotal)}</span></div>
+      `).join('');
+      document.getElementById('summaryItems').innerHTML = itemsHtml;
+
+      function updateSummary() {
+        const dm = (document.querySelector('input[name="deliveryMethod"]:checked') || {}).value || 'shipping';
+        const t = calcTotals(lines, dm);
+        document.getElementById('sumSub').textContent = fmtPrice(t.subTotal);
+        document.getElementById('sumShip').textContent = t.ship === 0 ? '免運' : fmtPrice(t.ship);
+        document.getElementById('sumTotal').textContent = fmtPrice(t.grandTotal);
+        const remain = Math.max(0, t.threshold - t.subTotal);
+        const note = dm === 'self'
+          ? '現場自取免運費'
+          : (remain > 0 ? `再買 ${fmtPrice(remain)} 即享免運費` : '已享免運費');
+        document.getElementById('shipNote').textContent = note;
+      }
+      updateSummary();
+
+      document.getElementById('checkoutForm').addEventListener('submit', (e) => {
+        e.preventDefault();
+        handleSubmit(lines);
+      });
+    }
+
+    async function handleSubmit(lines) {
+      const btn = document.getElementById('submitOrderBtn');
+      const name = document.getElementById('customerName').value.trim();
+      const phone = document.getElementById('customerPhone').value.trim();
+      const email = document.getElementById('customerEmail').value.trim();
+      const note = document.getElementById('orderNote').value.trim();
+      const dm = document.querySelector('input[name="deliveryMethod"]:checked').value;
+      const pm = document.querySelector('input[name="paymentMethod"]:checked').value;
+
+      if (!name) { showToast('請填寫訂購人姓名', 'error'); return; }
+      if (!phone || phone.replace(/\D/g, '').length < 8) { showToast('請填寫正確的手機號碼', 'error'); return; }
+
+      let storeInfoFull = '';
+      let pickupTime = '';
+      let deliveryLabel = '';
+
+      if (dm === 'shipping') {
+        const storeInfo = document.getElementById('storeInfo').value.trim();
+        if (!storeInfo) { showToast('請填寫收件門市資訊', 'error'); return; }
+        const storeType = document.querySelector('input[name="storeType"]:checked').value;
+        const storeLabel = storeType === '711' ? '7-11' : '全家 FamilyMart';
+        const receiver = document.getElementById('receiverName').value.trim();
+        storeInfoFull = `${storeLabel} - ${storeInfo}` + (receiver ? `（收件人：${receiver}）` : '');
+        deliveryLabel = '冷凍店到店';
+      } else {
+        pickupTime = document.getElementById('pickupTime').value.trim();
+        if (!pickupTime) { showToast('請填寫預計自取時間', 'error'); return; }
+        deliveryLabel = '現場自取';
+      }
+
+      let paymentInfo = '';
+      let paymentLabel = '';
+      if (pm === 'atm') {
+        const last5 = document.getElementById('atmLast5').value.trim();
+        const date = document.getElementById('atmDate').value;
+        if (!/^\d{5}$/.test(last5)) { showToast('請填寫正確的轉帳末 5 碼', 'error'); return; }
+        if (!date) { showToast('請填寫轉帳日期', 'error'); return; }
+        paymentInfo = `帳號末5碼: ${last5}, 日期: ${date}`;
+        paymentLabel = 'ATM轉帳';
+      } else {
+        paymentInfo = '貨到付款';
+        paymentLabel = '貨到付款';
+      }
+
+      const t = calcTotals(lines, dm);
+      const itemsStr = lines.map(l => `${l.p.Name}x${l.qty}`).join(', ');
+      const orderId = generateOrderId();
+
+      const fullEmail = email ? `, Email: ${email}` : '';
+      const fullNote = note + (email ? `\nEmail: ${email}` : '');
+
+      const payload = {
+        action: 'createOrder',
+        orderId,
+        groupLeader: '官網訂單',
+        name,
+        phone,
+        items: itemsStr,
+        totalAmount: t.subTotal,
+        shippingFee: t.ship,
+        grandTotal: t.grandTotal,
+        paymentMethod: paymentLabel,
+        paymentInfo,
+        deliveryMethod: deliveryLabel,
+        storeInfo: storeInfoFull,
+        pickupTime,
+        note: fullNote,
+      };
+
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner"></span> 送出中...';
+
+      try {
+        await submitOrderToGAS(payload);
+        clearCart();
+        renderSuccess(orderId, payload, t);
+      } catch (err) {
+        console.error(err);
+        showToast('訂單送出失敗，請稍後再試或聯絡客服', 'error');
+        btn.disabled = false;
+        btn.innerHTML = '確認下單';
+      }
+    }
+
+    function renderSuccess(orderId, payload, t) {
+      const now = new Date();
+      const lineMsg = `【我已下單】
+
+📋 訂單編號：${orderId}
+👤 訂購人：${payload.name}
+📱 電話：${payload.phone}
+🛒 訂購內容：${payload.items}
+💰 總金額：${fmtPrice(t.grandTotal)}
+💳 付款：${payload.paymentMethod}（${payload.paymentInfo}）
+🚚 取貨：${payload.deliveryMethod}${payload.storeInfo ? ` - ${payload.storeInfo}` : ''}${payload.pickupTime ? `\n⏰ 預計自取：${payload.pickupTime}` : ''}`;
+
+      const LINE_OA_ID = '@063ifost';
+      const lineUrl = `https://line.me/R/oaMessage/${LINE_OA_ID}/?${encodeURIComponent(lineMsg)}`;
+
+      document.getElementById('checkoutContent').innerHTML = `
+        <div class="success-card">
+          <div class="success-icon">✓</div>
+          <h1>訂購完成！</h1>
+          <p style="color: var(--ink-soft);">${now.toLocaleString('zh-TW', { hour12: false })} 訂單已送出</p>
+          <div class="order-id">訂單編號 <span class="num">${orderId}</span></div>
+
+          <div class="line-share-section" style="background: linear-gradient(135deg,#06c755,#00b548); padding: 18px; border-radius: var(--r-md); margin: 18px 0; color: white; box-shadow: 0 6px 18px rgba(6,199,85,.25);">
+            <p style="margin-bottom: 12px;">📬 請傳送訂單給我們，方便後續對帳與聯繫</p>
+            <a href="${lineUrl}" target="_blank" class="btn" style="background: white; color: #06c755; font-weight: 700;">
+              傳送訂單給建良
+            </a>
+            <div style="font-size: 0.8rem; opacity: .85; margin-top: 8px;">尚未加好友？點擊後會引導加入</div>
+          </div>
+
+          <div class="success-meta">
+            <div class="meta-line"><span class="label">訂購人</span><span class="value">${payload.name}</span></div>
+            <div class="meta-line"><span class="label">總金額</span><span class="value" style="color: var(--primary); font-weight: 700;">${fmtPrice(t.grandTotal)}</span></div>
+            <div class="meta-line"><span class="label">付款方式</span><span class="value">${payload.paymentMethod}<br><span style="color: var(--ink-mute); font-size: 0.85rem;">${payload.paymentInfo}</span></span></div>
+            <div class="meta-line"><span class="label">取貨方式</span><span class="value">${payload.deliveryMethod}${payload.storeInfo ? '<br>' + payload.storeInfo : ''}${payload.pickupTime ? '<br>預計自取：' + payload.pickupTime : ''}</span></div>
+            <div class="meta-line" style="display:block;"><span class="label" style="display:block; margin-bottom: 6px;">訂購內容</span><span class="value" style="text-align:left;">${payload.items.split(', ').map(s => '• ' + s).join('<br>')}</span></div>
+          </div>
+
+          <div style="background: #fff3cd; color: #856404; padding: 10px 14px; border-radius: var(--r-sm); display: inline-block; margin: 12px 0; font-size: 0.9rem;">
+            📸 請截圖保存此畫面，方便後續對帳
+          </div>
+
+          <div style="margin-top: 24px; display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+            <a href="tracking.html" class="btn btn-ghost">查詢我的訂單</a>
+            <a href="index.html" class="btn btn-primary">回到首頁</a>
+          </div>
+        </div>
+      `;
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    (async function () {
+      const data = await fetchShop();
+      allProducts = data.products;
+      shopSettings = data.settings;
+      renderCheckout();
+    })();
+  </script>
+</body>
+</html>

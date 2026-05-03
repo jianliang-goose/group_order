@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>聯絡我們｜建良鵝肉</title>
+  <meta name="description" content="建良鵝肉聯絡資訊：電話、地址、營業時間、LINE 官方帳號。歡迎來電或來訊洽詢。">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=Noto+Serif+TC:wght@500;700&family=Outfit:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css?v=1">
+</head>
+<body>
+  <div id="siteHeader"></div>
+
+  <section class="page-header">
+    <div class="eyebrow">Contact</div>
+    <h1>聯絡我們</h1>
+    <p>有任何問題、團購洽詢、合作邀約，歡迎與我們聯繫</p>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <div class="contact-grid">
+        <!-- Left: contact info -->
+        <div class="contact-info">
+          <h2>聯絡資訊</h2>
+
+          <div class="contact-block">
+            <div class="label">Address</div>
+            <div class="value"><a href="https://maps.google.com/?q=新竹市東區光復路一段230號" target="_blank">300 新竹市東區光復路一段230號</a></div>
+          </div>
+
+          <div class="contact-block">
+            <div class="label">Phone</div>
+            <div class="value"><a href="tel:036669219">03 666 9219</a></div>
+          </div>
+
+          <div class="contact-block">
+            <div class="label">Hours</div>
+            <div class="value">週二 ~ 週日 11:00 ~ 20:00<br><span style="color: var(--ink-mute); font-size: 0.92rem;">週一公休</span></div>
+          </div>
+
+          <div class="contact-block">
+            <div class="label">LINE 官方帳號</div>
+            <div class="value">
+              <a href="https://lin.ee/uLbdSkD" target="_blank" class="footer-line" style="margin-top: 6px;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M19.365 9.863c.349 0 .63.285.63.631 0 .345-.281.63-.63.63H17.61v1.125h1.755c.349 0 .63.283.63.63 0 .344-.281.629-.63.629h-2.386c-.345 0-.627-.285-.627-.629V8.108c0-.345.282-.63.63-.63h2.386c.346 0 .627.285.627.63 0 .349-.281.63-.63.63H17.61v1.125h1.755zm-3.855 3.016c0 .27-.174.51-.432.596-.064.021-.133.031-.199.031-.211 0-.391-.09-.51-.25l-2.443-3.317v2.94c0 .344-.279.629-.631.629-.346 0-.626-.285-.626-.629V8.108c0-.27.173-.51.43-.595.06-.023.136-.033.194-.033.195 0 .375.105.495.254l2.462 3.33V8.108c0-.345.282-.63.63-.63.345 0 .63.285.63.63v4.771zm-5.741 0c0 .344-.282.629-.631.629-.345 0-.627-.285-.627-.629V8.108c0-.345.282-.63.63-.63.346 0 .628.285.628.63v4.771zm-2.466.629H4.917c-.345 0-.63-.285-.63-.629V8.108c0-.345.285-.63.63-.63.348 0 .63.285.63.63v4.141h1.756c.348 0 .629.283.629.63 0 .344-.282.629-.629.629M24 10.314C24 4.943 18.615.572 12 .572S0 4.943 0 10.314c0 4.811 4.27 8.842 10.035 9.608.391.082.923.258 1.058.59.12.301.079.766.038 1.08l-.164 1.02c-.045.301-.24 1.186 1.049.645 1.291-.539 6.916-4.078 9.436-6.975C23.176 14.393 24 12.458 24 10.314"/></svg>
+                加入官方 LINE
+              </a>
+              <div style="margin-top: 8px; font-size: 0.88rem; color: var(--ink-mute);">訂單最快回覆 ・ 也可協助團購規劃</div>
+            </div>
+          </div>
+
+          <iframe class="contact-map"
+            src="https://www.google.com/maps?q=%E6%96%B0%E7%AB%B9%E5%B8%82%E6%9D%B1%E5%8D%80%E5%85%89%E5%BE%A9%E8%B7%AF%E4%B8%80%E6%AE%B5230%E8%99%9F&output=embed"
+            allowfullscreen loading="lazy"></iframe>
+        </div>
+
+        <!-- Right: contact form -->
+        <div class="form-card" style="margin: 0;">
+          <h2>留言給我們</h2>
+          <div class="card-desc">填寫表單後，我們會以電話或 LINE 與您聯繫。<br>
+            <strong style="color: var(--primary);">急件請直接撥打電話或加 LINE，我們回覆更快。</strong>
+          </div>
+
+          <form id="contactForm" onsubmit="return submitContact(event)">
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">姓名 <span class="required">*</span></label>
+                <input type="text" class="form-input" id="cName" required>
+              </div>
+              <div class="form-group">
+                <label class="form-label">手機 <span class="required">*</span></label>
+                <input type="tel" class="form-input" id="cPhone" required>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Email（選填）</label>
+              <input type="email" class="form-input" id="cEmail">
+            </div>
+            <div class="form-group">
+              <label class="form-label">主旨 <span class="required">*</span></label>
+              <select class="form-select" id="cTopic" required>
+                <option value="">請選擇詢問類型</option>
+                <option value="商品詢問">商品詢問</option>
+                <option value="訂單問題">訂單問題</option>
+                <option value="團購洽詢">團購洽詢（公司、社區、學校）</option>
+                <option value="禮盒/節慶預訂">禮盒 / 節慶預訂</option>
+                <option value="合作提案">合作提案</option>
+                <option value="其他">其他</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">訊息內容 <span class="required">*</span></label>
+              <textarea class="form-textarea" id="cMessage" required placeholder="請簡單描述您的需求…"></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary btn-block btn-lg" id="cSubmitBtn">送出訊息</button>
+            <div style="text-align: center; margin-top: 12px; font-size: 0.85rem; color: var(--ink-mute);">
+              送出後將開啟 LINE 官方帳號，您的訊息會自動帶入
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div id="siteFooter"></div>
+
+  <script src="js/main.js?v=1"></script>
+  <script>
+    function submitContact(e) {
+      e.preventDefault();
+      const name = document.getElementById('cName').value.trim();
+      const phone = document.getElementById('cPhone').value.trim();
+      const email = document.getElementById('cEmail').value.trim();
+      const topic = document.getElementById('cTopic').value;
+      const message = document.getElementById('cMessage').value.trim();
+
+      if (!name || !phone || !topic || !message) {
+        showToast('請填寫所有必填欄位', 'error');
+        return false;
+      }
+
+      const text = `【官網來信 - ${topic}】
+
+👤 姓名：${name}
+📱 電話：${phone}${email ? `\n📧 Email：${email}` : ''}
+
+📝 訊息：
+${message}`;
+
+      const LINE_OA_ID = '@063ifost';
+      const url = `https://line.me/R/oaMessage/${LINE_OA_ID}/?${encodeURIComponent(text)}`;
+      showToast('正在開啟 LINE…');
+      setTimeout(() => { window.open(url, '_blank'); }, 600);
+      return false;
+    }
+  </script>
+</body>
+</html>
